@@ -111,7 +111,7 @@ const UniversitiesPage = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!itemName.trim()) {
-            alert('කරුණාකර නමක් ඇතුළත් කරන්න.');
+            alert('please input name.');
             return;
         }
 
@@ -120,43 +120,43 @@ const UniversitiesPage = () => {
             if (activeTab === 'provinces') {
                 const newProvince = { id: `p${provinces.length + 1}`, name: itemName };
                 setProvinces([...provinces, newProvince]);
-                alert('පළාත සාර්ථකව එකතු කරන ලදී!');
+                alert('province added succesfully!');
             } else if (activeTab === 'districts') {
                 if (!selectedProvinceId) {
-                    alert('කරුණාකර පළාතක් තෝරන්න.');
+                    alert('please select district.');
                     return;
                 }
                 const newDistrict = { id: `d${districts.length + 1}`, name: itemName, provinceId: selectedProvinceId };
                 setDistricts([...districts, newDistrict]);
-                alert('දිස්ත්‍රික්කය සාර්ථකව එකතු කරන ලදී!');
+                alert('district added succesfully!');
             } else if (activeTab === 'universities') {
                 if (!selectedDistrictId) {
-                    alert('කරුණාකර දිස්ත්‍රික්කයක් තෝරන්න.');
+                    alert('please select district.');
                     return;
                 }
                 const newUniversity = { id: `u${universities.length + 1}`, name: itemName, districtId: selectedDistrictId };
                 setUniversities([...universities, newUniversity]);
-                alert('විශ්වවිද්‍යාලය සාර්ථකව එකතු කරන ලදී!');
+                alert('added university succesfully!');
             }
         } else if (modalType === 'edit' && editingItem) {
             // Simulate Edit operation
             if (activeTab === 'provinces') {
                 setProvinces(provinces.map(p => p.id === editingItem.id ? { ...p, name: itemName } : p));
-                alert('පළාත සාර්ථකව යාවත්කාලීන කරන ලදී!');
+                alert('province edited succesfully!');
             } else if (activeTab === 'districts') {
                 if (!selectedProvinceId) {
-                    alert('කරුණාකර පළාතක් තෝරන්න.');
+                    alert('please select province.');
                     return;
                 }
                 setDistricts(districts.map(d => d.id === editingItem.id ? { ...d, name: itemName, provinceId: selectedProvinceId } : d));
-                alert('දිස්ත්‍රික්කය සාර්ථකව යාවත්කාලීන කරන ලදී!');
+                alert('edited district successfully!');
             } else if (activeTab === 'universities') {
                 if (!selectedDistrictId) {
-                    alert('කරුණාකර දිස්ත්‍රික්කයක් තෝරන්න.');
+                    alert('please select district.');
                     return;
                 }
                 setUniversities(universities.map(u => u.id === editingItem.id ? { ...u, name: itemName, districtId: selectedDistrictId } : u));
-                alert('විශ්වවිද්‍යාලය සාර්ථකව යාවත්කාලීන කරන ලදී!');
+                alert('edited university successfully!');
             }
         }
         setIsModalOpen(false); // Close modal after submission
@@ -164,22 +164,22 @@ const UniversitiesPage = () => {
 
     // Handle Delete operation
     const handleDeleteItem = (type: 'provinces' | 'districts' | 'universities', id: string) => {
-        if (window.confirm(`ඔබට මෙම අයිතමය මකා දැමීමට අවශ්‍යද? (ID: ${id})`)) {
+        if (window.confirm(`Do u need to delete this? (ID: ${id})`)) {
             if (type === 'provinces') {
                 setProvinces(provinces.filter(p => p.id !== id));
                 // Also remove associated districts and universities (for dummy data)
                 const remainingDistricts = districts.filter(d => d.provinceId !== id);
                 setDistricts(remainingDistricts);
                 setUniversities(universities.filter(u => !remainingDistricts.some(d => d.id === u.districtId)));
-                alert('පළාත සාර්ථකව මකා දමන ලදී!');
+                alert('province deleted successfully!');
             } else if (type === 'districts') {
                 setDistricts(districts.filter(d => d.id !== id));
                 // Also remove associated universities
                 setUniversities(universities.filter(u => u.districtId !== id));
-                alert('දිස්ත්‍රික්කය සාර්ථකව මකා දමන ලදී!');
+                alert('deleted district successfully!');
             } else if (type === 'universities') {
                 setUniversities(universities.filter(u => u.id !== id));
-                alert('විශ්වවිද්‍යාලය සාර්ථකව මකා දමන ලදී!');
+                alert('university deleted successfully!');
             }
         }
     };
