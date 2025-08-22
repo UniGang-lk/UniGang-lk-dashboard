@@ -1,9 +1,6 @@
-// src/pages/admin/UniversitiesPage.tsx
 import React, { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaPlusCircle, FaSearch } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa';
 
-// Dummy Data
-// සැබෑ Backend එකෙන් මේ data ලබා ගත යුතුය
 const DUMMY_PROVINCES = [
     { id: 'p1', name: 'බස්නාහිර පළාත' },
     { id: 'p2', name: 'මධ්‍යම පළාත' },
@@ -55,17 +52,17 @@ const UniversitiesPage = () => {
     const [districts, setDistricts] = useState(DUMMY_DISTRICTS);
     const [universities, setUniversities] = useState(DUMMY_UNIVERSITIES);
 
-    const [loading, setLoading] = useState(false); // For future API calls
-    const [activeTab, setActiveTab] = useState<'provinces' | 'districts' | 'universities'>('universities'); // Default tab
+    const [loading, setLoading] = useState(false); 
+    const [activeTab, setActiveTab] = useState<'provinces' | 'districts' | 'universities'>('universities'); 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
-    const [editingItem, setEditingItem] = useState<any | null>(null); // Item being edited
+    const [editingItem, setEditingItem] = useState<any | null>(null); 
 
     // Form states for adding/editing
     const [itemName, setItemName] = useState('');
-    const [selectedProvinceId, setSelectedProvinceId] = useState(''); // For districts
-    const [selectedDistrictId, setSelectedDistrictId] = useState(''); // For universities
+    const [selectedProvinceId, setSelectedProvinceId] = useState(''); 
+    const [selectedDistrictId, setSelectedDistrictId] = useState(''); 
 
     useEffect(() => {
         setLoading(true);
@@ -87,14 +84,13 @@ const UniversitiesPage = () => {
         return districts.find(d => d.id === id)?.name || 'N/A';
     };
 
-    // Handle Add/Edit button clicks
     const handleAddItem = (type: 'provinces' | 'districts' | 'universities') => {
         setModalType('add');
         setItemName('');
         setSelectedProvinceId('');
         setSelectedDistrictId('');
-        setEditingItem(null); // Clear editing state
-        setActiveTab(type); // Ensure the correct tab is active when adding
+        setEditingItem(null); 
+        setActiveTab(type); 
         setIsModalOpen(true);
     };
 
@@ -107,7 +103,7 @@ const UniversitiesPage = () => {
         } else if (type === 'universities') {
             setSelectedDistrictId(item.districtId);
         }
-        setActiveTab(type); // Ensure the correct tab is active when editing
+        setActiveTab(type); 
         setIsModalOpen(true);
     };
 

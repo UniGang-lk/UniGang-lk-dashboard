@@ -117,7 +117,7 @@ const AnalyticsPage = () => {
                                     dataKey="value"
                                     label={({ name, percent }: { name: string; percent?: number }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
                                 >
-                                    {analyticsData.annexStatus.map((entry, index) => (
+                                    {analyticsData.annexStatus.map((_, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
