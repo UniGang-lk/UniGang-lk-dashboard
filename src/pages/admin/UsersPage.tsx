@@ -49,7 +49,7 @@ const UsersPage = () => {
 
   const handleEditUser = (userId: string) => {
     console.log(`Edit user with ID: ${userId}`);
-    alert(`User ID ${userId} සංස්කරණය කිරීමට සූදානම්.`);
+    alert(`User ID ${userId} ready to edit.`);
   };
 
   // Handle user delete (placeholder)
