@@ -7,10 +7,10 @@ const AdminSidebar = () => {
     const location = useLocation();
 
     useEffect(() => {
-    if (location.pathname === "/admin") {
-        navigate("/admin/users", { replace: true });
-    }
-}, [location, navigate]);
+        if (location.pathname === "/admin") {
+            navigate("/admin/users", { replace: true });
+        }
+    }, [location, navigate]);
 
 
     return (
@@ -27,7 +27,7 @@ const AdminSidebar = () => {
                         <div
                             onClick={() => navigate("/admin/users")}
                             className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
-                                ${location.pathname === '/admin/users' ? 'bg-gray-600 text-white':''}`}
+                                ${location.pathname === '/admin/users' ? 'bg-gray-600 text-white' : ''}`}
                         >
                             <FaUsers className="mr-3 text-lg" />
                             <span>User Management</span>
@@ -37,7 +37,7 @@ const AdminSidebar = () => {
                         <div
                             onClick={() => navigate("/admin/annexes")}
                             className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
-                                ${location.pathname === '/admin/annexes' ? 'bg-gray-600 text-white':''}`}
+                                ${location.pathname === '/admin/annexes' ? 'bg-gray-600 text-white' : ''}`}
                         >
                             <FaClipboardList className="mr-3 text-md" />
                             <span>Ads Management</span>
@@ -50,7 +50,7 @@ const AdminSidebar = () => {
                         <div
                             onClick={() => navigate("/admin/settings/universities")}
                             className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
-                                ${location.pathname === '/admin/settings/universities' ? 'bg-gray-600 text-white':''}`}
+                                ${location.pathname === '/admin/settings/universities' ? 'bg-gray-600 text-white' : ''}`}
                         >
                             <FaUniversity className="mr-3 text-md" />
                             <span>University / Institute</span>
@@ -59,8 +59,8 @@ const AdminSidebar = () => {
                     <li>
                         <div
                             onClick={() => navigate("/admin/settings/announcements")}
-                           className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
-                                ${location.pathname === '/admin/settings/announcements' ? 'bg-gray-600 text-white':''}`}
+                            className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
+                                ${location.pathname === '/admin/settings/announcements' ? 'bg-gray-600 text-white' : ''}`}
                         >
                             <FaBullhorn className="mr-3 text-md" />
                             <span>Announcements</span>
@@ -70,7 +70,7 @@ const AdminSidebar = () => {
                         <div
                             onClick={() => navigate("/admin/settings/analytics")}
                             className={`flex items-center p-3 text-md rounded-lg font-semibold text-gray-300 hover:bg-gray-700 hover:text-white hover:cursor-pointer transition-colors duration-200
-                                ${location.pathname === '/admin/settings/analytics' ? 'bg-gray-600 text-white':''}`}
+                                ${location.pathname === '/admin/settings/analytics' ? 'bg-gray-600 text-white' : ''}`}
                         >
                             <FaChartBar className="mr-3 text-md" />
                             <span>Analytics</span>
