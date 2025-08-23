@@ -21,7 +21,7 @@ function App() {
 
         {/* Admin Dashboard routes */}
         {/* AdminLayout එකට දාන pages වලට Header/Footer අවශ්‍ය නැත */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route path="/" element={<AdminLayout />}>
           <Route index element={<UsersPage />} /> {/* /admin ට ගියාම මුල් පිටුව පෙන්වයි */}
           <Route path="users" element={<UsersPage />} />
           <Route path="annexes" element={<AnnexesPage />} />
