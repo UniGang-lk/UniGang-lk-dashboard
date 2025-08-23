@@ -1,9 +1,17 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaUsers, FaClipboardList, FaChartBar, FaBullhorn, FaUniversity } from 'react-icons/fa';
+import { useEffect } from 'react';
 
 const AdminSidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+
+    useEffect(() => {
+    if (location.pathname === "/admin") {
+        navigate("/admin/users", { replace: true });
+    }
+}, [location, navigate]);
+
 
     return (
         <aside className="fixed w-64 bg-gray-800 flex flex-col min-h-screen p-4 shadow-lg flex-shrink-0">

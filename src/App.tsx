@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './components/admin/AdminLayout'; 
 import UsersPage from './pages/admin/UsersPage';
 import AnnexesPage from './pages/admin/AnnexesPage';
@@ -11,17 +11,11 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public/User-facing routes */}
-        {/* <Route path="/" element={<><Header /><HomePage /><Footer /></>} />
-        <Route path="/find-accommodation" element={<><Header /><FindAccommodationPage /><Footer /></>} />
-        <Route path="/post-ad" element={<><Header /><PostAdPage /><Footer /></>} />
-        <Route path="/contact-us" element={<><Header /><ContactUsPage /><Footer /></>} />
-        <Route path="/annex/:id" element={<><Header /><AnnexDetailsPage /><Footer /></>} />
-        <Route path="/profile" element={<><Header /><ProfilePage /><Footer /></>} /> */}
-
+         {/* Redirect root to /admin */}
+        <Route path="/" element={<Navigate to="/admin" replace />} />
+        
         {/* Admin Dashboard routes */}
-        {/* AdminLayout එකට දාන pages වලට Header/Footer අවශ්‍ය නැත */}
-        <Route path="/" element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<UsersPage />} /> {/* /admin ට ගියාම මුල් පිටුව පෙන්වයි */}
           <Route path="users" element={<UsersPage />} />
           <Route path="annexes" element={<AnnexesPage />} />
