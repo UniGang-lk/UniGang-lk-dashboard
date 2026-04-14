@@ -1,113 +1,116 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-/* ── Base Reset ──────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-950: #172554;
 
+  --color-slate-950: #020617;
+}
 :root {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 }
 
 html, body, #root {
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 body {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background-color: #020617; /* Solid Slate 950 base */
   background-attachment: fixed;
-  color: #e2e8f0;
-  min-height: 100vh;
+  color: #f1f5f9;
 }
 
-/* Reset button defaults so Tailwind has full control */
+/* Better button reset for Tailwind */
 button {
-  all: unset;
+  background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  box-sizing: border-box;
-}
-
-a {
+  font: inherit;
   color: inherit;
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Custom Scrollbar ────────────────────────────────────── */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: transparent;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.25);
-  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.2);
 }
 
-/* Global thin scrollbar for main areas */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
-}
-
-/* ── Glassmorphism Utility ───────────────────────────────── */
+/* ── Glassmorphism Utility (Sharper) ─────────────────────── */
 .glass {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.85); /* More opaque */
+  backdrop-filter: blur(8px); /* Reduced blur (md) */
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08); /* More visible border */
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.4); /* Darker base for contrast */
+  backdrop-filter: blur(12px); /* md-lg blur */
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 1.5rem;
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
 }
 
-/* ── Radial glow backgrounds ─────────────────────────────── */
-.glow-blue {
-  box-shadow: 0 4px 40px rgba(59, 130, 246, 0.15);
-}
-.glow-teal {
-  box-shadow: 0 4px 40px rgba(20, 184, 166, 0.15);
-}
-.glow-purple {
-  box-shadow: 0 4px 40px rgba(139, 92, 246, 0.15);
-}
-.glow-amber {
-  box-shadow: 0 4px 40px rgba(245, 158, 11, 0.15);
+.glass-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(15, 23, 42, 0.5);
+  transition: all 0.3s ease;
 }
 
-/* ── Gradient text ───────────────────────────────────────── */
+/* ── Typography & Effects ────────────────────────────────── */
 .gradient-text {
-  background: linear-gradient(135deg, #60a5fa, #818cf8);
+  background: linear-gradient(135deg, #60a5fa 0%, #a5b4fc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* ── Sidebar transition ──────────────────────────────────── */
-.sidebar-enter {
-  transform: translateX(-100%);
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
 }
-.sidebar-enter-active {
-  transform: translateX(0);
-  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
+

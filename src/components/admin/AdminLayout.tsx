@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import {
   LuMenu, LuBell, LuPlus,
   LuLayoutDashboard, LuUsers, LuClipboardList,
-  LuGraduationCap, LuMegaphone, LuBarChart3,
+  LuGraduationCap, LuMegaphone, LuChartBar,
 } from 'react-icons/lu';
 import AdminSidebar from './AdminSidebar';
 
@@ -14,7 +14,7 @@ const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
   '/admin/annexes':                 { label: 'Ads & Listings', icon: LuClipboardList },
   '/admin/settings/universities':   { label: 'Universities', icon: LuGraduationCap },
   '/admin/settings/announcements':  { label: 'Announcements', icon: LuMegaphone },
-  '/admin/settings/analytics':      { label: 'Analytics', icon: LuBarChart3 },
+  '/admin/settings/analytics':      { label: 'Analytics', icon: LuChartBar },
 };
 
 const AdminLayout = () => {
@@ -25,15 +25,15 @@ const AdminLayout = () => {
   const PageIcon = current.icon;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-slate-950">
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content area — offset for desktop sidebar */}
-      <div className="flex-1 flex flex-col lg:ml-64 min-h-screen">
+      {/* Main content area — naturally pushes next to the sidebar on desktop */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
 
         {/* ── Top Navigation Bar ────────────────────────────── */}
-        <header className="sticky top-0 z-30 flex items-center gap-4 px-4 md:px-8 h-16
-          bg-slate-950/60 backdrop-blur-xl border-b border-white/[0.06]">
+        <header className="sticky top-0 z-30 flex items-center gap-4 px-4 md:px-8 h-20
+          bg-slate-950/60 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
 
           {/* Hamburger (mobile) */}
           <button
@@ -44,18 +44,17 @@ const AdminLayout = () => {
             <LuMenu className="text-xl" />
           </button>
 
-          {/* Page title */}
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <div className="flex items-center justify-center w-7 h-7 rounded-lg
-              bg-blue-600/20 border border-blue-500/20">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xl
+              bg-blue-600/10 border border-blue-500/20 shadow-inner">
               <PageIcon className="text-blue-400 text-sm" />
             </div>
             <motion.h1
               key={location.pathname}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="text-sm font-bold text-white truncate"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              className="text-sm font-extrabold text-white tracking-tight"
             >
               {current.label}
             </motion.h1>
@@ -65,14 +64,20 @@ const AdminLayout = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Quick Action */}
             <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold
-                bg-gradient-to-r from-blue-600 to-indigo-600 text-white
-                shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 transition-shadow"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="hidden sm:flex items-center gap-2.5 px-6 py-2.5 rounded-2xl text-[12px] font-black
+                bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white
+                shadow-[0_8px_25px_-5px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_30px_-5px_rgba(59,130,246,0.6)] 
+                transition-all relative overflow-hidden group"
             >
-              <LuPlus className="text-sm" />
-              Add New Listing
+              {/* Shimmer Effect */}
+              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              
+              <div className="p-1 rounded-lg bg-white/20">
+                <LuPlus className="text-sm" />
+              </div>
+              <span className="tracking-tight uppercase">Add New Listing</span>
             </motion.button>
 
             {/* Notifications */}

@@ -7,16 +7,17 @@ interface University {
   name: string;
 }
 
-interface AnnexData {
+export interface AnnexData {
   id?: string;
   title: string;
-  university?: string;
-  campus?: string;
+  selectedCampus?: string | null;
   address: string;
   price: string;
   description: string;
   features: string[];
-  images: string[];
+  images?: string[];
+  newImages: File[];
+  existingImages: string[];
   contactName: string;
   contactPhone: string;
   contactEmail?: string;
@@ -48,7 +49,7 @@ const AnnexForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel, 
     setFilteredCampuses(universitiesData);
     if (initialData) {
       setTitle(initialData.title || '');
-      setSelectedCampus(initialData.university || null); 
+      setSelectedCampus(initialData.selectedCampus || null); 
       setAddress(initialData.address || '');
       setPrice(initialData.price ? initialData.price.replace('Rs. ', '').replace('/month', '') : '');
       setDescription(initialData.description || '');

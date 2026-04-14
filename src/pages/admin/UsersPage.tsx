@@ -130,13 +130,13 @@ const UsersPage = () => {
                       <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{user.name}</td>
                       <td className="py-3.5 px-5 text-slate-400">{user.email}</td>
                       <td className="py-3.5 px-5">
-                        <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/15 px-2.5 py-1 rounded-full">{user.role}</span>
+                        <span className="text-[10px] font-black text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">{user.role}</span>
                       </td>
                       <td className="py-3.5 px-5">
-                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold border ${
-                          user.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
-                          user.status === 'Suspended' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
-                          'bg-slate-500/20 text-slate-400 border-slate-500/20'
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter ${
+                          user.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                          user.status === 'Suspended' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                          'bg-slate-500/10 text-slate-400 border-slate-500/20'
                         }`}>
                           {user.status}
                         </span>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye } from 'react-icons/fa';
-import AnnexForm from '../../components/annex/AnnexForm';
+import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { IoClose } from 'react-icons/io5';
 import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, deleteUser as deleteAnnexApi } from '../../api/api';
 
@@ -29,16 +29,16 @@ interface AnnexDetailModalProps {
 
 const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) => {
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-6">
-        <div className='flex justify-between items-center mb-4'>
-          <h2 className="text-2xl font-bold text-gray-800">{annex.title}</h2>
-          <div
+    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-slate-900/90 backdrop-blur-2xl border border-white/[0.08] rounded-[2.5rem] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-8 custom-scrollbar">
+        <div className='flex justify-between items-center mb-6'>
+          <h2 className="text-2xl font-black text-white tracking-tight">{annex.title}</h2>
+          <button
             onClick={onClose}
-            className="bg-gray-300 p-2 rounded-md cursor-pointer"
+            className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all"
           >
-            <IoClose className='h-4 w-4'/>
-          </div>
+            <IoClose className='h-5 w-5'/>
+          </button>
         </div>
 
         {annex.images && annex.images.length > 0 && (
@@ -49,17 +49,24 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
           </div>
         )}
 
-        <div className="space-y-3 text-gray-700">
-          <p><strong>University/Institute:</strong> {annex.campus}</p>
-          <p><strong>Price:</strong> {annex.price}</p>
-          <p><strong>Status:</strong> <span className={`py-1 px-3 rounded-full text-xs font-semibold ${annex.status === 'Approved' || annex.status === 'Active' ? 'bg-green-200 text-green-800' :
-              annex.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
-                annex.status === 'Rejected' ? 'bg-red-200 text-red-800' :
-                  'bg-gray-200 text-gray-800'
-            }`}>{annex.status}</span></p>
-          <p><strong>Posted Date:</strong> {annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</p>
-          <p><strong>Address:</strong> {annex.address}</p>
-          <p><strong>Description:</strong> {annex.description}</p>
+        <div className="space-y-4 text-slate-300">
+          <p className="flex items-center gap-2"><strong className="text-white">University/Institute:</strong> {annex.campus}</p>
+          <p className="flex items-center gap-2"><strong className="text-white">Price:</strong> <span className="text-blue-400 font-black">{annex.price}</span></p>
+          <div className="flex items-center gap-2">
+            <strong className="text-white">Status:</strong> 
+            <span className={`py-1 px-3 rounded-full text-[10px] font-black border ${
+              annex.status === 'Approved' || annex.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
+              annex.status === 'Pending' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' :
+              annex.status === 'Rejected' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
+              'bg-slate-500/20 text-slate-400 border-slate-500/20'
+            }`}>{annex.status}</span>
+          </div>
+          <p><strong className="text-white">Posted Date:</strong> {annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</p>
+          <p><strong className="text-white">Address:</strong> {annex.address}</p>
+          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
+            <strong className="text-white block mb-2">Description:</strong>
+            <p className="text-sm leading-relaxed">{annex.description}</p>
+          </div>
 
           {annex.features && annex.features.length > 0 && (
             <div>
@@ -72,7 +79,7 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
             </div>
           )}
 
-          <h3 className="text-xl font-semibold text-gray-800 mt-5 border-t pt-4">Contact Information</h3>
+          <h3 className="text-lg font-black text-white mt-8 mb-4 border-t border-white/[0.08] pt-6 tracking-tight">Contact Information</h3>
           {annex.contactName && <p><strong>Contact Name:</strong> {annex.contactName}</p>}
           {annex.contactPhone && <p><strong>Contact Phone:</strong> {annex.contactPhone}</p>}
           {annex.contactEmail && <p><strong>Alternative Email:</strong> {annex.contactEmail}</p>}
@@ -83,13 +90,7 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
 };
 
 
-interface Annex {
-    id: string;
-    title: string;
-    description: string;
-    price: string;
-    status: 'pending' | 'approved' | 'rejected' | 'deleted';
-}
+
 
 const AnnexesPage = () => {
   const [annexes, setAnnexes] = useState<Annex[]>([]);
@@ -207,7 +208,7 @@ const AnnexesPage = () => {
           annex.id === editingAnnex.id ? {
             ...annex,
             title: updatedData.title,
-            campus: updatedData.selectedCampus, 
+            campus: updatedData.selectedCampus || '', 
             address: updatedData.address,
             price: `Rs. ${updatedData.price}/month`,
             description: updatedData.description,
@@ -362,7 +363,12 @@ const AnnexesPage = () => {
         <div className="mt-8">
           <h3 className="text-lg font-bold text-white mb-4">Edit Annex Ad</h3>
           <AnnexForm
-            initialData={editingAnnex}
+            initialData={editingAnnex ? {
+              ...editingAnnex,
+              selectedCampus: editingAnnex.campus,
+              existingImages: editingAnnex.images,
+              newImages: []
+            } as AnnexData : undefined}
             onSubmit={handleUpdateAnnexSubmit}
             onCancel={handleCancelEdit}
             isEditing={true}

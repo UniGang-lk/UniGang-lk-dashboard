@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuUsers, LuClipboardList, LuGraduationCap,
-  LuMegaphone, LuBarChart2, LuLayoutDashboard,
+  LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight,
 } from 'react-icons/lu';
 
@@ -16,7 +16,7 @@ const navItems = [
     section: 'Overview',
     items: [
       { label: 'Dashboard', icon: LuLayoutDashboard, path: '/admin/dashboard' },
-      { label: 'Analytics', icon: LuBarChart2, path: '/admin/settings/analytics' },
+      { label: 'Analytics', icon: LuChartBar, path: '/admin/settings/analytics' },
     ],
   },
   {
@@ -49,14 +49,17 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center justify-between px-6 py-6 border-b border-white/[0.06]">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <LuLayoutDashboard className="text-white text-base" />
-          </div>
+      <div className="flex items-center justify-between px-6 h-20 border-b border-white/[0.04] flex-shrink-0">
+        <div className="flex items-center gap-3.5">
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: -5 }}
+            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/20"
+          >
+            <LuLayoutDashboard className="text-white text-xl" />
+          </motion.div>
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.15em] text-slate-500 uppercase">The Uni Gang</p>
-            <p className="text-sm font-bold text-white leading-tight">Admin Panel</p>
+            <p className="text-[10px] font-black tracking-[0.3em] text-slate-500 uppercase leading-none mb-1.5">The Uni Gang</p>
+            <p className="text-[13px] font-black text-white tracking-[0.1em] uppercase leading-none">Admin Portal</p>
           </div>
         </div>
         {/* Mobile close */}
@@ -69,36 +72,52 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-5 space-y-6 overflow-y-auto custom-scrollbar">
+      <nav className="flex-1 px-4 py-8 space-y-8 overflow-y-auto custom-scrollbar">
         {navItems.map((group) => (
           <div key={group.section}>
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-600 px-3 mb-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500/60 px-4 mb-4">
               {group.section}
             </p>
-            <ul className="space-y-0.5">
+            <ul className="space-y-1">
               {group.items.map((item) => {
                 const active = isActive(item.path);
                 return (
                   <li key={item.path}>
                     <motion.button
-                      whileHover={{ x: 3 }}
-                      whileTap={{ scale: 0.97 }}
+                      whileHover={{ x: 6 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleNav(item.path)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 group relative
+                      className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[13px] font-bold transition-all duration-300 group relative overflow-hidden
                         ${active
-                          ? 'bg-blue-600/15 text-blue-400 border border-blue-500/20'
-                          : 'text-slate-400 hover:text-white hover:bg-white/[0.06]'
+                          ? 'bg-blue-600/10 text-white shadow-[inset_0_0_20px_rgba(59,130,246,0.08)]'
+                          : 'text-slate-400 hover:text-white'
                         }`}
                     >
+                      {/* Hover Glass Effect */}
+                      <div className="absolute inset-0 bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
                       {active && (
                         <motion.div
                           layoutId="activeIndicator"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-blue-500 rounded-full"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-blue-500 rounded-r-full shadow-[4px_0_15px_rgba(59,130,246,0.6)]"
                         />
                       )}
-                      <item.icon className={`text-lg flex-shrink-0 ${active ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
-                      <span className="flex-1 text-left">{item.label}</span>
-                      {active && <LuChevronRight className="text-xs text-blue-500/60" />}
+                      
+                      <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-500/20 text-blue-400' : 'text-slate-500 group-hover:text-slate-300 group-hover:bg-white/5'}`}>
+                        <item.icon className="text-lg flex-shrink-0" />
+                      </div>
+                      
+                      <span className="flex-1 text-left relative z-10 font-bold tracking-tight">{item.label}</span>
+                      
+                      {active && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -5 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="relative z-10"
+                        >
+                          <LuChevronRight className="text-xs text-blue-500/80" />
+                        </motion.div>
+                      )}
                     </motion.button>
                   </li>
                 );
@@ -127,8 +146,8 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 z-40
-        bg-slate-900/80 backdrop-blur-xl border-r border-white/[0.06]">
+      <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 sticky top-0 h-screen z-40
+        bg-slate-950 border-r border-white/[0.05] shadow-[1px_0_0_0_rgba(255,255,255,0.05)]">
         {sidebarContent}
       </aside>
 
@@ -147,12 +166,12 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             />
             <motion.aside
               key="drawer"
-              initial={{ x: -280 }}
+              initial={{ x: -260 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
+              exit={{ x: -260 }}
               transition={{ type: 'spring', damping: 28, stiffness: 260 }}
               className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col
-                bg-slate-900/95 backdrop-blur-xl border-r border-white/[0.08] lg:hidden"
+                bg-slate-900/98 border-r border-slate-800 lg:hidden"
             >
               {sidebarContent}
             </motion.aside>
