@@ -2,66 +2,39 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa';
 
 interface Province {
-    id: string;
+    id: number;
     name: string;
 }
 
 const DUMMY_PROVINCES: Province[] = [
-    { id: 'p1', name: 'බස්නාහිර පළාත' },
-    { id: 'p2', name: 'මධ්‍යම පළාත' },
-    { id: 'p3', name: 'දකුණු පළාත' },
-    { id: 'p4', name: 'උතුරු පළාත' },
-    { id: 'p5', name: 'නැගෙනහිර පළාත' },
-    { id: 'p6', name: 'වයඹ පළාත' },
-    { id: 'p7', name: 'උතුරු මැද පළාත' },
-    { id: 'p8', name: 'ඌව පළාත' },
-    { id: 'p9', name: 'සබරගමු පළාත' },
+    { id: 1, name: 'Western Province' },
+    { id: 2, name: 'Central Province' },
+    { id: 3, name: 'Southern Province' },
 ];
 
 interface District {
-    id: string;
+    id: number;
     name: string;
-    provinceId: string;
+    provinceId: number;
 }
 
 const DUMMY_DISTRICTS: District[] = [
-    { id: 'd1', name: 'කොළඹ', provinceId: 'p1' },
-    { id: 'd2', name: 'ගම්පහ', provinceId: 'p1' },
-    { id: 'd3', name: 'කළුතර', provinceId: 'p1' },
-    { id: 'd4', name: 'මහනුවර', provinceId: 'p2' },
-    { id: 'd5', name: 'මාතලේ', provinceId: 'p2' },
-    { id: 'd6', name: 'නුවරඑළිය', provinceId: 'p2' },
-    { id: 'd7', name: 'ගාල්ල', provinceId: 'p3' },
-    { id: 'd8', name: 'මාතර', provinceId: 'p3' },
-    { id: 'd9', name: 'හම්බන්තොට', provinceId: 'p3' },
-    { id: 'd10', name: 'යාපනය', provinceId: 'p4' },
-    { id: 'd11', name: 'ත්‍රිකුණාමලය', provinceId: 'p5' },
-    { id: 'd12', name: 'කුරුණෑගල', provinceId: 'p6' },
-    { id: 'd13', name: 'අනුරාධපුරය', provinceId: 'p7' },
-    { id: 'd14', name: 'බදුල්ල', provinceId: 'p8' },
-    { id: 'd15', name: 'රත්නපුරය', provinceId: 'p9' },
+    { id: 1, name: 'Colombo', provinceId: 1 },
+    { id: 2, name: 'Kandy', provinceId: 2 },
+    { id: 3, name: 'Galle', provinceId: 3 },
 ];
 
 interface University {
-    id: string;
+    id: number;
     name: string;
-    districtId: string;
+    districtId: number;
+    location: string;
 }
 
 const DUMMY_UNIVERSITIES: University[] = [
-    { id: 'u1', name: 'කොළඹ විශ්වවිද්‍යාලය', districtId: 'd1' },
-    { id: 'u2', name: 'පේරාදෙණිය විශ්වවිද්‍යාලය', districtId: 'd4' },
-    { id: 'u3', name: 'මොරටුව විශ්වවිද්‍යාලය', districtId: 'd3' },
-    { id: 'u4', name: 'රුහුණු විශ්වවිද්‍යාලය', districtId: 'd8' },
-    { id: 'u5', name: 'ශ්‍රී ජයවර්ධනපුර විශ්වවිද්‍යාලය', districtId: 'd1' },
-    { id: 'u6', name: 'කැලණිය විශ්වවිද්‍යාලය', districtId: 'd2' },
-    { id: 'u7', name: 'ජාතික මුහුදු විද්‍යා හා සාගර තාක්ෂණික ආයතනය (NIMASA)', districtId: 'd7' },
-    { id: 'u8', name: 'නැගෙනහිර විශ්වවිද්‍යාලය, ශ්‍රී ලංකා', districtId: 'd11' },
-    { id: 'u9', name: 'යාපනය විශ්වවිද්‍යාලය', districtId: 'd10' },
-    { id: 'u10', name: 'ශ්‍රී ලංකා විවෘත විශ්වවිද්‍යාලය', districtId: 'd1' },
-    { id: 'u11', name: 'රජරට විශ්වවිද්‍යාලය', districtId: 'd13' },
-    { id: 'u12', name: 'ඌව වෙල්ලස්ස විශ්වවිද්‍යාලය', districtId: 'd14' },
-    { id: 'u13', name: 'සබරගමුව විශ්වවිද්‍යාලය', districtId: 'd15' },
+    { id: 1, name: 'University of Colombo', districtId: 1, location: 'Colombo' },
+    { id: 2, name: 'University of Peradeniya', districtId: 2, location: 'Kandy' },
+    { id: 3, name: 'University of Moratuwa', districtId: 1, location: 'Moratuwa' },
 ];
 
 const UniversitiesPage = () => {
@@ -78,8 +51,8 @@ const UniversitiesPage = () => {
 
     // Form states for adding/editing
     const [itemName, setItemName] = useState('');
-    const [selectedProvinceId, setSelectedProvinceId] = useState(''); 
-    const [selectedDistrictId, setSelectedDistrictId] = useState(''); 
+    const [selectedProvinceId, setSelectedProvinceId] = useState<number | ''>(''); 
+    const [selectedDistrictId, setSelectedDistrictId] = useState<number | ''>(''); 
 
     useEffect(() => {
         setLoading(true);
@@ -93,11 +66,11 @@ const UniversitiesPage = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const getProvinceName = (id: string) => {
+    const getProvinceName = (id: number) => {
         return provinces.find(p => p.id === id)?.name || 'N/A';
     };
 
-    const getDistrictName = (id: string) => {
+    const getDistrictName = (id: number) => {
         return districts.find(d => d.id === id)?.name || 'N/A';
     };
 
@@ -135,7 +108,7 @@ const UniversitiesPage = () => {
         if (modalType === 'add') {
             // Simulate Add operation
             if (activeTab === 'provinces') {
-                const newProvince = { id: `p${provinces.length + 1}`, name: itemName };
+                const newProvince = { id: provinces.length + 1, name: itemName };
                 setProvinces([...provinces, newProvince]);
                 alert('province added succesfully!');
             } else if (activeTab === 'districts') {
@@ -143,7 +116,7 @@ const UniversitiesPage = () => {
                     alert('please select district.');
                     return;
                 }
-                const newDistrict = { id: `d${districts.length + 1}`, name: itemName, provinceId: selectedProvinceId };
+                const newDistrict = { id: districts.length + 1, name: itemName, provinceId: selectedProvinceId as number };
                 setDistricts([...districts, newDistrict]);
                 alert('district added succesfully!');
             } else if (activeTab === 'universities') {
@@ -151,7 +124,7 @@ const UniversitiesPage = () => {
                     alert('please select district.');
                     return;
                 }
-                const newUniversity = { id: `u${universities.length + 1}`, name: itemName, districtId: selectedDistrictId };
+                const newUniversity = { id: universities.length + 1, name: itemName, districtId: selectedDistrictId as number, location: '' };
                 setUniversities([...universities, newUniversity]);
                 alert('added university succesfully!');
             }
@@ -165,14 +138,14 @@ const UniversitiesPage = () => {
                     alert('please select province.');
                     return;
                 }
-                setDistricts(districts.map(d => d.id === editingItem.id ? { ...d, name: itemName, provinceId: selectedProvinceId } : d));
+                setDistricts(districts.map(d => d.id === editingItem.id ? { ...d, name: itemName, provinceId: selectedProvinceId as number } : d));
                 alert('edited district successfully!');
             } else if (activeTab === 'universities') {
                 if (!selectedDistrictId) {
                     alert('please select district.');
                     return;
                 }
-                setUniversities(universities.map(u => u.id === editingItem.id ? { ...u, name: itemName, districtId: selectedDistrictId } : u));
+                setUniversities(universities.map(u => u.id === editingItem.id ? { ...u, name: itemName, districtId: selectedDistrictId as number } : u));
                 alert('edited university successfully!');
             }
         }
@@ -180,7 +153,7 @@ const UniversitiesPage = () => {
     };
 
     // Handle Delete operation
-    const handleDeleteItem = (type: 'provinces' | 'districts' | 'universities', id: string) => {
+    const handleDeleteItem = (type: 'provinces' | 'districts' | 'universities', id: number) => {
         if (window.confirm(`Do u need to delete this? (ID: ${id})`)) {
             if (type === 'provinces') {
                 setProvinces(provinces.filter(p => p.id !== id));

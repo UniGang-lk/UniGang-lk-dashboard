@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa'; 
+import { FaEdit, FaTrash, FaSearch, FaUserShield, FaUserGraduate, FaUserTag } from 'react-icons/fa'; 
 import { fetchUsers, deleteUser as deleteUserApi } from '../../api/api';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: string;
-  createdAt?: string;
-}
+import type { User } from '../../types/schema';
 
 const UsersPage = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -23,9 +15,7 @@ const UsersPage = () => {
     const loadUsers = async () => {
       setLoading(true);
       try {
-        // Placeholder token for now - in real app, get from auth context/storage
-        const token = localStorage.getItem('token') || ''; 
-        const data = await fetchUsers(token);
+        const data = await fetchUsers();
         setUsers(data);
       } catch (error) {
         console.error("Failed to fetch users:", error);
@@ -45,17 +35,16 @@ const UsersPage = () => {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleEditUser = (userId: string) => {
+  const handleEditUser = (userId: number) => {
     console.log(`Edit user with ID: ${userId}`);
     alert(`User ID ${userId} ready to edit.`);
   };
 
   // Handle user delete
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (userId: number) => {
     if (window.confirm(`Are you sure you want to delete user ID ${userId}?`)) {
       try {
-        const token = localStorage.getItem('token') || '';
-        await deleteUserApi(userId, token);
+        await deleteUserApi(userId);
         setUsers(users.filter(user => user.id !== userId));
         alert(`User ID ${userId} deleted successfully.`);
       } catch (error) {
@@ -91,8 +80,9 @@ const UsersPage = () => {
           onChange={(e) => setFilterRole(e.target.value)}
         >
           <option value="All" className="bg-slate-900">All Roles</option>
-          <option value="Student" className="bg-slate-900">Student</option>
-          <option value="Owner" className="bg-slate-900">Owner</option>
+          <option value="student" className="bg-slate-900">Student</option>
+          <option value="landlord" className="bg-slate-900">Landlord</option>
+          <option value="admin" className="bg-slate-900">Admin</option>
         </select>
 
         <select
@@ -130,18 +120,23 @@ const UsersPage = () => {
                       <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{user.name}</td>
                       <td className="py-3.5 px-5 text-slate-400">{user.email}</td>
                       <td className="py-3.5 px-5">
-                        <span className="text-[10px] font-black text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2.5 py-1 rounded-full uppercase tracking-widest">{user.role}</span>
+                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 w-fit">
+                          {user.role === 'admin' && <FaUserShield className="text-blue-400 text-xs" />}
+                          {user.role === 'landlord' && <FaUserTag className="text-blue-400 text-xs" />}
+                          {user.role === 'student' && <FaUserGraduate className="text-blue-400 text-xs" />}
+                          <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{user.role}</span>
+                        </div>
                       </td>
                       <td className="py-3.5 px-5">
                         <span className={`py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter ${
-                          user.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                          user.status === 'Suspended' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                          user.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                          user.status === 'suspended' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                           'bg-slate-500/10 text-slate-400 border-slate-500/20'
                         }`}>
                           {user.status}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5 text-slate-500 text-xs">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</td>
+                      <td className="py-3.5 px-5 text-slate-500 text-xs">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</td>
                       <td className="py-3.5 px-5">
                         <div className="flex items-center justify-center gap-2">
                           <button

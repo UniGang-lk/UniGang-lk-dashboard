@@ -48,8 +48,7 @@ const AnalyticsPage = () => {
         const loadStats = async () => {
             setLoading(true);
             try {
-                const token = localStorage.getItem('token') || '';
-                const data = await fetchStats(token);
+                const data: any = await fetchStats();
                 setAnalyticsData(prev => ({
                     ...prev,
                     totalUsers: data.totalStudents,

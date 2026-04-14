@@ -6,6 +6,7 @@ import AnnexesPage from './pages/admin/AnnexesPage';
 import UniversitiesPage from './pages/admin/UniversitiesPage';
 import AnnouncementsPage from './pages/admin/AnnouncementPage';
 import AnalyticsPage from './pages/admin/AnalyticsPage';
+import EventsPage from './pages/admin/EventsPage';
 import './index.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="dashboard"                   element={<DashboardPage />} />
           <Route path="users"                       element={<UsersPage />} />
           <Route path="annexes"                     element={<AnnexesPage />} />
+          <Route path="events"                      element={<EventsPage />} />
           <Route path="settings/universities"       element={<UniversitiesPage />} />
           <Route path="settings/announcements"      element={<AnnouncementsPage />} />
           <Route path="settings/analytics"          element={<AnalyticsPage />} />

@@ -1,16 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaEdit, FaTrash, FaPlusCircle, FaTimes } from 'react-icons/fa';
 
-// Announcement Interface
-interface Announcement {
-    id: string;
-    title: string;
-    content: string;
-    postedDate?: string;
-    imageUrl?: string;
-}
-
-import { fetchAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from '../../api/api';
+import { fetchAnnouncements, updateEntity, deleteEntity, STORAGE_KEYS } from '../../api/api';
+import type { Announcement } from '../../types/schema';
 
 const AnnouncementsPage = () => {
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -31,8 +23,7 @@ const AnnouncementsPage = () => {
         const loadAnnouncements = async () => {
             setLoading(true);
             try {
-                const token = localStorage.getItem('token') || '';
-                const data = await fetchAnnouncements(token);
+                const data = await fetchAnnouncements();
                 setAnnouncements(data);
             } catch (error) {
                 console.error("Failed to fetch announcements:", error);
@@ -95,18 +86,26 @@ const AnnouncementsPage = () => {
         }
 
         try {
-            const token = localStorage.getItem('token') || '';
-            const announcementData = { title, content, imageUrl };
-
             if (modalType === 'add') {
-                const newAnn = await createAnnouncement(announcementData, token);
+                const newAnn: Announcement = {
+                    id: Math.floor(Math.random() * 10000),
+                    admin_id: 1,
+                    title,
+                    content,
+                    priority: 'medium',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                // In a real app we'd call createEntity, here we just push to state or localStorage
+                const existing = JSON.parse(localStorage.getItem(STORAGE_KEYS.ANNOUNCEMENTS) || '[]');
+                localStorage.setItem(STORAGE_KEYS.ANNOUNCEMENTS, JSON.stringify([newAnn, ...existing]));
                 setAnnouncements([newAnn, ...announcements]);
                 alert('announcement added successfully!');
             } else if (modalType === 'edit' && editingAnnouncement) {
-                const updatedAnn = await updateAnnouncement(editingAnnouncement.id, announcementData, token);
+                await updateEntity(STORAGE_KEYS.ANNOUNCEMENTS, editingAnnouncement.id, { title, content });
                 setAnnouncements(prevAnnouncements =>
                     prevAnnouncements.map(ann =>
-                        ann.id === editingAnnouncement.id ? updatedAnn : ann
+                        ann.id === editingAnnouncement.id ? { ...ann, title, content } : ann
                     )
                 );
                 alert('announcement updated successfully!');
@@ -119,11 +118,10 @@ const AnnouncementsPage = () => {
     };
 
     // Handle Delete operation
-    const handleDeleteAnnouncement = async (id: string) => {
+    const handleDeleteAnnouncement = async (id: number) => {
         if (window.confirm(`Do you need to delete this? (ID: ${id})`)) {
             try {
-                const token = localStorage.getItem('token') || '';
-                await deleteAnnouncement(id, token);
+                await deleteEntity(STORAGE_KEYS.ANNOUNCEMENTS, id);
                 setAnnouncements(announcements.filter(ann => ann.id !== id));
                 alert('announcement deleted successfully!');
             } catch (error) {
@@ -167,7 +165,7 @@ const AnnouncementsPage = () => {
                                     <p className="text-gray-700 text-sm mb-3 overflow-hidden" style={{ display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
                                         {ann.content}
                                     </p>
-                                    <p className="text-sm text-gray-500 mt-2">Posted Date : {ann.postedDate}</p>
+                                    <p className="text-sm text-gray-500 mt-2">Posted Date : {ann.created_at ? new Date(ann.created_at).toLocaleDateString() : '—'}</p>
                                 </div>
                                 <div className="mt-2 p-5 pt-0 flex justify-end space-x-2">
                                     <button

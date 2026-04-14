@@ -24,13 +24,12 @@ interface StatCard {
 }
 
 interface Listing {
-  id: string;
+  id: number;
   title: string;
   campus: string;
-  price: string;
-  status: string;
-  createdAt?: string;
-  images?: string[];
+  price: number;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
   contactName?: string;
 }
 
@@ -98,14 +97,14 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const load = async () => {
-      const token = localStorage.getItem('token') || '';
+      setLoading(true);
       try {
         const [statsData, annexData] = await Promise.all([
-          fetchStats(token).catch(() => null),
-          fetchAnnexes(token).catch(() => []),
+          fetchStats().catch(() => ({ totalStudents: 0, approvedAnnexes: 0, pendingAnnexes: 0 })),
+          fetchAnnexes().catch(() => []),
         ]);
         if (statsData) setStats(statsData);
-        setListings((annexData as Listing[]).slice(0, 6));
+        setListings((annexData as any[]).slice(0, 6));
       } catch {
         // silently fall through to skeleton state
       } finally {

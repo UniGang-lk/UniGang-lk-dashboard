@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuUsers, LuClipboardList, LuGraduationCap,
   LuMegaphone, LuChartBar, LuLayoutDashboard,
-  LuX, LuLogOut, LuChevronRight,
+  LuX, LuLogOut, LuChevronRight, LuCalendarDays,
 } from 'react-icons/lu';
 
 interface AdminSidebarProps {
@@ -24,6 +24,7 @@ const navItems = [
     items: [
       { label: 'Users', icon: LuUsers, path: '/admin/users' },
       { label: 'Ads & Listings', icon: LuClipboardList, path: '/admin/annexes' },
+      { label: 'System Events', icon: LuCalendarDays, path: '/admin/events' },
     ],
   },
   {
