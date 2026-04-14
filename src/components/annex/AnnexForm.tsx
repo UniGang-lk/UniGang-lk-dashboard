@@ -7,9 +7,24 @@ interface University {
   name: string;
 }
 
+interface AnnexData {
+  id?: string;
+  title: string;
+  university?: string;
+  campus?: string;
+  address: string;
+  price: string;
+  description: string;
+  features: string[];
+  images: string[];
+  contactName: string;
+  contactPhone: string;
+  contactEmail?: string;
+}
+
 interface AnnexFormProps {
-  initialData?: any; 
-  onSubmit: (data: any, isEditing: boolean) => void; 
+  initialData?: AnnexData; 
+  onSubmit: (data: AnnexData, isEditing: boolean) => void; 
   onCancel: () => void; 
   isEditing: boolean; 
 }

@@ -1,22 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaEdit, FaTrash, FaPlusCircle, FaTimes } from 'react-icons/fa';
 
-// Dummy Announcement Data
-const DUMMY_ANNOUNCEMENTS = [
-    { id: 'ann1', title: 'නව Annex ලියාපදිංචි කිරීමේ ක්‍රියාවලිය', content: 'දැන් ඔබට ඔබගේ Annexes වඩාත් පහසුවෙන් ලියාපදිංචි කළ හැක. වැඩි විස්තර සඳහා අපගේ උපකාරක අංශය වෙත පිවිසෙන්න.', postedDate: '2024-07-01', imageUrl: 'https://placehold.co/400x200/FF5733/FFFFFF?text=New+Feature' },
-    { id: 'ann2', title: 'වෙබ් අඩවි නඩත්තු කිරීම', content: 'හෙට (ජූලි 10) අලුයම 2 සිට 4 දක්වා වෙබ් අඩවිය නඩත්තු කිරීමක් සිදුවන බව කරුණාවෙන් සලකන්න.', postedDate: '2024-07-09', imageUrl: 'https://placehold.co/400x200/3366FF/FFFFFF?text=Maintenance' },
-    { id: 'ann3', title: 'නව විශේෂාංග නිකුත් කිරීම', content: 'අපගේ වෙබ් අඩවියට නව සෙවුම් පෙරහන් (search filters) එක් කර ඇත. දැන් ඔබට අවශ්‍ය Annexes ඉක්මනින් සොයාගත හැක.', postedDate: '2024-06-25', imageUrl: 'https://placehold.co/400x200/33FF57/000000?text=New+Filters' },
-    { id: 'ann4', title: 'විශ්වවිද්‍යාල ශිෂ්‍යාවන්ට විශේෂ දීමනා', content: 'සීමිත කාලයක් සඳහා, ඇතැම් නවාතැන් සඳහා විශේෂ වට්ටම් ලබා ගත හැක. අදම ගවේෂණය කරන්න!', postedDate: '2024-08-01', imageUrl: 'https://placehold.co/400x200/FFCC33/000000?text=Special+Offers' },
-    { id: 'ann5', title: 'අපගේ නව ජංගම යෙදුම', content: 'දැන් ඔබට අපගේ නව ජංගම යෙදුම හරහා පහසුවෙන් නවාතැන් සොයාගත හැක. App Store/Play Store වෙතින් බාගත කරන්න.', postedDate: '2024-08-05', imageUrl: 'https://placehold.co/400x200/9933FF/FFFFFF?text=Mobile+App' },
-];
+// Announcement Interface
+interface Announcement {
+    id: string;
+    title: string;
+    content: string;
+    postedDate?: string;
+    imageUrl?: string;
+}
+
+import { fetchAnnouncements, createAnnouncement, updateAnnouncement, deleteAnnouncement } from '../../api/api';
 
 const AnnouncementsPage = () => {
-    const [announcements, setAnnouncements] = useState(DUMMY_ANNOUNCEMENTS);
+    const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [loading, setLoading] = useState(false);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
-    const [editingAnnouncement, setEditingAnnouncement] = useState<any | null>(null);
+    const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
 
     // Form states for adding/editing
     const [title, setTitle] = useState('');
@@ -26,12 +28,19 @@ const AnnouncementsPage = () => {
     const fileInputRef = useRef<HTMLInputElement>(null); // File input එකට reference එකක්
 
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setAnnouncements(DUMMY_ANNOUNCEMENTS);
-            setLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
+        const loadAnnouncements = async () => {
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token') || '';
+                const data = await fetchAnnouncements(token);
+                setAnnouncements(data);
+            } catch (error) {
+                console.error("Failed to fetch announcements:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadAnnouncements();
     }, []);
 
     // Handle Add button click
@@ -45,7 +54,7 @@ const AnnouncementsPage = () => {
     };
 
     // Handle Edit button click
-    const handleEditAnnouncement = (announcement: any) => {
+    const handleEditAnnouncement = (announcement: Announcement) => {
         setModalType('edit');
         setEditingAnnouncement(announcement);
         setTitle(announcement.title);
@@ -78,41 +87,49 @@ const AnnouncementsPage = () => {
 
 
     // Handle form submission (Add/Edit)
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title.trim() || !content.trim()) {
-            alert('කරුණාකර සියලුම ක්ෂේත්‍ර පුරවන්න.');
+            alert('please input all fields.');
             return;
         }
 
-        const currentDate = new Date().toISOString().slice(0, 10); // YYYY-MM-DD format
+        try {
+            const token = localStorage.getItem('token') || '';
+            const announcementData = { title, content, imageUrl };
 
-        if (modalType === 'add') {
-            const newAnnouncement = {
-                id: `ann${announcements.length + 1}`, // Simple ID generation for dummy data
-                title: title,
-                content: content,
-                postedDate: currentDate,
-                imageUrl: imageUrl,
-            };
-            setAnnouncements([newAnnouncement, ...announcements]);
-            alert('නිවේදනය සාර්ථකව එකතු කරන ලදී!');
-        } else if (modalType === 'edit' && editingAnnouncement) {
-            setAnnouncements(prevAnnouncements =>
-                prevAnnouncements.map(ann =>
-                    ann.id === editingAnnouncement.id ? { ...ann, title: title, content: content, imageUrl: imageUrl } : ann
-                )
-            );
-            alert('නිවේදනය සාර්ථකව යාවත්කාලීන කරන ලදී!');
+            if (modalType === 'add') {
+                const newAnn = await createAnnouncement(announcementData, token);
+                setAnnouncements([newAnn, ...announcements]);
+                alert('announcement added successfully!');
+            } else if (modalType === 'edit' && editingAnnouncement) {
+                const updatedAnn = await updateAnnouncement(editingAnnouncement.id, announcementData, token);
+                setAnnouncements(prevAnnouncements =>
+                    prevAnnouncements.map(ann =>
+                        ann.id === editingAnnouncement.id ? updatedAnn : ann
+                    )
+                );
+                alert('announcement updated successfully!');
+            }
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("Failed to save announcement:", error);
+            alert("Failed to save announcement");
         }
-        setIsModalOpen(false);
     };
 
     // Handle Delete operation
-    const handleDeleteAnnouncement = (id: string) => {
-        if (window.confirm(`ඔබට මෙම නිවේදනය මකා දැමීමට අවශ්‍යද? (ID: ${id})`)) {
-            setAnnouncements(announcements.filter(ann => ann.id !== id));
-            alert('නිවේදනය සාර්ථකව මකා දමන ලදී!');
+    const handleDeleteAnnouncement = async (id: string) => {
+        if (window.confirm(`Do you need to delete this? (ID: ${id})`)) {
+            try {
+                const token = localStorage.getItem('token') || '';
+                await deleteAnnouncement(id, token);
+                setAnnouncements(announcements.filter(ann => ann.id !== id));
+                alert('announcement deleted successfully!');
+            } catch (error) {
+                console.error("Failed to delete announcement:", error);
+                alert("Failed to delete announcement.");
+            }
         }
     };
 

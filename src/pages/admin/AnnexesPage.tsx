@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye } from 'react-icons/fa';
 import AnnexForm from '../../components/annex/AnnexForm';
 import { IoClose } from 'react-icons/io5';
+import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, deleteUser as deleteAnnexApi } from '../../api/api';
 
 interface Annex {
   id: string;
   title: string;
   campus: string;
   price: string;
-  status: 'Pending' | 'Active' | 'Rejected' | 'Expired';
-  postedDate: string;
+  status: 'Pending' | 'Active' | 'Rejected' | 'Expired' | 'Approved';
+  createdAt?: string;
+  postedDate?: string;
   images: string[];
   description: string;
   address: string;
@@ -18,69 +20,6 @@ interface Annex {
   contactPhone?: string;
   contactEmail?: string;
 }
-
-const DUMMY_ANNEXES: Annex[] = [
-  {
-    id: 'a1',
-    title: 'Peradeniya Annex - Single Room',
-    campus: 'University of Peradeniya',
-    price: 'Rs. 15,000/month',
-    status: 'Pending',
-    postedDate: '2024-07-20',
-    images: ['https://placehold.co/300x200/FF0000/FFFFFF?text=Annex1'],
-    description: 'A cozy single room near the university with all basic amenities. Ideal for a single student looking for a quiet place.',
-    address: 'Peradeniya Rd, Kandy',
-    features: ['Single Room', 'Attached Bathroom', 'Furnished', 'Study Table'],
-    contactName: 'Kasun Perera',
-    contactPhone: '0712345678',
-    contactEmail: 'kasun@example.com'
-  },
-  {
-    id: 'a2',
-    title: 'Colombo Annex - Spacious 2BHK',
-    campus: 'University of Colombo',
-    price: 'Rs. 30,000/month',
-    status: 'Active',
-    postedDate: '2024-07-15',
-    images: ['https://placehold.co/300x200/00FF00/000000?text=Annex2', 'https://placehold.co/300x200/00FF00/000000?text=Annex2B'],
-    description: '2-bedroom house ideal for students. Located close to public transport and supermarkets.',
-    address: 'Bambalapitiya, Colombo 04',
-    features: ['2 Bedrooms', 'Attached Bathroom', 'Furnished', 'Parking', 'Hot Water'],
-    contactName: 'Nimal Bandara',
-    contactPhone: '0778765432',
-    contactEmail: 'nimal@example.com'
-  },
-  {
-    id: 'a3',
-    title: 'Moratuwa Annex - Shared Room',
-    campus: 'University of Moratuwa',
-    price: 'Rs. 10,000/month',
-    status: 'Rejected',
-    postedDate: '2024-07-22',
-    images: ['https://placehold.co/300x200/0000FF/FFFFFF?text=Annex3'],
-    description: 'Shared room available for female students. Friendly neighborhood and walkable distance to university.',
-    address: 'Katubedda, Moratuwa',
-    features: ['Shared Room', 'Parking', 'Electricity Included'],
-    contactName: 'Priya Fernando',
-    contactPhone: '0754567890',
-    contactEmail: 'priya@example.com'
-  },
-  {
-    id: 'a4',
-    title: 'Ruhunu Annex - New Building',
-    campus: 'University of Ruhuna',
-    price: 'Rs. 20,000/month',
-    status: 'Active',
-    postedDate: '2024-07-18',
-    images: ['https://placehold.co/300x200/FFFF00/000000?text=Annex4', 'https://placehold.co/300x200/FFFF00/000000?text=Annex4B', 'https://placehold.co/300x200/FFFF00/000000?text=Annex4C'],
-    description: 'Brand new annex with modern facilities. Close to Ruhuna University main gate.',
-    address: 'Wellamadama, Matara',
-    features: ['Single Room', 'Attached Bathroom', 'AC', 'Washing Machine'],
-    contactName: 'Samantha Silva',
-    contactPhone: '0701234567',
-    contactEmail: 'samantha@example.com'
-  },
-];
 
 // Annex Detail Modal Component
 interface AnnexDetailModalProps {
@@ -113,12 +52,12 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
         <div className="space-y-3 text-gray-700">
           <p><strong>University/Institute:</strong> {annex.campus}</p>
           <p><strong>Price:</strong> {annex.price}</p>
-          <p><strong>Status:</strong> <span className={`py-1 px-3 rounded-full text-xs font-semibold ${annex.status === 'Active' ? 'bg-green-200 text-green-800' :
+          <p><strong>Status:</strong> <span className={`py-1 px-3 rounded-full text-xs font-semibold ${annex.status === 'Approved' || annex.status === 'Active' ? 'bg-green-200 text-green-800' :
               annex.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
                 annex.status === 'Rejected' ? 'bg-red-200 text-red-800' :
                   'bg-gray-200 text-gray-800'
             }`}>{annex.status}</span></p>
-          <p><strong>Posted Date:</strong> {annex.postedDate}</p>
+          <p><strong>Posted Date:</strong> {annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</p>
           <p><strong>Address:</strong> {annex.address}</p>
           <p><strong>Description:</strong> {annex.description}</p>
 
@@ -144,8 +83,16 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
 };
 
 
+interface Annex {
+    id: string;
+    title: string;
+    description: string;
+    price: string;
+    status: 'pending' | 'approved' | 'rejected' | 'deleted';
+}
+
 const AnnexesPage = () => {
-  const [annexes, setAnnexes] = useState<Annex[]>(DUMMY_ANNEXES);
+  const [annexes, setAnnexes] = useState<Annex[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [loading, setLoading] = useState(false);
@@ -157,12 +104,19 @@ const AnnexesPage = () => {
 
   // Annex data loading simulation (for future API integration)
   useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setAnnexes(DUMMY_ANNEXES);
-      setLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    const loadAnnexes = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token') || '';
+        const data = await fetchAnnexes(token);
+        setAnnexes(data);
+      } catch (error) {
+        console.error("Failed to fetch annexes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAnnexes();
   }, []);
 
   // Filtered annexes based on search term and status
@@ -175,43 +129,61 @@ const AnnexesPage = () => {
   });
 
   // Handle annex approval
-  const handleApproveAnnex = (annexId: string) => {
+  const handleApproveAnnex = async (annexId: string) => {
     if (window.confirm(`Do you want to approve this ads? (ID: ${annexId})`)) {
-      console.log(`Approving annex with ID: ${annexId}`);
-      setAnnexes(prevAnnexes =>
-        prevAnnexes.map(annex =>
-          annex.id === annexId ? { ...annex, status: 'Active' } : annex
-        )
-      );
-      alert(`Ads ID ${annexId} approved successfully.`);
+      try {
+        const token = localStorage.getItem('token') || '';
+        await updateAnnexStatusApi(annexId, 'Approved', token);
+        setAnnexes(prevAnnexes =>
+          prevAnnexes.map(annex =>
+            annex.id === annexId ? { ...annex, status: 'Approved' } : annex
+          )
+        );
+        alert(`Ads ID ${annexId} approved successfully.`);
+      } catch (error) {
+        console.error("Failed to approve annex:", error);
+        alert("Failed to approve ads.");
+      }
     }
   };
 
   // Handle annex rejection
-  const handleRejectAnnex = (annexId: string) => {
+  const handleRejectAnnex = async (annexId: string) => {
     if (window.confirm(`Do you want to reject this ads? (ID: ${annexId})`)) {
-      console.log(`Rejecting annex with ID: ${annexId}`);
-      setAnnexes(prevAnnexes =>
-        prevAnnexes.map(annex =>
-          annex.id === annexId ? { ...annex, status: 'Rejected' } : annex
-        )
-      );
-      alert(`Ads ID ${annexId} rejected successfully`);
+      try {
+        const token = localStorage.getItem('token') || '';
+        await updateAnnexStatusApi(annexId, 'Rejected', token);
+        setAnnexes(prevAnnexes =>
+          prevAnnexes.map(annex =>
+            annex.id === annexId ? { ...annex, status: 'Rejected' } : annex
+          )
+        );
+        alert(`Ads ID ${annexId} rejected successfully`);
+      } catch (error) {
+        console.error("Failed to reject annex:", error);
+        alert("Failed to reject ads.");
+      }
     }
   };
 
   // CHANGED: Annex edit functionality
-  const handleEditAnnex = (annex: Annex) => { // annex object එකම receive කරන්න
-    setEditingAnnex(annex); // Edit කරන Annex එක state එකට දාන්න
-    setCurrentView('editForm'); // View එක editForm එකට වෙනස් කරන්න
+  const handleEditAnnex = (annex: Annex) => {
+    setEditingAnnex(annex);
+    setCurrentView('editForm');
   };
 
   // Handle annex delete
-  const handleDeleteAnnex = (annexId: string) => {
+  const handleDeleteAnnex = async (annexId: string) => {
     if (window.confirm(`Do you want to delete ads? (ID ${annexId})`)) {
-      console.log(`Deleting annex with ID: ${annexId}`);
-      setAnnexes(annexes.filter(annex => annex.id !== annexId));
-      alert(`Ads ID ${annexId} deleted successfully.`);
+      try {
+        const token = localStorage.getItem('token') || '';
+        await deleteAnnexApi(annexId, token);
+        setAnnexes(annexes.filter(annex => annex.id !== annexId));
+        alert(`Ads ID ${annexId} deleted successfully.`);
+      } catch (error) {
+        console.error("Failed to delete annex:", error);
+        alert("Failed to delete ads.");
+      }
     }
   };
 
@@ -225,7 +197,7 @@ const AnnexesPage = () => {
     setShowViewModal(false);
   };
 
-  const handleUpdateAnnexSubmit = (updatedData: any, isEditing: boolean) => {
+  const handleUpdateAnnexSubmit = (updatedData: AnnexData, isEditing: boolean) => {
     if (isEditing && editingAnnex) {
       console.log('Updating Annex:', editingAnnex.id, updatedData);
       // මෙතන backend API call එක දාලා annex update කරන්න ඕන
@@ -259,132 +231,129 @@ const AnnexesPage = () => {
   };
 
   return (
-    <div className="bg-gray-700 border border-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-white mb-6">Ads Management</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-extrabold text-white tracking-tight">Ads Management</h2>
 
       {currentView === 'table' ? (
         <>
           {/* Search and Filter Section */}
-          <div className="mb-6 flex flex-wrap gap-4 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             <div className="relative flex-grow">
               <input
                 type="text"
-                placeholder="Search Using Title, Campus or Name..."
-                className="w-full pl-10 pr-4 py-2 text-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                placeholder="Search by title, campus or name..."
+                className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl
+                  focus:outline-none focus:ring-1 focus:ring-blue-500/50 placeholder:text-slate-600 transition-all"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
-              <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
             </div>
 
             <select
-              className="w-full md:w-auto text-white py-2 pl-3 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none bg-gray-700
-              [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-              bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
+              className="text-sm text-white bg-white/[0.05] border border-white/[0.08] rounded-xl
+                py-2.5 pl-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500/50 appearance-none"
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
             >
-              <option value="All">All Ads</option>
-              <option value="Pending">Pending</option>
-              <option value="Active">Active</option>
-              <option value="Rejected">Rejected</option>
-              <option value="Expired">Expired</option>
+              <option value="All" className="bg-slate-900">All Ads</option>
+              <option value="Pending" className="bg-slate-900">Pending</option>
+              <option value="Active" className="bg-slate-900">Active</option>
+              <option value="Rejected" className="bg-slate-900">Rejected</option>
+              <option value="Expired" className="bg-slate-900">Expired</option>
             </select>
           </div>
 
           {loading ? (
-            <div className="text-center py-10 text-white">Ads Loading...</div>
+            <div className="text-center py-16 text-slate-500 text-sm">Loading ads...</div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-gray-200 border border-gray-200 rounded-lg">
-                <thead>
-                  <tr className="bg-gray-300 text-left text-black uppercase text-sm leading-normal">
-                    <th className="py-3 px-6 text-left">Title</th>
-                    <th className="py-3 px-6 text-left">Campus/Institute</th>
-                    <th className="py-3 px-6 text-left">Price</th>
-                    <th className="py-3 px-6 text-left">Status</th>
-                    <th className="py-3 px-6 text-left">Date</th>
-                    <th className="py-3 px-6 text-left">Name</th>
-                    <th className="py-3 px-6 text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="text-black text-sm font-light">
-                  {filteredAnnexes.length > 0 ? (
-                    filteredAnnexes.map(annex => (
-                      <tr key={annex.id} className="border-b border-gray-200 hover:bg-gray-300">
-                        <td className="py-3 px-6 text-left whitespace-nowrap">
-                          <div className="flex items-center">
-                            <span>{annex.title}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-6 text-left">{annex.campus}</td>
-                        <td className="py-3 px-6 text-left">{annex.price}</td>
-                        <td className="py-3 px-6 text-left">
-                          <span className={`py-1 px-3 rounded-full text-xs font-semibold ${annex.status === 'Active' ? 'bg-green-200 text-green-800' :
-                              annex.status === 'Pending' ? 'bg-yellow-200 text-yellow-800' :
-                                annex.status === 'Rejected' ? 'bg-red-200 text-red-800' :
-                                  'bg-gray-200 text-gray-800'
-                            }`}>
-                            {annex.status}
-                          </span>
-                        </td>
-                        <td className="py-3 px-6 text-left">{annex.postedDate}</td>
-                        <td className="py-3 px-6 text-left">{annex.contactName}</td>
-                        <td className="py-3 px-6 text-center">
-                          <div className="flex item-center justify-center">
-                            {/* View Button */}
-                            <button
-                              onClick={() => handleViewAnnex(annex)}
-                              className="w-8 h-8 mr-2 transform text-black hover:text-blue-600 hover:scale-110"
-                              title="View Details"
-                            >
-                              <FaEye />
-                            </button>
-
-                            {annex.status === 'Pending' && (
-                              <>
-                                <button
-                                  onClick={() => handleApproveAnnex(annex.id)}
-                                  className="w-8 h-8 mr-2 transform text-black hover:text-green-500 hover:scale-110"
-                                  title="Approve"
-                                >
-                                  <FaCheckCircle />
-                                </button>
-                                <button
-                                  onClick={() => handleRejectAnnex(annex.id)}
-                                  className="w-8 h-8 mr-2 transform text-black hover:text-red-500 hover:scale-110"
-                                  title="Reject"
-                                >
-                                  <FaTimesCircle />
-                                </button>
-                              </>
-                            )}
-                            {/* CHANGED: Edit button එක Annex object එක handleEditAnnex වෙත යවයි */}
-                            <button
-                              onClick={() => handleEditAnnex(annex)}
-                              className="w-8 h-8 mr-2 transform text-black hover:text-blue-500 hover:scale-110"
-                              title="Edit"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteAnnex(annex.id)}
-                              className="w-8 h-8 transform text-black hover:text-red-500 hover:scale-110"
-                              title="Delete"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={7} className="py-6 text-center text-white">No Ads.</td>
+            <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
+              <div className="overflow-x-auto custom-scrollbar">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-white/[0.06] bg-white/[0.03]">
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Title</th>
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Campus</th>
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Price</th>
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Status</th>
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Date</th>
+                      <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Owner</th>
+                      <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Actions</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-white/[0.04]">
+                    {filteredAnnexes.length > 0 ? (
+                      filteredAnnexes.map((annex: Annex) => (
+                        <tr key={annex.id} className="hover:bg-white/[0.04] transition-colors">
+                          <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{annex.title}</td>
+                          <td className="py-3.5 px-5 text-slate-400">{annex.campus}</td>
+                          <td className="py-3.5 px-5 font-bold text-blue-400">{annex.price}</td>
+                          <td className="py-3.5 px-5">
+                            <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold border ${
+                              annex.status === 'Approved' || annex.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
+                              annex.status === 'Pending' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' :
+                              annex.status === 'Rejected' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
+                              'bg-slate-500/20 text-slate-400 border-slate-500/20'
+                            }`}>
+                              {annex.status}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-5 text-slate-500 text-xs">{annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</td>
+                          <td className="py-3.5 px-5 text-slate-400">{annex.contactName}</td>
+                          <td className="py-3.5 px-5">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                onClick={() => handleViewAnnex(annex)}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 hover:bg-blue-500/25 transition-all"
+                                title="View"
+                              >
+                                <FaEye className="text-sm" />
+                              </button>
+
+                              {annex.status === 'Pending' && (
+                                <>
+                                  <button
+                                    onClick={() => handleApproveAnnex(annex.id)}
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/25 transition-all"
+                                    title="Approve"
+                                  >
+                                    <FaCheckCircle className="text-sm" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleRejectAnnex(annex.id)}
+                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
+                                    title="Reject"
+                                  >
+                                    <FaTimesCircle className="text-sm" />
+                                  </button>
+                                </>
+                              )}
+                              <button
+                                onClick={() => handleEditAnnex(annex)}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all"
+                                title="Edit"
+                              >
+                                <FaEdit className="text-sm" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteAnnex(annex.id)}
+                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
+                                title="Delete"
+                              >
+                                <FaTrash className="text-sm" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={7} className="py-16 text-center text-slate-600 text-sm">No ads found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </>

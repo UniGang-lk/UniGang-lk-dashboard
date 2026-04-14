@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaPlusCircle } from 'react-icons/fa';
 
-const DUMMY_PROVINCES = [
+interface Province {
+    id: string;
+    name: string;
+}
+
+const DUMMY_PROVINCES: Province[] = [
     { id: 'p1', name: 'බස්නාහිර පළාත' },
     { id: 'p2', name: 'මධ්‍යම පළාත' },
     { id: 'p3', name: 'දකුණු පළාත' },
@@ -13,7 +18,13 @@ const DUMMY_PROVINCES = [
     { id: 'p9', name: 'සබරගමු පළාත' },
 ];
 
-const DUMMY_DISTRICTS = [
+interface District {
+    id: string;
+    name: string;
+    provinceId: string;
+}
+
+const DUMMY_DISTRICTS: District[] = [
     { id: 'd1', name: 'කොළඹ', provinceId: 'p1' },
     { id: 'd2', name: 'ගම්පහ', provinceId: 'p1' },
     { id: 'd3', name: 'කළුතර', provinceId: 'p1' },
@@ -31,7 +42,13 @@ const DUMMY_DISTRICTS = [
     { id: 'd15', name: 'රත්නපුරය', provinceId: 'p9' },
 ];
 
-const DUMMY_UNIVERSITIES = [
+interface University {
+    id: string;
+    name: string;
+    districtId: string;
+}
+
+const DUMMY_UNIVERSITIES: University[] = [
     { id: 'u1', name: 'කොළඹ විශ්වවිද්‍යාලය', districtId: 'd1' },
     { id: 'u2', name: 'පේරාදෙණිය විශ්වවිද්‍යාලය', districtId: 'd4' },
     { id: 'u3', name: 'මොරටුව විශ්වවිද්‍යාලය', districtId: 'd3' },
@@ -57,7 +74,7 @@ const UniversitiesPage = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
-    const [editingItem, setEditingItem] = useState<any | null>(null); 
+    const [editingItem, setEditingItem] = useState<Province | District | University | null>(null); 
 
     // Form states for adding/editing
     const [itemName, setItemName] = useState('');
@@ -94,14 +111,14 @@ const UniversitiesPage = () => {
         setIsModalOpen(true);
     };
 
-    const handleEditItem = (type: 'provinces' | 'districts' | 'universities', item: any) => {
+    const handleEditItem = (type: 'provinces' | 'districts' | 'universities', item: Province | District | University) => {
         setModalType('edit');
         setEditingItem(item);
         setItemName(item.name);
         if (type === 'districts') {
-            setSelectedProvinceId(item.provinceId);
+            setSelectedProvinceId((item as District).provinceId);
         } else if (type === 'universities') {
-            setSelectedDistrictId(item.districtId);
+            setSelectedDistrictId((item as University).districtId);
         }
         setActiveTab(type); 
         setIsModalOpen(true);

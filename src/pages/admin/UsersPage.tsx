@@ -1,41 +1,39 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaSearch } from 'react-icons/fa'; 
+import { fetchUsers, deleteUser as deleteUserApi } from '../../api/api';
 
-const DUMMY_USERS = [
-  { id: 'u1', name: 'Nimal Perera', email: 'nimal.p@example.com', role: 'Student', status: 'Active', registeredDate: '2023-01-15' },
-  { id: 'u2', name: 'Kamala Silva', email: 'kamala.s@example.com', role: 'Owner', status: 'Active', registeredDate: '2023-02-20' },
-  { id: 'u3', name: 'Sunil Fernando', email: 'sunil.f@example.com', role: 'Student', status: 'Suspended', registeredDate: '2023-03-01' },
-  { id: 'u4', name: 'Amara Bandara', email: 'amara.b@example.com', role: 'Student', status: 'Active', registeredDate: '2023-04-10' },
-  { id: 'u5', name: 'Piyal Rajapaksha', email: 'piyal.r@example.com', role: 'Owner', status: 'Active', registeredDate: '2023-05-05' },
-  { id: 'u6', name: 'Gayani Samaraweera', email: 'gayani.s@example.com', role: 'Student', status: 'Active', registeredDate: '2023-06-12' },
-];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  createdAt?: string;
+}
 
 const UsersPage = () => {
-  const [users, setUsers] = useState(DUMMY_USERS);
+  const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [loading, setLoading] = useState(false); // For future API calls
+  const [loading, setLoading] = useState(false);
 
-  // User data loading simulation (for future API integration)
+  // User data loading
   useEffect(() => {
-    setLoading(true);
-    // In a real app, you would fetch data from your backend here
-    // fetch('/api/admin/users')
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     setUsers(data);
-    //     setLoading(false);
-    //   })
-    //   .catch(error => {
-    //     console.error("Failed to fetch users:", error);
-    //     setLoading(false);
-    //   });
-    const timer = setTimeout(() => {
-        setUsers(DUMMY_USERS); 
+    const loadUsers = async () => {
+      setLoading(true);
+      try {
+        // Placeholder token for now - in real app, get from auth context/storage
+        const token = localStorage.getItem('token') || ''; 
+        const data = await fetchUsers(token);
+        setUsers(data);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      } finally {
         setLoading(false);
-    }, 500); 
-    return () => clearTimeout(timer);
+      }
+    };
+    loadUsers();
   }, []);
 
   // Filtered users based on search term, role, and status
@@ -52,116 +50,126 @@ const UsersPage = () => {
     alert(`User ID ${userId} ready to edit.`);
   };
 
-  // Handle user delete (placeholder)
-  const handleDeleteUser = (userId: string) => {
-    if (window.confirm(`ඔබට user ID ${userId} මකා දැමීමට අවශ්‍යද?`)) {
-      console.log(`Delete user with ID: ${userId}`);
-      // In a real app, you would send a DELETE request to your backend
-      setUsers(users.filter(user => user.id !== userId)); // Remove from UI
-      alert(`User ID ${userId} සාර්ථකව මකා දමන ලදී.`);
+  // Handle user delete
+  const handleDeleteUser = async (userId: string) => {
+    if (window.confirm(`Are you sure you want to delete user ID ${userId}?`)) {
+      try {
+        const token = localStorage.getItem('token') || '';
+        await deleteUserApi(userId, token);
+        setUsers(users.filter(user => user.id !== userId));
+        alert(`User ID ${userId} deleted successfully.`);
+      } catch (error) {
+        console.error("Failed to delete user:", error);
+        alert("Failed to delete user.");
+      }
     }
   };
 
   return (
-    <div className="bg-gray-700 border border-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-white mb-6">User Management</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-extrabold text-white tracking-tight">User Management</h2>
 
       {/* Search and Filter Section */}
-      <div className="mb-6 flex flex-wrap gap-4 items-center">
+      <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-grow">
           <input
             type="text"
-            placeholder="Search from name or email..."
-            className="w-full pl-10 pr-4 py-2 text-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-100"
+            placeholder="Search by name or email..."
+            className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl
+              focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50
+              placeholder:text-slate-600 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
         </div>
 
         <select
-          className="w-full text-white md:w-auto py-2 pl-3 pr-8 border border-gray-300 rounded-md focus:outline-none appearance-none bg-gray-700
-          [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-          bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
+          className="text-sm text-white bg-white/[0.05] border border-white/[0.08] rounded-xl
+            py-2.5 pl-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500/50 appearance-none"
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
         >
-          <option value="All">All Roles</option>
-          <option value="Student">Student</option>
-          <option value="Owner">Owner</option>
+          <option value="All" className="bg-slate-900">All Roles</option>
+          <option value="Student" className="bg-slate-900">Student</option>
+          <option value="Owner" className="bg-slate-900">Owner</option>
         </select>
 
         <select
-          className="w-full text-white md:w-auto py-2 pl-3 pr-8 border border-gray-300 rounded-md focus:outline-none appearance-none bg-gray-700
-          [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%23fff%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-          bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
+          className="text-sm text-white bg-white/[0.05] border border-white/[0.08] rounded-xl
+            py-2.5 pl-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500/50 appearance-none"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <option value="All">All Status</option>
-          <option value="Active">Active</option>
-          <option value="Suspended">Suspended</option>
+          <option value="All" className="bg-slate-900">All Status</option>
+          <option value="Active" className="bg-slate-900">Active</option>
+          <option value="Suspended" className="bg-slate-900">Suspended</option>
         </select>
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-white">Users Loading ...</div>
+        <div className="text-center py-16 text-slate-500 text-sm">Loading users...</div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-200 border border-gray-200 rounded-lg">
-            <thead>
-              <tr className="bg-gray-300 text-left text-black uppercase text-sm leading-normal">
-                <th className="py-3 px-6 text-left">Name</th>
-                <th className="py-3 px-6 text-left">Email</th>
-                <th className="py-3 px-6 text-left">Role</th>
-                <th className="py-3 px-6 text-left">Status</th>
-                <th className="py-3 px-6 text-left">Registered Date</th>
-                <th className="py-3 px-6 text-center">Option</th>
-              </tr>
-            </thead>
-            <tbody className="text-black text-sm font-light">
-              {filteredUsers.length > 0 ? (
-                filteredUsers.map(user => (
-                  <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-300">
-                    <td className="py-3 px-6 text-left whitespace-nowrap">{user.name}</td>
-                    <td className="py-3 px-6 text-left">{user.email}</td>
-                    <td className="py-3 px-6 text-left">{user.role}</td>
-                    <td className="py-3 px-6 text-left">
-                      <span className={`py-1 px-3 rounded-full text-xs font-semibold ${
-                        user.status === 'Active' ? 'bg-green-200 text-green-800' :
-                        user.status === 'Suspended' ? 'bg-red-200 text-red-800' : 'bg-gray-200 text-gray-800'
-                      }`}>
-                        {user.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-6 text-left">{user.registeredDate}</td>
-                    <td className="py-3 px-6 text-center">
-                      <div className="flex item-center justify-center">
-                        <button
-                          onClick={() => handleEditUser(user.id)}
-                          className="w-8 h-8 mr-2 transform text-black hover:text-blue-500 hover:scale-110"
-                          title="Edit"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="w-8 h-8 transform text-black hover:text-red-500 hover:scale-110"
-                          title="Delete"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="py-6 text-center text-gray-500">Users Not Found.</td>
+        <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
+          <div className="overflow-x-auto custom-scrollbar">
+            <table className="min-w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/[0.06] bg-white/[0.03]">
+                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Name</th>
+                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Email</th>
+                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Role</th>
+                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Status</th>
+                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Joined</th>
+                  <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/[0.04]">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-white/[0.04] transition-colors">
+                      <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{user.name}</td>
+                      <td className="py-3.5 px-5 text-slate-400">{user.email}</td>
+                      <td className="py-3.5 px-5">
+                        <span className="text-xs font-bold text-blue-400 bg-blue-500/10 border border-blue-500/15 px-2.5 py-1 rounded-full">{user.role}</span>
+                      </td>
+                      <td className="py-3.5 px-5">
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold border ${
+                          user.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
+                          user.status === 'Suspended' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
+                          'bg-slate-500/20 text-slate-400 border-slate-500/20'
+                        }`}>
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-5 text-slate-500 text-xs">{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'}</td>
+                      <td className="py-3.5 px-5">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleEditUser(user.id)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all"
+                            title="Edit"
+                          >
+                            <FaEdit className="text-sm" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
+                            title="Delete"
+                          >
+                            <FaTrash className="text-sm" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="py-16 text-center text-slate-600 text-sm">No users found.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

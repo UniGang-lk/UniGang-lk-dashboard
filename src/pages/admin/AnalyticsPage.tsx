@@ -1,39 +1,40 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { FaClipboardList, FaUserCheck, FaUsers } from "react-icons/fa";
+import { fetchStats } from '../../api/api';
 
 const DUMMY_ANALYTICS_DATA = {
-    totalUsers: 1500,
-    totalAnnexes: 550,
-    totalAnnouncement: 8,
+    totalUsers: 0,
+    totalAnnexes: 0,
+    totalAnnouncement: 0,
     annexStatus: [
-        { name: 'Active', value: 350 },
-        { name: 'Pending', value: 100 },
-        { name: 'Rejected', value: 50 },
-        { name: 'Expired', value: 50 },
+        { name: 'Active', value: 0 },
+        { name: 'Pending', value: 0 },
+        { name: 'Rejected', value: 0 },
+        { name: 'Expired', value: 0 },
     ],
     annexesPerUniversity: [
-        { name: 'Peradeniya', count: 120 },
-        { name: 'Colombo', count: 80 },
-        { name: 'Moratuwa', count: 60 },
-        { name: 'Jaffna', count: 40 },
-        { name: 'Ruhuna', count: 30 },
+        { name: 'Peradeniya', count: 0 },
+        { name: 'Colombo', count: 0 },
+        { name: 'Moratuwa', count: 0 },
+        { name: 'Jaffna', count: 0 },
+        { name: 'Ruhuna', count: 0 },
     ],
     annexesPerDistrict: [
-        { name: 'Kandy', count: 130 },
-        { name: 'Colombo', count: 100 },
-        { name: 'Gampaha', count: 70 },
-        { name: 'Galle', count: 50 },
-        { name: 'Matara', count: 40 },
+        { name: 'Kandy', count: 0 },
+        { name: 'Colombo', count: 0 },
+        { name: 'Gampaha', count: 0 },
+        { name: 'Galle', count: 0 },
+        { name: 'Matara', count: 0 },
     ],
     monthlyNewUsers: [
-        { month: 'Jan', users: 50 },
-        { month: 'Feb', users: 75 },
-        { month: 'Mar', users: 60 },
-        { month: 'Apr', users: 90 },
-        { month: 'May', users: 80 },
-        { month: 'Jun', users: 110 },
-        { month: 'Jul', users: 130 },
+        { month: 'Jan', users: 0 },
+        { month: 'Feb', users: 0 },
+        { month: 'Mar', users: 0 },
+        { month: 'Apr', users: 0 },
+        { month: 'May', users: 0 },
+        { month: 'Jun', users: 0 },
+        { month: 'Jul', users: 0 },
     ],
 };
 
@@ -44,68 +45,74 @@ const AnalyticsPage = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setLoading(true);
-        // In a real app, you would fetch data from your backend here
-        // fetch('/api/admin/analytics')
-        //   .then(res => res.json())
-        //   .then(data => {
-        //     setAnalyticsData(data);
-        //     setLoading(false);
-        //   })
-        //   .catch(error => {
-        //     console.error("Failed to fetch analytics:", error);
-        //     setLoading(false);
-        //   });
-        const timer = setTimeout(() => {
-            setAnalyticsData(DUMMY_ANALYTICS_DATA);
-            setLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
+        const loadStats = async () => {
+            setLoading(true);
+            try {
+                const token = localStorage.getItem('token') || '';
+                const data = await fetchStats(token);
+                setAnalyticsData(prev => ({
+                    ...prev,
+                    totalUsers: data.totalStudents,
+                    totalAnnexes: data.pendingAnnexes + data.approvedAnnexes,
+                    annexStatus: [
+                        { name: 'Active', value: data.approvedAnnexes },
+                        { name: 'Pending', value: data.pendingAnnexes },
+                        { name: 'Rejected', value: 0 },
+                        { name: 'Expired', value: 0 },
+                    ]
+                }));
+            } catch (error) {
+                console.error("Failed to fetch analytics:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadStats();
     }, []);
 
     return (
-        <div className="bg-gray-700 border border-white p-6 rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-white mb-6">Analytics Dashboard</h2>
+        <div className="space-y-6">
+            <h2 className="text-2xl font-extrabold text-white tracking-tight">Analytics Dashboard</h2>
 
             {loading ? (
                 <div className="text-center py-10 text-white">Loading Data...</div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Summary Cards */}
-                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div className="flex flex-col justify-start bg-white p-5 shadow rounded-lg">
-                            <div className='bg-[#2196f3] w-12 h-12 flex items-center justify-center rounded-md'>
-                                <FaUsers className='h-7 w-7' />
+                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
+                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
+                            <div className='bg-blue-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
+                                <FaUsers className='h-5 w-5 text-blue-400' />
                             </div>
-                            <h3 className="text-4xl mt-4  font-bold text-black">{analyticsData.totalUsers}</h3>
-                            <p className="text-gray-500 text-md mt-4 font-bold">Total Users</p>
+                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalUsers}</h3>
+                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Total Users</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white p-5 shadow rounded-lg">
-                            <div className='bg-[#4caf50] w-12 h-12 flex items-center justify-center rounded-md'>
-                                <FaClipboardList className='h-7 w-7' />
+                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
+                            <div className='bg-emerald-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
+                                <FaClipboardList className='h-5 w-5 text-emerald-400' />
                             </div>
-                            <h3 className="text-4xl mt-4  font-bold text-black">{analyticsData.totalAnnexes}</h3>
-                            <p className="text-gray-500 text-md mt-4 font-bold">Total Advertiesment</p>
+                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalAnnexes}</h3>
+                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Total Ads</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white p-5 shadow rounded-lg">
-                            <div className='bg-[#f44336] w-12 h-12 flex items-center justify-center rounded-md'>
-                                <FaUserCheck className='h-7 w-7' />
+                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
+                            <div className='bg-red-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
+                                <FaUserCheck className='h-5 w-5 text-red-400' />
                             </div>
-                            <h3 className="text-4xl mt-4  font-bold text-black">{analyticsData.monthlyNewUsers[analyticsData.monthlyNewUsers.length - 1]?.users || 0}</h3>
-                            <p className="text-gray-500 text-md mt-4 font-bold">New Users (Monthly)</p>
+                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.monthlyNewUsers[analyticsData.monthlyNewUsers.length - 1]?.users || 0}</h3>
+                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">New Users (Monthly)</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white p-5 shadow rounded-lg">
-                            <div className='bg-[#ff7300] w-12 h-12 flex items-center justify-center rounded-md'>
-                                <FaClipboardList className='h-7 w-7' />
+                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
+                            <div className='bg-amber-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
+                                <FaClipboardList className='h-5 w-5 text-amber-400' />
                             </div>
-                            <h3 className="text-4xl mt-4  font-bold text-black">{analyticsData.totalAnnouncement}</h3>
-                            <p className="text-gray-500 text-md mt-4 font-bold">Total Announcement</p>
+                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalAnnouncement}</h3>
+                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Announcements</p>
                         </div>
                     </div>
 
                     {/* Charts */}
-                    <div className="bg-white p-5 rounded-lg shadow-md border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Advertisement Status</h3>
+                    <div className="bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
+                        <h3 className="text-base font-bold text-white mb-4">Advertisement Status</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <PieChart>
                                 <Pie
@@ -127,8 +134,8 @@ const AnalyticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="bg-white p-5 rounded-lg shadow-md border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Advertisements by university</h3>
+                    <div className="bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
+                        <h3 className="text-base font-bold text-white mb-4">Advertisements by university</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={analyticsData.annexesPerUniversity}
@@ -144,8 +151,8 @@ const AnalyticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white p-5 rounded-lg shadow-md border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Monthly new users</h3>
+                    <div className="lg:col-span-2 bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
+                        <h3 className="text-base font-bold text-white mb-4">Monthly new users</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={analyticsData.monthlyNewUsers}
@@ -161,8 +168,8 @@ const AnalyticsPage = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white p-5 rounded-lg shadow-md border border-gray-200">
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4">Advertiesments by districts</h3>
+                    <div className="lg:col-span-2 bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
+                        <h3 className="text-base font-bold text-white mb-4">Advertiesments by districts</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={analyticsData.annexesPerDistrict}
