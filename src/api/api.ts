@@ -7,7 +7,11 @@ export const STORAGE_KEYS = {
   ANNEXES: 'uni_gang_annexes',
   UNIVERSITIES: 'uni_gang_universities',
   ANNOUNCEMENTS: 'uni_gang_announcements',
-  EVENTS: 'uni_gang_events'
+  EVENTS: 'uni_gang_events',
+  SERVICES: 'uni_gang_services',
+  BLOGS: 'uni_gang_blogs',
+  FEEDBACK: 'uni_gang_feedback',
+  PROBLEMS: 'uni_gang_problems'
 };
 
 const getStorage = <T>(key: string): T[] => {
@@ -38,17 +42,24 @@ const seedData = () => {
 
     const annexes: Annex[] = [
       { 
-        id: 1, owner_id: 2, university_id: 1, title: 'Luxury Studio - Moratuwa', status: 'pending', price: 25000, 
+        id: 1, owner_id: 2, university_id: 1, title: 'Luxury Studio - Moratuwa', status: 'Pending', price: '25,000', 
         address: 'No 45, Bandaranayake Mawatha', campus: 'UOM', description: 'Prime location near UOM',
-        images: [], features: ['WiFi', 'Kitchen'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() 
-      },
-      { 
-        id: 2, owner_id: 2, university_id: 2, title: 'Student Annex near SLIIT', status: 'approved', price: 15000, 
-        address: 'Malabe North', campus: 'SLIIT', description: 'Sharing room for boys',
-        images: [], features: ['Attached Bathroom'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() 
+        images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800'], 
+        features: ['WiFi', 'Kitchen'], contactName: 'John Landlord', contactPhone: '+94 77 123 4567',
+        securityDeposit: '50,000', proximityHub: '100m to UOM Main Gate', googleMapsUrl: 'https://maps.google.com'
       },
     ];
     setStorage(STORAGE_KEYS.ANNEXES, annexes);
+
+    const events: SystemEvent[] = [
+      {
+        id: 1, title: 'UOM Career Fair 2024', description: 'Annual career fair for engineering students.',
+        date: '2024-11-10', location: 'Civil Auditorium', status: 'upcoming', price: 'Free',
+        image: 'https://images.unsplash.com/photo-1540575861501-7ad0582373f3?q=80&w=800',
+        phone: '+94 11 265 0301', extra: 'Bring your printed CVs.'
+      }
+    ];
+    setStorage(STORAGE_KEYS.EVENTS, events);
   }
 };
 

@@ -25,14 +25,21 @@ export interface Annex {
   university_id: number;
   title: string;
   description: string;
-  price: number;
+  price: string | number;
   address: string;
   campus: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'Active' | 'Approved' | 'Rejected' | 'Expired';
   images: string[];
   features: string[];
-  created_at: string;
-  updated_at: string;
+  securityDeposit?: string;
+  proximityHub?: string;
+  googleMapsUrl?: string;
+  contactName: string;
+  contactPhone: string;
+  contactEmail?: string;
+  postedDate?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Announcement {
@@ -41,19 +48,24 @@ export interface Announcement {
   title: string;
   content: string;
   priority: 'low' | 'medium' | 'high';
+  imageUrl?: string;
   created_at: string;
   updated_at: string;
 }
 
 export interface SystemEvent {
   id: number;
-  organizer_id: number;
+  organizer_id?: number;
   title: string;
   description: string;
   date: string;
   location: string;
-  price?: number;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
-  created_at: string;
-  updated_at: string;
+  price?: number | string;
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | 'pending' | 'approved' | 'rejected';
+  image?: string;
+  phone?: string;
+  extra?: string;
+  university?: string;
+  created_at?: string;
+  updated_at?: string;
 }

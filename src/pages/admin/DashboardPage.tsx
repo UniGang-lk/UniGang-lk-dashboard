@@ -30,6 +30,7 @@ interface Listing {
   price: number;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
+  images?: string[];
   contactName?: string;
 }
 
@@ -91,7 +92,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 /* Main Component                                             */
 /* ─────────────────────────────────────────────────────────── */
 const DashboardPage = () => {
-  const [stats, setStats] = useState({ totalStudents: 0, approvedAnnexes: 0, pendingAnnexes: 0 });
+  const [stats, setStats] = useState<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }>({ totalStudents: 0, approvedAnnexes: 0, pendingAnnexes: 0 });
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -307,8 +308,8 @@ const DashboardPage = () => {
                 >
                   {/* Thumbnail / Placeholder */}
                   <div className="w-14 h-14 rounded-xl flex-shrink-0 overflow-hidden bg-slate-800/80">
-                    {listing.images && listing.images[0] ? (
-                      <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
+                    {(listing as any).images && (listing as any).images[0] ? (
+                      <img src={(listing as any).images[0]} alt={listing.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <LuHouse className="text-slate-600 text-xl" />

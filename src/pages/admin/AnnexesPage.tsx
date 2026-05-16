@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye } from 'react-icons/fa';
-import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { IoClose } from 'react-icons/io5';
+import { LuExternalLink } from 'react-icons/lu';
+import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, updateEntity } from '../../api/api';
-import { Annex } from '../../types/schema';
+import type { Annex } from '../../types/schema';
 
 // Annex Detail Modal Component
 interface AnnexDetailModalProps {
@@ -15,58 +16,93 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
   return (
     <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-slate-900/90 backdrop-blur-2xl border border-white/[0.08] rounded-[2.5rem] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-8 custom-scrollbar">
-        <div className='flex justify-between items-center mb-6'>
-          <h2 className="text-2xl font-black text-white tracking-tight">{annex.title}</h2>
+        <div className='flex justify-between items-center mb-8'>
+          <div>
+            <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-2">{annex.title}</h2>
+            <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em]">{annex.campus}</p>
+          </div>
           <button
             onClick={onClose}
-            className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all"
+            className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90"
           >
-            <IoClose className='h-5 w-5'/>
+            <IoClose className='h-6 w-6'/>
           </button>
         </div>
 
         {annex.images && annex.images.length > 0 && (
-          <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {annex.images.map((img, index) => (
-              <img key={index} src={img} alt={`${annex.title} - Image ${index + 1}`} className="w-full h-40 object-cover rounded-md" />
+              <div key={index} className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 group">
+                <img src={img} alt={`${annex.title} - Image ${index + 1}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                {index === 0 && <span className="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-[8px] font-black text-white rounded-md">COVER</span>}
+              </div>
             ))}
           </div>
         )}
 
-        <div className="space-y-4 text-slate-300">
-          <p className="flex items-center gap-2"><strong className="text-white">University/Institute:</strong> {annex.campus}</p>
-          <p className="flex items-center gap-2"><strong className="text-white">Price:</strong> <span className="text-blue-400 font-black">{annex.price}</span></p>
-          <div className="flex items-center gap-2">
-            <strong className="text-white">Status:</strong> 
-            <span className={`py-1 px-3 rounded-full text-[10px] font-black border ${
-              annex.status === 'Approved' || annex.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
-              annex.status === 'Pending' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' :
-              annex.status === 'Rejected' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
-              'bg-slate-500/20 text-slate-400 border-slate-500/20'
-            }`}>{annex.status}</span>
-          </div>
-          <p><strong className="text-white">Posted Date:</strong> {annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</p>
-          <p><strong className="text-white">Address:</strong> {annex.address}</p>
-          <div className="bg-white/[0.03] border border-white/[0.06] rounded-2xl p-4">
-            <strong className="text-white block mb-2">Description:</strong>
-            <p className="text-sm leading-relaxed">{annex.description}</p>
-          </div>
-
-          {annex.features && annex.features.length > 0 && (
-            <div>
-              <strong>Features:</strong>
-              <ul className="list-disc list-inside ml-4">
-                {annex.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <div className="space-y-6">
+            <div className="p-5 rounded-[1.5rem] bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Pricing & Deposit</p>
+              <div className="flex flex-col gap-2">
+                <p className="text-xl font-black text-white">{annex.price}</p>
+                <p className="text-xs font-bold text-slate-400">Security Deposit: <span className="text-blue-400">{annex.securityDeposit || 'N/A'}</span></p>
+              </div>
             </div>
-          )}
 
-          <h3 className="text-lg font-black text-white mt-8 mb-4 border-t border-white/[0.08] pt-6 tracking-tight">Contact Information</h3>
-          {annex.contactName && <p><strong>Contact Name:</strong> {annex.contactName}</p>}
-          {annex.contactPhone && <p><strong>Contact Phone:</strong> {annex.contactPhone}</p>}
-          {annex.contactEmail && <p><strong>Alternative Email:</strong> {annex.contactEmail}</p>}
+            <div className="p-5 rounded-[1.5rem] bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Location Context</p>
+              <div className="space-y-3">
+                <p className="text-sm font-bold text-slate-300">Address: <span className="text-white font-medium">{annex.address}</span></p>
+                <p className="text-sm font-bold text-slate-300">Proximity: <span className="text-blue-400 font-medium">{annex.proximityHub || 'N/A'}</span></p>
+                {annex.googleMapsUrl && (
+                  <a href={annex.googleMapsUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 font-black uppercase tracking-widest flex items-center gap-1 hover:underline mt-2">
+                    <LuExternalLink size={12}/> View on Maps
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="p-5 rounded-[1.5rem] bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Status Control</p>
+              <div className="flex items-center gap-3">
+                <span className={`py-1 px-4 rounded-full text-[10px] font-black border uppercase tracking-widest ${
+                  annex.status === 'Approved' || annex.status === 'Active' || annex.status === 'approved' ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20' :
+                  annex.status === 'Pending' || annex.status === 'pending' ? 'bg-amber-500/15 text-amber-400 border-amber-500/20' :
+                  annex.status === 'Rejected' || annex.status === 'rejected' ? 'bg-red-500/15 text-red-400 border-red-500/20' :
+                  'bg-slate-500/20 text-slate-400 border-slate-500/20'
+                }`}>{annex.status}</span>
+                <p className="text-[10px] font-bold text-slate-500 uppercase">{annex.createdAt ? new Date(annex.createdAt).toLocaleDateString() : annex.postedDate}</p>
+              </div>
+            </div>
+
+            <div className="p-5 rounded-[1.5rem] bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Contact Information</p>
+              <div className="space-y-2">
+                <p className="text-sm font-black text-white">{annex.contactName}</p>
+                <p className="text-sm font-bold text-slate-400">{annex.contactPhone}</p>
+                {annex.contactEmail && <p className="text-xs text-slate-500">{annex.contactEmail}</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+          <div className="p-6 rounded-[2rem] bg-white/[0.03] border border-white/[0.06]">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Description & House Rules</p>
+            <p className="text-sm text-slate-300 leading-relaxed font-medium mb-4">{annex.description}</p>
+            {annex.features && annex.features.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {annex.features.map((feature, index) => (
+                  <span key={index} className="px-3 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase border border-blue-500/10">
+                    {feature}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

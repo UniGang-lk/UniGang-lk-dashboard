@@ -384,7 +384,7 @@ const UniversitiesPage = () => {
           [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%23666%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
           bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
                                         value={selectedProvinceId}
-                                        onChange={(e) => setSelectedProvinceId(e.target.value)}
+                                        onChange={(e) => setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value))}
                                         required
                                     >
                                         <option value="">Select Province</option>
@@ -405,7 +405,7 @@ const UniversitiesPage = () => {
           bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
                                             value={selectedProvinceId}
                                             onChange={(e) => {
-                                                setSelectedProvinceId(e.target.value);
+                                                setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value));
                                                 setSelectedDistrictId('');
                                             }}
                                             required
@@ -424,7 +424,7 @@ const UniversitiesPage = () => {
           [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%23666%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
           bg-no-repeat bg-[right_0.5rem_center] bg-[length:1.25rem]"
                                             value={selectedDistrictId}
-                                            onChange={(e) => { setSelectedDistrictId(e.target.value) }}
+                                            onChange={(e) => { setSelectedDistrictId(e.target.value === '' ? '' : Number(e.target.value)) }}
                                             required
                                             disabled={!selectedProvinceId}
                                         >

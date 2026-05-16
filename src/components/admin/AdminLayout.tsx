@@ -5,15 +5,20 @@ import {
   LuMenu, LuBell, LuPlus,
   LuLayoutDashboard, LuUsers, LuClipboardList,
   LuGraduationCap, LuMegaphone, LuChartBar,
+  LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone
 } from 'react-icons/lu';
 import AdminSidebar from './AdminSidebar';
 
 const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
   '/admin/dashboard':               { label: 'Dashboard', icon: LuLayoutDashboard },
   '/admin/users':                   { label: 'User Management', icon: LuUsers },
-  '/admin/annexes':                 { label: 'Ads & Listings', icon: LuClipboardList },
+  '/admin/annexes':                 { label: 'Annex Management', icon: LuClipboardList },
+  '/admin/services':                { label: 'Service Requests', icon: LuMonitor },
+  '/admin/events':                  { label: 'Event Hub', icon: LuCalendarDays },
+  '/admin/blogs':                   { label: 'Campus Blogs', icon: LuMessageCircle },
+  '/admin/contacts':                { label: 'Contact Hub', icon: LuPhone },
+  '/admin/notifications':           { label: 'Broadcasts', icon: LuMegaphone },
   '/admin/settings/universities':   { label: 'Universities', icon: LuGraduationCap },
-  '/admin/settings/announcements':  { label: 'Announcements', icon: LuMegaphone },
   '/admin/settings/analytics':      { label: 'Analytics', icon: LuChartBar },
 };
 

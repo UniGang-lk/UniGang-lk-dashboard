@@ -4,6 +4,7 @@ import {
   LuUsers, LuClipboardList, LuGraduationCap,
   LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
+  LuMonitor, LuMessageCircle, LuPhone
 } from 'react-icons/lu';
 
 interface AdminSidebarProps {
@@ -20,18 +21,31 @@ const navItems = [
     ],
   },
   {
-    section: 'Management',
+    section: 'Marketplace',
     items: [
-      { label: 'Users', icon: LuUsers, path: '/admin/users' },
-      { label: 'Ads & Listings', icon: LuClipboardList, path: '/admin/annexes' },
-      { label: 'System Events', icon: LuCalendarDays, path: '/admin/events' },
+      { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes' },
+      { label: 'Services', icon: LuMonitor, path: '/admin/services' },
     ],
   },
   {
-    section: 'Configuration',
+    section: 'Community',
+    items: [
+      { label: 'Events', icon: LuCalendarDays, path: '/admin/events' },
+      { label: 'Blogs', icon: LuMessageCircle, path: '/admin/blogs' },
+    ],
+  },
+  {
+    section: 'Communication',
+    items: [
+      { label: 'Contacts', icon: LuPhone, path: '/admin/contacts' },
+      { label: 'Notifications', icon: LuMegaphone, path: '/admin/notifications' },
+    ],
+  },
+  {
+    section: 'System',
     items: [
       { label: 'Universities', icon: LuGraduationCap, path: '/admin/settings/universities' },
-      { label: 'Announcements', icon: LuMegaphone, path: '/admin/settings/announcements' },
+      { label: 'Users', icon: LuUsers, path: '/admin/users' },
     ],
   },
 ];
@@ -52,7 +66,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
       {/* Logo */}
       <div className="flex items-center justify-between px-6 h-20 border-b border-white/[0.04] flex-shrink-0">
         <div className="flex items-center gap-3.5">
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.05, rotate: -5 }}
             className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/20"
           >
@@ -96,20 +110,20 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                     >
                       {/* Hover Glass Effect */}
                       <div className="absolute inset-0 bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
-                      
+
                       {active && (
                         <motion.div
                           layoutId="activeIndicator"
                           className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-blue-500 rounded-r-full shadow-[4px_0_15px_rgba(59,130,246,0.6)]"
                         />
                       )}
-                      
+
                       <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-500/20 text-blue-400' : 'text-slate-500 group-hover:text-slate-300 group-hover:bg-white/5'}`}>
                         <item.icon className="text-lg flex-shrink-0" />
                       </div>
-                      
+
                       <span className="flex-1 text-left relative z-10 font-bold tracking-tight">{item.label}</span>
-                      
+
                       {active && (
                         <motion.div
                           initial={{ opacity: 0, x: -5 }}
