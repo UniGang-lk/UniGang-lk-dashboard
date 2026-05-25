@@ -93,20 +93,74 @@ export const fetchStats = async () => {
   });
 };
 
-export const fetchAnnexes = async (): Promise<Annex[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(getStorage<Annex>(STORAGE_KEYS.ANNEXES)), 300);
+export const fetchAnnexes = async (): Promise<any[]> => {
+  const token = localStorage.getItem('userToken');
+  const response = await fetch('http://localhost:5000/api/annexes/admin', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
   });
+  if (!response.ok) throw new Error('Failed to fetch admin listings');
+  const data = await response.json();
+  return data.map((item: any) => ({
+    ...item,
+    price: `Rs. ${parseFloat(item.price).toLocaleString()}/month`,
+    campus: item.university ? item.university.name : 'Unknown',
+    contactName: item.owner ? item.owner.name : 'Owner',
+    contactPhone: item.owner ? item.owner.phone : '',
+    postedDate: new Date(item.createdAt).toLocaleDateString(),
+    features: item.features ? item.features.map((f: any) => f.featureName) : [],
+    images: item.images ? item.images.map((img: any) => `http://localhost:5000${img.imageUrl}`) : []
+  }));
 };
 
-export const updateAnnexStatus = async (id: number, status: Annex['status']): Promise<void> => {
-  return new Promise((resolve) => {
-    const annexes = getStorage<Annex>(STORAGE_KEYS.ANNEXES);
-    const updated = annexes.map(a => a.id === id ? { ...a, status, updated_at: new Date().toISOString() } : a);
-    setStorage(STORAGE_KEYS.ANNEXES, updated);
-    setTimeout(resolve, 300);
+export const updateAnnexStatus = async (id: number | string, status: string): Promise<void> => {
+  const token = localStorage.getItem('userToken');
+  const normalizedStatus = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : status;
+  const response = await fetch(`http://localhost:5000/api/annexes/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status: normalizedStatus })
   });
+  if (!response.ok) throw new Error('Failed to update status');
 };
+
+export const fetchPendingReviews = async (): Promise<any[]> => {
+  const token = localStorage.getItem('userToken');
+  const response = await fetch('http://localhost:5000/api/annexes/reviews/pending', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch pending reviews');
+  return await response.json();
+};
+
+export const approveReview = async (reviewId: number | string): Promise<void> => {
+  const token = localStorage.getItem('userToken');
+  const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}/approve`, {
+    method: 'PUT',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to approve review');
+};
+
+export const deleteReview = async (reviewId: number | string): Promise<void> => {
+  const token = localStorage.getItem('userToken');
+  const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete review');
+};
+
 
 export const fetchAnnouncements = async (): Promise<Announcement[]> => {
   return new Promise((resolve) => {

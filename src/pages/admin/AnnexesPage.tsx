@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaStar } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { LuExternalLink } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
-import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, updateEntity } from '../../api/api';
+import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, updateEntity, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
 
 // Annex Detail Modal Component
@@ -122,6 +122,55 @@ const AnnexesPage = () => {
   // CHANGED: Edit functionality සඳහා අලුත් states
   const [editingAnnex, setEditingAnnex] = useState<Annex | null>(null); // Edit කරන Annex එක
   const [currentView, setCurrentView] = useState<'table' | 'editForm'>('table'); // වත්මන් View එක control කරන්න
+
+  // Advanced feature: Reviews Moderation state
+  const [activeTab, setActiveTab] = useState<'ads' | 'reviews'>('ads');
+  const [pendingReviews, setPendingReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+
+  // Fetch pending reviews when activeTab is 'reviews'
+  useEffect(() => {
+    if (activeTab === 'reviews') {
+      const loadReviews = async () => {
+        setReviewsLoading(true);
+        try {
+          const data = await fetchPendingReviews();
+          setPendingReviews(data);
+        } catch (error) {
+          console.error("Failed to fetch pending reviews:", error);
+        } finally {
+          setReviewsLoading(false);
+        }
+      };
+      loadReviews();
+    }
+  }, [activeTab]);
+
+  const handleApproveReview = async (reviewId: number | string) => {
+    if (window.confirm(`Do you want to approve this review?`)) {
+      try {
+        await approveReviewApi(reviewId);
+        setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
+        alert("Review approved successfully.");
+      } catch (error) {
+        console.error("Failed to approve review:", error);
+        alert("Failed to approve review.");
+      }
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: number | string) => {
+    if (window.confirm(`Do you want to delete this review?`)) {
+      try {
+        await deleteReviewApi(reviewId);
+        setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
+        alert("Review deleted successfully.");
+      } catch (error) {
+        console.error("Failed to delete review:", error);
+        alert("Failed to delete review.");
+      }
+    }
+  };
 
   // Annex data loading simulation (for future API integration)
   useEffect(() => {
@@ -250,9 +299,113 @@ const AnnexesPage = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-extrabold text-white tracking-tight">Ads Management</h2>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-white tracking-tight uppercase">Annex Moderation Hub</h2>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Approve property listings and moderate student voice</p>
+        </div>
+      </div>
 
-      {currentView === 'table' ? (
+      {/* Modern Premium Tabs */}
+      <div className="flex gap-4 border-b border-white/[0.08] pb-2">
+        <button
+          onClick={() => {
+            setActiveTab('ads');
+            setCurrentView('table');
+          }}
+          className={`pb-2.5 px-2 text-xs font-black uppercase tracking-widest transition-all relative ${
+            activeTab === 'ads' ? 'text-blue-500' : 'text-slate-500 hover:text-white'
+          }`}
+        >
+          Ads Management
+          {activeTab === 'ads' && (
+            <span className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-blue-500 rounded-full" />
+          )}
+        </button>
+        <button
+          onClick={() => {
+            setActiveTab('reviews');
+            setCurrentView('table');
+          }}
+          className={`pb-2.5 px-2 text-xs font-black uppercase tracking-widest transition-all relative flex items-center gap-1.5 ${
+            activeTab === 'reviews' ? 'text-blue-500' : 'text-slate-500 hover:text-white'
+          }`}
+        >
+          Reviews Moderation
+          {pendingReviews.length > 0 && (
+            <span className="bg-blue-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">
+              {pendingReviews.length}
+            </span>
+          )}
+          {activeTab === 'reviews' && (
+            <span className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-blue-500 rounded-full" />
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'reviews' ? (
+        reviewsLoading ? (
+          <div className="text-center py-16 text-slate-500 text-sm">Loading reviews...</div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {pendingReviews.length > 0 ? (
+              pendingReviews.map((review: any) => (
+                <div 
+                  key={review.id} 
+                  className="bg-white/5 border border-white/10 rounded-[2rem] p-6 hover:border-white/20 transition-all duration-300 flex flex-col justify-between"
+                >
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="text-sm font-black text-white uppercase tracking-wider line-clamp-1">{review.annex?.title || 'Unknown Property'}</h4>
+                        <p className="text-slate-500 text-[10px] font-bold mt-0.5 uppercase tracking-widest">{review.student?.name || 'Anonymous Student'}</p>
+                      </div>
+                      <div className="flex items-center gap-1 bg-yellow-500/10 text-yellow-400 border border-yellow-500/25 px-2 py-0.5 rounded-lg text-xs font-black">
+                        <FaStar size={10} className="fill-yellow-400" />
+                        {review.overallRating || review.overall_rating || review.rating || 0}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 p-3 bg-white/[0.02] border border-white/[0.04] rounded-xl text-xs">
+                      <div className="flex justify-between text-slate-400">
+                        <span className="font-medium">Cleanliness:</span>
+                        <span className="font-bold text-white">{review.cleanlinessRating || review.cleanliness_rating || 0}/5</span>
+                      </div>
+                      <div className="flex justify-between text-slate-400">
+                        <span className="font-medium">Landlord:</span>
+                        <span className="font-bold text-white">{review.landlordRating || review.landlord_rating || 0}/5</span>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-300 text-xs leading-relaxed italic font-medium">
+                      "{review.comment}"
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 mt-6 pt-4 border-t border-white/5">
+                    <button
+                      onClick={() => handleApproveReview(review.id)}
+                      className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20 hover:scale-[1.02] transition-all"
+                    >
+                      <FaCheckCircle size={10} /> Approve
+                    </button>
+                    <button
+                      onClick={() => handleDeleteReview(review.id)}
+                      className="flex-1 py-2.5 rounded-xl bg-red-500/10 text-red-400 font-black text-[9px] uppercase tracking-wider flex items-center justify-center gap-1.5 border border-red-500/10 hover:bg-red-500/20 transition-all"
+                    >
+                      <FaTimesCircle size={10} /> Delete
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-16 text-center text-slate-600 text-sm">
+                No pending reviews found. Excellent job!
+              </div>
+            )}
+          </div>
+        )
+      ) : currentView === 'table' ? (
         <>
           {/* Search and Filter Section */}
           <div className="flex flex-wrap gap-3 items-center">
