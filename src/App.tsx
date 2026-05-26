@@ -11,35 +11,52 @@ import ServicesPage from './pages/admin/ServicesPage';
 import BlogsPage from './pages/admin/BlogsPage';
 import ContactsPage from './pages/admin/ContactsPage';
 import NotificationsPage from './pages/admin/NotificationsPage';
+import LoginPage from './pages/LoginPage';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/admin/ProtectedRoute';
 import './index.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Redirect root to dashboard */}
-        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-        {/* Admin Layout wraps all admin pages */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard"                   element={<DashboardPage />} />
-          <Route path="users"                       element={<UsersPage />} />
-          <Route path="annexes"                     element={<AnnexesPage />} />
-          <Route path="events"                      element={<EventsPage />} />
-          <Route path="services"                    element={<ServicesPage />} />
-          <Route path="blogs"                       element={<BlogsPage />} />
-          <Route path="contacts"                    element={<ContactsPage />} />
-          <Route path="notifications"               element={<NotificationsPage />} />
-          <Route path="settings/universities"       element={<UniversitiesPage />} />
+    <AuthProvider>
+      <Router>
+        <Routes>
+          {/* Public login gate */}
+          <Route path="/login" element={<LoginPage />} />
 
-          <Route path="settings/analytics"          element={<AnalyticsPage />} />
-        </Route>
+          {/* Redirect root to dashboard */}
+          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
+          
+          {/* Admin Layout wraps all admin pages, protected by Firebase Auth Gate */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard"                   element={<DashboardPage />} />
+            <Route path="users"                       element={<UsersPage />} />
+            <Route path="annexes"                     element={<AnnexesPage />} />
+            <Route path="events"                      element={<EventsPage />} />
+            <Route path="services"                    element={<ServicesPage />} />
+            <Route path="blogs"                       element={<BlogsPage />} />
+            <Route path="contacts"                    element={<ContactsPage />} />
+            <Route path="notifications"               element={<NotificationsPage />} />
+            <Route path="settings/universities"       element={<UniversitiesPage />} />
 
-        {/* Catch-all */}
-        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
-      </Routes>
-    </Router>
+            <Route path="settings/analytics"          element={<AnalyticsPage />} />
+          </Route>
+
+          {/* Catch-all */}
+          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
 export default App;
+

@@ -1,4 +1,21 @@
 import type { User, Annex, University, Announcement, SystemEvent } from '../types/schema';
+import { auth } from '../firebase';
+
+// Helper to retrieve active Firebase ID token, with fallback to cached localStorage token
+const getToken = async (): Promise<string | null> => {
+  const user = auth.currentUser;
+  if (!user) {
+    return localStorage.getItem('userToken');
+  }
+  try {
+    const token = await user.getIdToken();
+    localStorage.setItem('userToken', token);
+    return token;
+  } catch (error) {
+    console.error('Error refreshing Firebase ID token:', error);
+    return localStorage.getItem('userToken');
+  }
+};
 
 // --- MOCK STORAGE SERVICE ---
 
@@ -94,7 +111,7 @@ export const fetchStats = async () => {
 };
 
 export const fetchAnnexes = async (): Promise<any[]> => {
-  const token = localStorage.getItem('userToken');
+  const token = await getToken();
   const response = await fetch('http://localhost:5000/api/annexes/admin', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -115,7 +132,7 @@ export const fetchAnnexes = async (): Promise<any[]> => {
 };
 
 export const updateAnnexStatus = async (id: number | string, status: string): Promise<void> => {
-  const token = localStorage.getItem('userToken');
+  const token = await getToken();
   const normalizedStatus = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : status;
   const response = await fetch(`http://localhost:5000/api/annexes/${id}/status`, {
     method: 'PUT',
@@ -129,7 +146,7 @@ export const updateAnnexStatus = async (id: number | string, status: string): Pr
 };
 
 export const fetchPendingReviews = async (): Promise<any[]> => {
-  const token = localStorage.getItem('userToken');
+  const token = await getToken();
   const response = await fetch('http://localhost:5000/api/annexes/reviews/pending', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -140,7 +157,7 @@ export const fetchPendingReviews = async (): Promise<any[]> => {
 };
 
 export const approveReview = async (reviewId: number | string): Promise<void> => {
-  const token = localStorage.getItem('userToken');
+  const token = await getToken();
   const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}/approve`, {
     method: 'PUT',
     headers: {
@@ -151,7 +168,7 @@ export const approveReview = async (reviewId: number | string): Promise<void> =>
 };
 
 export const deleteReview = async (reviewId: number | string): Promise<void> => {
-  const token = localStorage.getItem('userToken');
+  const token = await getToken();
   const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}`, {
     method: 'DELETE',
     headers: {

@@ -6,6 +6,7 @@ import {
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
   LuMonitor, LuMessageCircle, LuPhone
 } from 'react-icons/lu';
+import { useAuth } from '../../context/AuthContext';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -53,6 +54,7 @@ const navItems = [
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { currentUser, logout } = useAuth();
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -60,6 +62,10 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   };
 
   const isActive = (path: string) => location.pathname === path;
+
+  const adminName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Admin';
+  const adminEmail = currentUser?.email || 'admin@unigung.lk';
+  const initial = adminName.charAt(0).toUpperCase();
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -144,13 +150,20 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
 
       {/* Footer */}
       <div className="px-3 py-4 border-t border-white/[0.06]">
-        <div className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer group">
+        <div 
+          onClick={async () => {
+            await logout();
+            navigate('/login');
+          }}
+          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer group"
+          title="Sign Out of Command Center"
+        >
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            A
+            {initial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate">Admin Kaja</p>
-            <p className="text-[10px] text-slate-500 truncate">admin@unigung.lk</p>
+            <p className="text-xs font-bold text-white truncate capitalize">{adminName}</p>
+            <p className="text-[10px] text-slate-500 truncate">{adminEmail}</p>
           </div>
           <LuLogOut className="text-slate-600 group-hover:text-red-400 transition-colors text-sm flex-shrink-0" />
         </div>
