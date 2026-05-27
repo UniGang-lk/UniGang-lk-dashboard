@@ -51,7 +51,7 @@ const AnnexForm: React.FC<AnnexFormProps> = ({ initialData, onSubmit, onCancel, 
       setTitle(initialData.title || '');
       setSelectedCampus(initialData.selectedCampus || null); 
       setAddress(initialData.address || '');
-      setPrice(initialData.price ? initialData.price.replace('Rs. ', '').replace('/month', '') : '');
+      setPrice(initialData.price ? String(initialData.price).replace('Rs. ', '').replace('/month', '') : '');
       setDescription(initialData.description || '');
       setFeaturesText(initialData.features ? initialData.features.join('\n') : '');
       setExistingImageUrls(initialData.images || []); 
