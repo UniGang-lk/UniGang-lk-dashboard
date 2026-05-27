@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LuSearch, LuMessageSquare, LuTriangleAlert, LuStar, LuUser, LuMail,
-  LuTrash2, LuCircleCheck, LuX, LuPhone, LuChevronRight, LuCalendar
+  LuSearch, LuStar, LuUser, LuMail,
+  LuTrash2, LuCircleCheck, LuCalendar
 } from 'react-icons/lu';
 
 // Mock Data for Feedbacks

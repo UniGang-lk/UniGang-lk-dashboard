@@ -3,7 +3,7 @@ import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaStar 
 import { IoClose } from 'react-icons/io5';
 import { LuExternalLink } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
-import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, updateEntity, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi } from '../../api/api';
+import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
 
 // Annex Detail Modal Component
@@ -538,7 +538,7 @@ const AnnexesPage = () => {
               selectedCampus: editingAnnex.campus,
               existingImages: editingAnnex.images,
               newImages: []
-            } as AnnexData : undefined}
+            } as any as AnnexData : undefined}
             onSubmit={handleUpdateAnnexSubmit}
             onCancel={handleCancelEdit}
             isEditing={true}

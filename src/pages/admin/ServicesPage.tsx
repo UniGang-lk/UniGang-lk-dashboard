@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LuSearch, LuMonitor, LuCalendar, LuDollarSign, 
@@ -42,7 +42,6 @@ const itemVariants = {
 
 const ServicesPage = () => {
   const [requests, setRequests] = useState(DUMMY_SERVICES);
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<typeof DUMMY_SERVICES[0] | null>(null);
 

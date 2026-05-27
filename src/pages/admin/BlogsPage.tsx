@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LuSearch, LuMessageCircle, LuUser, LuTag, LuCalendar,
-  LuTrash2, LuCircleCheck, LuX, LuChevronRight, LuPencilLine,
-  LuImage, LuEye
+  LuSearch, LuMessageCircle, LuUser, LuTag,
+  LuTrash2, LuCircleCheck, LuX, LuPencilLine
 } from 'react-icons/lu';
 
 // Mock Data for Blogs

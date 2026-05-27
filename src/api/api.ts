@@ -98,10 +98,10 @@ export const deleteUser = async (id: number): Promise<void> => {
   });
 };
 
-export const fetchStats = async () => {
+export const fetchStats = async (): Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }> => {
   const users = getStorage<User>(STORAGE_KEYS.USERS);
   const annexes = getStorage<Annex>(STORAGE_KEYS.ANNEXES);
-  return new Promise((resolve) => {
+  return new Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }>((resolve) => {
     setTimeout(() => resolve({
       totalStudents: users.filter(u => u.role === 'student').length,
       approvedAnnexes: annexes.filter(a => a.status === 'approved').length,

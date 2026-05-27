@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   LuSearch, LuPlus, LuCalendar, LuMapPin, 
-  LuTrash2, LuPencil, LuCircleCheck, 
+  LuTrash2, LuCircleCheck, 
   LuX, LuClock, LuPhone
 } from 'react-icons/lu';
-import { fetchEvents, updateEntity } from '../../api/api';
+import { fetchEvents } from '../../api/api';
 import type { SystemEvent } from '../../types/schema';
 
 const containerVariants = {

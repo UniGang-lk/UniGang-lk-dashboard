@@ -28,7 +28,7 @@ export interface Annex {
   price: string | number;
   address: string;
   campus: string;
-  status: 'pending' | 'approved' | 'rejected' | 'Active' | 'Approved' | 'Rejected' | 'Expired';
+  status: string;
   images: string[];
   features: string[];
   securityDeposit?: string;
@@ -40,6 +40,8 @@ export interface Annex {
   postedDate?: string;
   created_at?: string;
   updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Announcement {
