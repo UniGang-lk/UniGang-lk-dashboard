@@ -3,7 +3,7 @@ import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaStar 
 import { IoClose } from 'react-icons/io5';
 import { LuExternalLink } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
-import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi } from '../../api/api';
+import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi, updateAnnex as updateAnnexApi, deleteAnnex as deleteAnnexApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
 
 // Annex Detail Modal Component
@@ -204,7 +204,7 @@ const AnnexesPage = () => {
         await updateAnnexStatusApi(annexId, 'approved');
         setAnnexes(prevAnnexes =>
           prevAnnexes.map(annex =>
-            annex.id === annexId ? { ...annex, status: 'approved' } : annex
+            annex.id === annexId ? { ...annex, status: 'Approved' } : annex
           )
         );
         alert(`Ads ID ${annexId} approved successfully.`);
@@ -222,7 +222,7 @@ const AnnexesPage = () => {
         await updateAnnexStatusApi(annexId, 'rejected');
         setAnnexes(prevAnnexes =>
           prevAnnexes.map(annex =>
-            annex.id === annexId ? { ...annex, status: 'rejected' } : annex
+            annex.id === annexId ? { ...annex, status: 'Rejected' } : annex
           )
         );
         alert(`Ads ID ${annexId} rejected successfully`);
@@ -243,8 +243,7 @@ const AnnexesPage = () => {
   const handleDeleteAnnex = async (annexId: number) => {
     if (window.confirm(`Do you want to delete ads? (ID ${annexId})`)) {
       try {
-        // Mock delete via update status or actual delete if implemented in api.ts
-        // For now, let's keep it in UI state or implement delete in StorageService
+        await deleteAnnexApi(annexId);
         setAnnexes(annexes.filter(annex => annex.id !== annexId));
         alert(`Ads ID ${annexId} deleted successfully.`);
       } catch (error) {
@@ -264,29 +263,35 @@ const AnnexesPage = () => {
     setShowViewModal(false);
   };
 
-  const handleUpdateAnnexSubmit = (updatedData: AnnexData, isEditing: boolean) => {
+  const handleUpdateAnnexSubmit = async (updatedData: AnnexData, isEditing: boolean) => {
     if (isEditing && editingAnnex) {
       console.log('Updating Annex:', editingAnnex.id, updatedData);
-      // මෙතන backend API call එක දාලා annex update කරන්න ඕන
-      // දැනට dummy data update කරනවා
-      setAnnexes(prevAnnexes =>
-        prevAnnexes.map(annex =>
-          annex.id === editingAnnex.id ? {
-            ...annex,
-            title: updatedData.title,
-            campus: updatedData.selectedCampus || '', 
-            address: updatedData.address,
-            price: `Rs. ${updatedData.price}/month`,
-            description: updatedData.description,
-            features: updatedData.features,
-            images: updatedData.existingImages.concat(updatedData.newImages.map((file: File) => URL.createObjectURL(file))), // Images update කරන්න
-            contactName: updatedData.contactName,
-            contactPhone: updatedData.contactPhone,
-            contactEmail: updatedData.contactEmail,
-          } : annex
-        )
-      );
-      alert(`Ads ID ${editingAnnex.id} updated successfully!`);
+      setLoading(true);
+      try {
+        const result = await updateAnnexApi(editingAnnex.id, updatedData);
+        const mappedAnnex = {
+          ...result,
+          price: `Rs. ${parseFloat(result.price).toLocaleString()}/month`,
+          campus: result.university ? result.university.name : (updatedData.selectedCampus || 'Unknown'),
+          contactName: result.owner ? result.owner.name : updatedData.contactName,
+          contactPhone: result.owner ? result.owner.phone : updatedData.contactPhone,
+          postedDate: new Date(result.createdAt).toLocaleDateString(),
+          features: result.features ? result.features.map((f: any) => f.featureName || f) : [],
+          images: result.images ? result.images.map((img: any) => typeof img === 'object' ? `http://localhost:5000${img.imageUrl}` : img) : []
+        };
+
+        setAnnexes(prevAnnexes =>
+          prevAnnexes.map(annex =>
+            annex.id === editingAnnex.id ? mappedAnnex : annex
+          )
+        );
+        alert(`Ads ID ${editingAnnex.id} updated successfully!`);
+      } catch (error: any) {
+        console.error("Failed to update annex:", error);
+        alert(error.message || "Failed to update ads.");
+      } finally {
+        setLoading(false);
+      }
     }
     setEditingAnnex(null); 
     setCurrentView('table'); 

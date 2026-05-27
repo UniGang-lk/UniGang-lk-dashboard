@@ -1,5 +1,6 @@
 import type { User, Annex, University, Announcement, SystemEvent } from '../types/schema';
 import { auth } from '../firebase';
+import universitiesData from '../constants/annex/Universities.json';
 
 // Helper to retrieve active Firebase ID token, with fallback to cached localStorage token
 const getToken = async (): Promise<string | null> => {
@@ -206,4 +207,59 @@ export const updateEntity = async <T extends { id: number }>(key: string, id: nu
     setStorage(key, updated);
     setTimeout(resolve, 300);
   });
+};
+
+export const updateAnnex = async (id: number | string, adData: any): Promise<any> => {
+  const token = await getToken();
+  const formData = new FormData();
+  formData.append('title', adData.title);
+  formData.append('description', adData.description);
+  formData.append('price', adData.price);
+  formData.append('address', adData.address);
+  
+  // Resolve university ID
+  const uni = universitiesData.find((u: any) => u.name === adData.selectedCampus);
+  if (uni) {
+    formData.append('universityId', uni.id);
+  } else {
+    formData.append('universityId', '0');
+  }
+
+  formData.append('features', JSON.stringify(adData.features));
+
+  if (adData.newImages && adData.newImages.length > 0) {
+    adData.newImages.forEach((file: File) => {
+      formData.append('images', file);
+    });
+  }
+
+  const response = await fetch(`http://localhost:5000/api/annexes/${id}`, {
+    method: 'PUT',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || 'Failed to update annex advertisement');
+  }
+
+  return await response.json();
+};
+
+export const deleteAnnex = async (id: number | string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/annexes/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || 'Failed to delete annex advertisement');
+  }
 };
