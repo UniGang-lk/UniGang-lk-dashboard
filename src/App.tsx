@@ -13,13 +13,15 @@ import ContactsPage from './pages/admin/ContactsPage';
 import NotificationsPage from './pages/admin/NotificationsPage';
 import LoginPage from './pages/LoginPage';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import './index.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <ToastProvider>
+      <AuthProvider>
+        <Router>
         <Routes>
           {/* Public login gate */}
           <Route path="/login" element={<LoginPage />} />
@@ -55,6 +57,7 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+   </ToastProvider>
   );
 }
 

@@ -5,6 +5,8 @@ import { LuExternalLink } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi, updateAnnex as updateAnnexApi, deleteAnnex as deleteAnnexApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
+import { useToast } from '../../context/ToastContext';
+
 
 // Annex Detail Modal Component
 interface AnnexDetailModalProps {
@@ -113,7 +115,9 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
 
 
 const AnnexesPage = () => {
+  const { toast } = useToast();
   const [annexes, setAnnexes] = useState<Annex[]>([]);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [loading, setLoading] = useState(false);
@@ -151,11 +155,12 @@ const AnnexesPage = () => {
       try {
         await approveReviewApi(reviewId);
         setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
-        alert("Review approved successfully.");
+        toast.success("Review approved successfully.");
       } catch (error) {
         console.error("Failed to approve review:", error);
-        alert("Failed to approve review.");
+        toast.error("Failed to approve review.");
       }
+
     }
   };
 
@@ -164,11 +169,12 @@ const AnnexesPage = () => {
       try {
         await deleteReviewApi(reviewId);
         setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
-        alert("Review deleted successfully.");
+        toast.success("Review deleted successfully.");
       } catch (error) {
         console.error("Failed to delete review:", error);
-        alert("Failed to delete review.");
+        toast.error("Failed to delete review.");
       }
+
     }
   };
 
@@ -207,11 +213,12 @@ const AnnexesPage = () => {
             annex.id === annexId ? { ...annex, status: 'Approved' } : annex
           )
         );
-        alert(`Ads ID ${annexId} approved successfully.`);
+        toast.success(`Ads ID ${annexId} approved successfully.`);
       } catch (error) {
         console.error("Failed to approve annex:", error);
-        alert("Failed to approve ads.");
+        toast.error("Failed to approve ads.");
       }
+
     }
   };
 
@@ -225,11 +232,12 @@ const AnnexesPage = () => {
             annex.id === annexId ? { ...annex, status: 'Rejected' } : annex
           )
         );
-        alert(`Ads ID ${annexId} rejected successfully`);
+        toast.success(`Ads ID ${annexId} rejected successfully.`);
       } catch (error) {
         console.error("Failed to reject annex:", error);
-        alert("Failed to reject ads.");
+        toast.error("Failed to reject ads.");
       }
+
     }
   };
 
@@ -245,11 +253,12 @@ const AnnexesPage = () => {
       try {
         await deleteAnnexApi(annexId);
         setAnnexes(annexes.filter(annex => annex.id !== annexId));
-        alert(`Ads ID ${annexId} deleted successfully.`);
+        toast.success(`Ads ID ${annexId} deleted successfully.`);
       } catch (error) {
         console.error("Failed to delete annex:", error);
-        alert("Failed to delete ads.");
+        toast.error("Failed to delete ads.");
       }
+
     }
   };
 
@@ -285,11 +294,12 @@ const AnnexesPage = () => {
             annex.id === editingAnnex.id ? mappedAnnex : annex
           )
         );
-        alert(`Ads ID ${editingAnnex.id} updated successfully!`);
+        toast.success(`Ads ID ${editingAnnex.id} updated successfully!`);
       } catch (error: any) {
         console.error("Failed to update annex:", error);
-        alert(error.message || "Failed to update ads.");
+        toast.error(error.message || "Failed to update ads.");
       } finally {
+
         setLoading(false);
       }
     }

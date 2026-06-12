@@ -187,10 +187,41 @@ export const fetchAnnouncements = async (): Promise<Announcement[]> => {
 };
 
 export const fetchEvents = async (): Promise<SystemEvent[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(getStorage<SystemEvent>(STORAGE_KEYS.EVENTS)), 300);
+  const token = await getToken();
+  const response = await fetch('http://localhost:5000/api/events/admin/all', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
   });
+  if (!response.ok) throw new Error('Failed to fetch admin events');
+  const result = await response.json();
+  return result.data || [];
 };
+
+export const updateEventStatus = async (id: number | string, status: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/events/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update event status');
+};
+
+export const deleteEvent = async (id: number | string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete event');
+};
+
 
 export const deleteEntity = async (key: string, id: number): Promise<void> => {
   return new Promise((resolve) => {
@@ -263,3 +294,95 @@ export const deleteAnnex = async (id: number | string): Promise<void> => {
     throw new Error(err.message || 'Failed to delete annex advertisement');
   }
 };
+
+// ─── SERVICE REQUESTS ────────────────────────────────────────────────────────
+
+// @desc  Fetch all service requests (optionally filtered by status)
+export const fetchServiceRequests = async (status?: string): Promise<any[]> => {
+  const token = await getToken();
+  const query = status && status !== 'all' ? `?status=${status}` : '';
+  const response = await fetch(`http://localhost:5000/api/services${query}`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch service requests');
+  const data = await response.json();
+  return data.data ?? [];
+};
+
+// @desc  Fetch a single service request by ID
+export const fetchServiceRequestById = async (id: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/services/${id}`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Service request not found');
+  const data = await response.json();
+  return data.data;
+};
+
+// @desc  Update the status (and optional admin notes) of a service request
+export const updateServiceRequestStatus = async (
+  id: string,
+  status: string,
+  adminNotes?: string
+): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/services/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status, ...(adminNotes !== undefined ? { adminNotes } : {}) })
+  });
+  if (!response.ok) throw new Error('Failed to update service request status');
+};
+
+// @desc  Delete a service request
+export const deleteServiceRequest = async (id: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/services/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete service request');
+};
+
+// @desc  Fetch messages for a service request
+export const fetchServiceMessages = async (id: string): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/services/${id}/messages`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch service messages');
+  const data = await response.json();
+  return data.data ?? [];
+};
+
+// @desc  Add a message to a service request
+export const addServiceMessage = async (id: string, message: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/services/${id}/messages`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ message })
+  });
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || 'Failed to add service message');
+  }
+  const data = await response.json();
+  return data.data;
+};
+

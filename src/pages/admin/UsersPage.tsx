@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaSearch, FaUserShield, FaUserGraduate, FaUserTag } from 'react-icons/fa'; 
 import { fetchUsers, deleteUser as deleteUserApi } from '../../api/api';
 import type { User } from '../../types/schema';
+import { useToast } from '../../context/ToastContext';
 
 const UsersPage = () => {
+  const { toast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('All');
@@ -37,7 +39,7 @@ const UsersPage = () => {
 
   const handleEditUser = (userId: number) => {
     console.log(`Edit user with ID: ${userId}`);
-    alert(`User ID ${userId} ready to edit.`);
+    toast.info(`User ID ${userId} ready to edit.`);
   };
 
   // Handle user delete
@@ -46,10 +48,10 @@ const UsersPage = () => {
       try {
         await deleteUserApi(userId);
         setUsers(users.filter(user => user.id !== userId));
-        alert(`User ID ${userId} deleted successfully.`);
+        toast.success(`User ID ${userId} deleted successfully.`);
       } catch (error) {
         console.error("Failed to delete user:", error);
-        alert("Failed to delete user.");
+        toast.error("Failed to delete user.");
       }
     }
   };

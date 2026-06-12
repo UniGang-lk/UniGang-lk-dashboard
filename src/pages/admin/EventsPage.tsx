@@ -5,8 +5,9 @@ import {
   LuTrash2, LuCircleCheck, 
   LuX, LuClock, LuPhone
 } from 'react-icons/lu';
-import { fetchEvents } from '../../api/api';
+import { fetchEvents, updateEventStatus, deleteEvent } from '../../api/api';
 import type { SystemEvent } from '../../types/schema';
+import { useToast } from '../../context/ToastContext';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -49,11 +50,17 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
   );
 };
 
+// Helper to resolve image URL
+const getImageUrl = (image?: string) => {
+  if (!image) return 'https://images.unsplash.com/photo-1540575861501-7ad058ad37fa?q=80&w=800';
+  return image.startsWith('http') ? image : `http://localhost:5000${image}`;
+};
+
 // Event Detail Modal Component
 interface EventDetailModalProps {
   event: SystemEvent;
   onClose: () => void;
-  onStatusChange: (id: number, status: string) => void;
+  onStatusChange: (id: number | string, status: string) => void;
 }
 
 const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onStatusChange }) => {
@@ -74,7 +81,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
         </div>
 
         <div className="mb-8 rounded-[2rem] overflow-hidden border border-white/10 aspect-video relative group">
-          <img src={event.image || 'https://via.placeholder.com/800x450'} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <img src={getImageUrl(event.image)} alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
         </div>
 
@@ -89,7 +96,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
                  <LuMapPin className="text-blue-500" /> {event.location}
                </div>
                <div className="flex items-center gap-3 text-white text-sm font-bold">
-                 <LuPhone className="text-blue-500" /> {event.phone || 'N/A'}
+                 <LuPhone className="text-blue-500" /> {event.contact || 'N/A'}
                </div>
             </div>
           </div>
@@ -125,13 +132,13 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
 
         <div className="pt-8 border-t border-white/10 flex gap-3">
           <button 
-            onClick={() => { onStatusChange(event.id, 'ongoing'); onClose(); }}
+            onClick={() => { onStatusChange(event.id, 'approved'); onClose(); }}
             className="flex-1 py-4 rounded-2xl bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 hover:scale-[1.02] transition-all"
           >
             <LuCircleCheck size={16} /> Approve Event
           </button>
           <button 
-             onClick={() => { onStatusChange(event.id, 'cancelled'); onClose(); }}
+             onClick={() => { onStatusChange(event.id, 'rejected'); onClose(); }}
              className="flex-1 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-400 font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
           >
             <LuX size={16} /> Reject / Cancel
@@ -143,6 +150,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
 };
 
 const EventsPage = () => {
+  const { toast } = useToast();
   const [events, setEvents] = useState<SystemEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -170,16 +178,29 @@ const EventsPage = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number | string) => {
     if (window.confirm('Are you sure you want to delete this event?')) {
-      setEvents(events.filter(e => e.id !== id));
-      if (selectedEvent?.id === id) setSelectedEvent(null);
+      try {
+        await deleteEvent(id);
+        setEvents(events.filter(e => e.id !== id));
+        if (selectedEvent?.id === id) setSelectedEvent(null);
+        toast.success('Event deleted successfully.');
+      } catch (err: any) {
+        console.error(err);
+        toast.error(err.message || 'Failed to delete event.');
+      }
     }
   };
 
-  const handleStatusUpdate = (id: number, status: any) => {
-    setEvents(events.map(e => e.id === id ? { ...e, status } : e));
-    alert(`Event status updated to ${status}`);
+  const handleStatusUpdate = async (id: number | string, status: any) => {
+    try {
+      await updateEventStatus(id, status);
+      setEvents(events.map(e => e.id === id ? { ...e, status } : e));
+      toast.success(`Event status updated to ${status}`);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || 'Failed to update event status.');
+    }
   };
 
   return (
@@ -217,10 +238,9 @@ const EventsPage = () => {
           className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white focus:outline-none outline-none appearance-none cursor-pointer"
         >
           <option value="all" className="bg-slate-900">All Statuses</option>
-          <option value="upcoming" className="bg-slate-900">Upcoming</option>
-          <option value="ongoing" className="bg-slate-900">Ongoing</option>
-          <option value="completed" className="bg-slate-900">Completed</option>
-          <option value="cancelled" className="bg-slate-900">Cancelled</option>
+          <option value="pending" className="bg-slate-900">Pending</option>
+          <option value="approved" className="bg-slate-900">Approved</option>
+          <option value="rejected" className="bg-slate-900">Rejected</option>
         </select>
       </div>
 
@@ -256,7 +276,7 @@ const EventsPage = () => {
               </div>
 
               <div className="aspect-[16/10] rounded-2xl overflow-hidden mb-5 border border-white/5">
-                <img src={event.image || 'https://via.placeholder.com/400x250'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Cover" />
+                <img src={getImageUrl(event.image)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="Cover" />
               </div>
 
               <h3 className="text-xl font-black text-white mb-2 line-clamp-1 tracking-tight">{event.title}</h3>

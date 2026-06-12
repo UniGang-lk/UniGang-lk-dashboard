@@ -56,8 +56,8 @@ export interface Announcement {
 }
 
 export interface SystemEvent {
-  id: number;
-  organizer_id?: number;
+  id: number | string;
+  organizer_id?: number | string;
   title: string;
   description: string;
   date: string;
@@ -66,8 +66,30 @@ export interface SystemEvent {
   status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | 'pending' | 'approved' | 'rejected';
   image?: string;
   phone?: string;
+  contact?: string;
   extra?: string;
   university?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface ServiceRequest {
+  id: string;
+  serviceName: string;
+  clientPhone: string;
+  clientEmail?: string;
+  brief: string;
+  deadline?: string;
+  budget?: string;
+  status: 'pending' | 'approved' | 'rejected' | 'in_progress' | 'completed';
+  adminNotes?: string;
+  created_at: string;
+  updated_at: string;
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+    profile_pic?: string;
+    phone?: string;
+  };
 }
