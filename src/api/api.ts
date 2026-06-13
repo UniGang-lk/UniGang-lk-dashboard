@@ -386,3 +386,55 @@ export const addServiceMessage = async (id: string, message: string): Promise<an
   return data.data;
 };
 
+// ─── BLOGS CONSOLE ENDPOINTS ────────────────────────────────────────
+
+export const fetchBlogs = async (): Promise<Blog[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5000/api/blogs/admin/all', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch admin blogs');
+  const data = await response.json();
+  return data.map((blog: any) => ({
+    id: blog.id,
+    title: blog.title,
+    category: blog.category,
+    author: blog.author ? blog.author.name : 'Unknown',
+    excerpt: blog.excerpt,
+    content: blog.content,
+    tags: blog.tags || '',
+    image: blog.featuredImage 
+      ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`)
+      : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800',
+    status: blog.status.toLowerCase() as 'pending' | 'approved' | 'rejected',
+    createdAt: blog.createdAt
+  }));
+};
+
+export const updateBlogStatus = async (id: number | string, status: string): Promise<void> => {
+  const token = await getToken();
+  const normalizedStatus = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : 'Pending';
+  const response = await fetch(`http://localhost:5000/api/blogs/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status: normalizedStatus })
+  });
+  if (!response.ok) throw new Error('Failed to update blog status');
+};
+
+export const deleteBlog = async (id: number | string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/blogs/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete blog');
+};
+

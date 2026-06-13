@@ -1,37 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LuSearch, LuMessageCircle, LuUser, LuTag,
   LuTrash2, LuCircleCheck, LuX, LuPencilLine
 } from 'react-icons/lu';
-
-// Mock Data for Blogs
-const DUMMY_BLOGS = [
-  {
-    id: 1,
-    title: 'How I Survived My First Semester',
-    category: 'Campus Life',
-    author: 'Dulaj Silva',
-    excerpt: 'Sharing my personal journey of navigating university life, from exams to social clubs.',
-    content: '<p>University life can be overwhelming at first. The transition from school is a major leap...</p>',
-    tags: 'lifestyle, campus, advice',
-    image: 'https://images.unsplash.com/photo-1523050335392-9bc5675e7753?q=80&w=800',
-    status: 'pending',
-    createdAt: '2024-10-25T10:30:00Z'
-  },
-  {
-    id: 2,
-    title: 'Top 5 Exam Tips for Engineering Students',
-    category: 'Exam Tips',
-    author: 'Kaja Perera',
-    excerpt: 'Proven strategies to ace your mid-terms and finals without losing your sanity.',
-    content: '<ul><li>Start early</li><li>Practice past papers</li></ul>',
-    tags: 'exams, engineering, study',
-    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=800',
-    status: 'approved',
-    createdAt: '2024-10-24T14:45:00Z'
-  }
-];
+import { fetchBlogs, updateBlogStatus, deleteBlog } from '../../api/api';
+import type { Blog } from '../../types/schema';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -44,9 +18,26 @@ const itemVariants = {
 };
 
 const BlogsPage = () => {
-  const [blogs, setBlogs] = useState(DUMMY_BLOGS);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBlog, setSelectedBlog] = useState<typeof DUMMY_BLOGS[0] | null>(null);
+  const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
+
+  const loadBlogs = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchBlogs();
+      setBlogs(data);
+    } catch (error) {
+      console.error('Failed to load blogs:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBlogs();
+  }, []);
 
   const filteredBlogs = blogs.filter(b => 
     b.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -54,17 +45,39 @@ const BlogsPage = () => {
     b.tags.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleStatusChange = (id: number, newStatus: string) => {
-    setBlogs(blogs.map(b => b.id === id ? { ...b, status: newStatus } : b));
-    if (selectedBlog?.id === id) setSelectedBlog({ ...selectedBlog, status: newStatus });
-  };
-
-  const handleDelete = (id: number) => {
-    if (window.confirm('Are you sure you want to delete this blog?')) {
-      setBlogs(blogs.filter(b => b.id !== id));
-      setSelectedBlog(null);
+  const handleStatusChange = async (id: number | string, newStatus: string) => {
+    try {
+      await updateBlogStatus(id, newStatus);
+      setBlogs(prev => prev.map(b => b.id === id ? { ...b, status: newStatus as 'pending' | 'approved' | 'rejected' } : b));
+      if (selectedBlog?.id === id) {
+        setSelectedBlog(prev => prev ? { ...prev, status: newStatus as 'pending' | 'approved' | 'rejected' } : null);
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update blog status.');
     }
   };
+
+  const handleDelete = async (id: number | string) => {
+    if (window.confirm('Are you sure you want to delete this blog?')) {
+      try {
+        await deleteBlog(id);
+        setBlogs(prev => prev.filter(b => b.id !== id));
+        setSelectedBlog(null);
+      } catch (error) {
+        console.error(error);
+        alert('Failed to delete blog.');
+      }
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <div className="text-slate-500 font-bold uppercase tracking-widest text-xs animate-pulse">Loading Blogs Console...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -118,6 +131,8 @@ const BlogsPage = () => {
                     <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${
                       blog.status === 'approved' 
                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                      : blog.status === 'rejected'
+                      ? 'bg-red-500/10 text-red-400 border-red-500/20'
                       : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                     }`}>
                       {blog.status}
@@ -133,6 +148,12 @@ const BlogsPage = () => {
                 </div>
               </motion.div>
             ))}
+
+            {filteredBlogs.length === 0 && (
+              <div className="text-center py-20 border border-white/5 border-dashed rounded-[2.5rem]">
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No blogs found</p>
+              </div>
+            )}
           </motion.div>
         </div>
 
@@ -195,11 +216,15 @@ const BlogsPage = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      {selectedBlog.tags.split(',').map(tag => (
-                        <span key={tag} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-500 text-[10px] font-bold uppercase">
-                          #{tag.trim()}
-                        </span>
-                      ))}
+                      {selectedBlog.tags.split(',').map(tag => {
+                        const trimmedTag = tag.trim();
+                        if (!trimmedTag) return null;
+                        return (
+                          <span key={trimmedTag} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-500 text-[10px] font-bold uppercase">
+                            #{trimmedTag}
+                          </span>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -208,13 +233,13 @@ const BlogsPage = () => {
                       <>
                         <button 
                           onClick={() => handleStatusChange(selectedBlog.id, 'approved')}
-                          className="py-4 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 hover:scale-[1.02] transition-all"
+                          className="py-4 rounded-2xl bg-emerald-600 text-white font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 hover:scale-[1.02] transition-all cursor-pointer"
                         >
                           <LuCircleCheck size={14} /> Approve
                         </button>
                         <button 
                           onClick={() => handleStatusChange(selectedBlog.id, 'rejected')}
-                          className="py-4 rounded-2xl bg-red-500/10 text-red-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all border border-red-500/10"
+                          className="py-4 rounded-2xl bg-red-500/10 text-red-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-red-500/20 transition-all border border-red-500/10 cursor-pointer"
                         >
                           <LuX size={14} /> Reject
                         </button>
@@ -222,7 +247,7 @@ const BlogsPage = () => {
                     ) : (
                       <button 
                          onClick={() => handleStatusChange(selectedBlog.id, 'pending')}
-                         className="col-span-2 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all"
+                         className="col-span-2 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-400 font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/10 transition-all cursor-pointer"
                       >
                         <LuPencilLine size={14} /> Revert to Pending
                       </button>

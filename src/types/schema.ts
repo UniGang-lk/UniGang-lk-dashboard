@@ -93,3 +93,16 @@ export interface ServiceRequest {
     phone?: string;
   };
 }
+
+export interface Blog {
+  id: number | string;
+  title: string;
+  category: string;
+  author: string;
+  excerpt: string;
+  content: string;
+  tags: string;
+  image: string;
+  status: 'pending' | 'approved' | 'rejected';
+  createdAt: string;
+}
