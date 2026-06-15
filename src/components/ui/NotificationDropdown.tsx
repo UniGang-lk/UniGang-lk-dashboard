@@ -1,8 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LuBell, LuCheck } from 'react-icons/lu';
+import { LuBell, LuCheck, LuInfo, LuFileText, LuCalendar, LuWrench, LuClipboardList } from 'react-icons/lu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchMyNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
+
+const getNotificationIcon = (type: string) => {
+  switch (type) {
+    case 'Blog': return <LuFileText className="w-4 h-4 text-purple-400" />;
+    case 'Event': return <LuCalendar className="w-4 h-4 text-emerald-400" />;
+    case 'Service': return <LuWrench className="w-4 h-4 text-orange-400" />;
+    case 'Annex': return <LuClipboardList className="w-4 h-4 text-rose-400" />;
+    case 'System':
+    default: return <LuInfo className="w-4 h-4 text-blue-400" />;
+  }
+};
+
+const getNotificationColor = (type: string) => {
+  switch (type) {
+    case 'Blog': return 'bg-purple-500/10 border-purple-500/20';
+    case 'Event': return 'bg-emerald-500/10 border-emerald-500/20';
+    case 'Service': return 'bg-orange-500/10 border-orange-500/20';
+    case 'Annex': return 'bg-rose-500/10 border-rose-500/20';
+    case 'System':
+    default: return 'bg-blue-500/10 border-blue-500/20';
+  }
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+const itemVariants: any = {
+  hidden: { opacity: 0, x: 20 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeOut' } },
+  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } }
+};
 
 export const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,7 +59,7 @@ export const NotificationDropdown = () => {
 
   useEffect(() => {
     loadNotifications();
-    const interval = setInterval(loadNotifications, 60000); // Poll every minute
+    const interval = setInterval(loadNotifications, 30000); // Polled every 30s
     return () => clearInterval(interval);
   }, []);
 
@@ -77,12 +115,13 @@ export const NotificationDropdown = () => {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all focus:outline-none"
+        className="relative w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900/50 border border-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500/50 shadow-sm"
       >
-        <LuBell className="text-lg" />
+        <LuBell className={`text-[1.1rem] ${unreadCount > 0 ? 'animate-pulse text-blue-400' : ''}`} />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-blue-500 rounded-full border border-slate-950 flex items-center justify-center">
-            <span className="absolute w-full h-full bg-blue-500 rounded-full animate-ping opacity-75"></span>
+          <span className="absolute -top-1 -right-1 flex items-center justify-center w-3 h-3">
+            <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 border-2 border-slate-950"></span>
           </span>
         )}
       </button>
@@ -90,70 +129,112 @@ export const NotificationDropdown = () => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-3 w-80 sm:w-96 bg-slate-950/95 backdrop-blur-xl border border-white/[0.06] rounded-2xl shadow-2xl overflow-hidden z-50 shadow-[0_8px_30px_rgba(0,0,0,0.5)]"
+            initial={{ opacity: 0, y: 15, scale: 0.95, filter: 'blur(10px)' }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+            exit={{ opacity: 0, y: 10, scale: 0.95, filter: 'blur(5px)' }}
+            transition={{ duration: 0.3, type: 'spring', stiffness: 300, damping: 25 }}
+            className="absolute right-0 mt-3 w-[22rem] sm:w-[25rem] bg-slate-950/80 backdrop-blur-3xl border border-white/10 rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden z-50"
           >
-            <div className="p-4 border-b border-white/[0.06] flex items-center justify-between bg-white/[0.02]">
-              <h3 className="text-sm font-semibold text-white tracking-tight">Notifications</h3>
+            {/* Header */}
+            <div className="px-5 py-4 flex items-center justify-between bg-gradient-to-r from-slate-900/80 to-slate-800/80 border-b border-white/[0.06]">
+              <h3 className="text-[1.05rem] font-bold text-white flex items-center gap-2">
+                Notifications 
+                {unreadCount > 0 && (
+                  <span className="bg-blue-500/20 text-blue-300 text-xs px-2 py-0.5 rounded-full font-semibold border border-blue-500/30">
+                    {unreadCount} New
+                  </span>
+                )}
+              </h3>
               {unreadCount > 0 && (
                 <button 
                   onClick={handleMarkAllAsRead}
-                  className="text-xs text-blue-400 hover:text-blue-300 transition-colors tracking-wide"
+                  className="text-xs font-medium text-slate-400 hover:text-blue-400 transition-colors"
                 >
                   Mark all as read
                 </button>
               )}
             </div>
             
-            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+            {/* Body */}
+            <div className="max-h-[26rem] overflow-y-auto custom-scrollbar p-2">
               {notifications.length === 0 ? (
-                <div className="p-8 text-center text-slate-500">
-                  <LuBell className="w-8 h-8 mx-auto mb-3 opacity-20" />
-                  <p className="text-sm tracking-wide">No notifications yet.</p>
-                </div>
+                <motion.div 
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                  className="px-6 py-12 text-center text-slate-400"
+                >
+                  <div className="w-16 h-16 mx-auto mb-4 bg-slate-900 rounded-full flex items-center justify-center border border-white/5">
+                    <LuBell className="w-7 h-7 text-slate-500" />
+                  </div>
+                  <p className="font-medium text-slate-300">All caught up!</p>
+                  <p className="text-sm mt-1 text-slate-500">You have no new notifications.</p>
+                </motion.div>
               ) : (
-                <div className="divide-y divide-white/[0.03]">
-                  {notifications.map(notification => (
-                    <div 
-                      key={notification.id}
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`p-4 hover:bg-white/[0.03] cursor-pointer transition-colors relative group ${!notification.isRead ? 'bg-blue-500/[0.03]' : ''}`}
-                    >
-                      {!notification.isRead && (
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
-                      )}
-                      <div className="flex justify-between items-start gap-3">
-                        <div className="flex-1">
-                          <p className={`text-sm tracking-tight ${!notification.isRead ? 'text-white font-medium' : 'text-slate-300'}`}>
-                            {notification.title}
-                          </p>
-                          <p className="text-[13px] text-slate-500 mt-1 line-clamp-2 leading-snug">
-                            {notification.message}
-                          </p>
-                          <p className="text-[10px] text-slate-600 mt-2 font-semibold tracking-wider uppercase">
-                            {new Date(notification.createdAt).toLocaleString()}
-                          </p>
-                        </div>
+                <motion.div 
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-1"
+                >
+                  <AnimatePresence>
+                    {notifications.map(notification => (
+                      <motion.div 
+                        variants={itemVariants}
+                        layout
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`group relative p-4 rounded-2xl cursor-pointer transition-all duration-300 ease-out border overflow-hidden
+                          ${!notification.isRead 
+                            ? 'bg-slate-900/90 border-white/10 shadow-lg hover:shadow-xl' 
+                            : 'bg-transparent border-transparent hover:bg-white/[0.03]'}`}
+                      >
+                        {/* Soft background glow for unread */}
                         {!notification.isRead && (
-                          <button 
-                            onClick={(e) => handleMarkAsRead(notification.id, e)}
-                            className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-blue-400 transition-all opacity-0 group-hover:opacity-100"
-                            title="Mark as read"
-                          >
-                            <LuCheck className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/[0.05] to-transparent pointer-events-none" />
                         )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+
+                        <div className="flex gap-4 relative">
+                          {/* Icon Badge */}
+                          <div className="flex-shrink-0 mt-0.5">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border shadow-inner ${getNotificationColor(notification.type)}`}>
+                              {getNotificationIcon(notification.type)}
+                            </div>
+                          </div>
+
+                          {/* Content */}
+                          <div className="flex-1 min-w-0 pr-8">
+                            <p className={`text-[14px] leading-tight ${!notification.isRead ? 'font-semibold text-white' : 'font-medium text-slate-300'}`}>
+                              {notification.title}
+                            </p>
+                            <p className="text-[13px] text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+                              {notification.message}
+                            </p>
+                            <p className="text-[10px] text-slate-500 mt-2 font-semibold tracking-wider uppercase flex items-center gap-1.5">
+                              {!notification.isRead && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full inline-block shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>}
+                              {new Date(notification.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+
+                          {/* Action Button */}
+                          {!notification.isRead && (
+                            <button 
+                              onClick={(e) => handleMarkAsRead(notification.id, e)}
+                              className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-800 text-slate-400 hover:text-blue-400 hover:shadow-md hover:bg-slate-700 transition-all opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0"
+                              title="Mark as read"
+                            >
+                              <LuCheck className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
               )}
             </div>
-            <div className="p-3 border-t border-white/[0.06] bg-black/40 text-center">
-              <span className="text-[10px] uppercase tracking-widest text-slate-600 font-bold">End of notifications</span>
+            
+            {/* Footer */}
+            <div className="p-3 bg-black/40 border-t border-white/[0.06] text-center shadow-[inset_0_10px_20px_-10px_rgba(0,0,0,0.2)]">
+              <span className="text-[11px] font-bold tracking-[0.2em] text-slate-600 uppercase">End of updates</span>
             </div>
           </motion.div>
         )}
