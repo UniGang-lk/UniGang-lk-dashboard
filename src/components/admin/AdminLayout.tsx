@@ -5,9 +5,10 @@ import {
   LuMenu, LuBell, LuPlus,
   LuLayoutDashboard, LuUsers, LuClipboardList,
   LuGraduationCap, LuMegaphone, LuChartBar,
-  LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone
+  LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone, LuArrowRight
 } from 'react-icons/lu';
 import AdminSidebar from './AdminSidebar';
+import { NotificationDropdown } from '../ui/NotificationDropdown';
 
 const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
   '/admin/dashboard':               { label: 'Dashboard', icon: LuLayoutDashboard },
@@ -69,28 +70,18 @@ const AdminLayout = () => {
           <div className="flex items-center gap-2 flex-shrink-0">
             {/* Quick Action */}
             <motion.button
-              whileHover={{ scale: 1.02, y: -2 }}
-              whileTap={{ scale: 0.98 }}
-              className="hidden sm:flex items-center gap-2.5 px-6 py-2.5 rounded-2xl text-[12px] font-black
-                bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 text-white
-                shadow-[0_8px_25px_-5px_rgba(59,130,246,0.5)] hover:shadow-[0_15px_30px_-5px_rgba(59,130,246,0.6)] 
-                transition-all relative overflow-hidden group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="hidden sm:flex items-center gap-2 px-8 py-4 rounded-2xl text-[12px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 transition-all relative overflow-hidden group"
             >
-              {/* Shimmer Effect */}
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
               
-              <div className="p-1 rounded-lg bg-white/20">
-                <LuPlus className="text-sm" />
-              </div>
-              <span className="tracking-tight uppercase">Add New Listing</span>
+              <span>Add New Listing</span>
+              <LuArrowRight className="text-lg transition-transform group-hover:translate-x-1" />
             </motion.button>
 
             {/* Notifications */}
-            <button className="relative w-9 h-9 rounded-xl flex items-center justify-center
-              text-slate-400 hover:text-white hover:bg-white/10 transition-all">
-              <LuBell className="text-lg" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full border border-slate-950" />
-            </button>
+            <NotificationDropdown />
 
             {/* Avatar */}
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600

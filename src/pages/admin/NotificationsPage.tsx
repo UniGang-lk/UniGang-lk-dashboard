@@ -182,7 +182,7 @@ const NotificationsPage = () => {
                 <h3 className="text-2xl font-black text-white tracking-tight uppercase">
                   {editingNotif ? 'Edit Notification' : 'New Broadcast'}
                 </h3>
-                <button onClick={handleCloseModal} className="text-slate-500 hover:text-white transition-colors">
+                <button onClick={handleCloseModal} className="text-slate-500 hover:text-white transition-all font-bold uppercase tracking-wider">
                   <LuX size={24} />
                 </button>
               </div>
@@ -225,7 +225,7 @@ const NotificationsPage = () => {
 
                 <button 
                   type="submit"
-                  className="w-full py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-blue-600/20 hover:scale-[1.02] transition-all"
+                  className="w-full py-5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-3 shadow-xl hover:scale-[1.02] transition-all"
                 >
                   <LuSend size={18} />
                   {editingNotif ? 'Save Changes' : 'Post Notification'}

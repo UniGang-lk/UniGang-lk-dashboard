@@ -15,6 +15,7 @@ import LoginPage from './pages/LoginPage';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
+import { Toaster } from 'react-hot-toast';
 import './index.css';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
           <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
         </Routes>
       </Router>
+      <Toaster position="top-center" />
     </AuthProvider>
    </ToastProvider>
   );

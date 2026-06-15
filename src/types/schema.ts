@@ -99,6 +99,7 @@ export interface Blog {
   title: string;
   category: string;
   author: string;
+  authorImage?: string;
   excerpt: string;
   content: string;
   tags: string;

@@ -402,6 +402,9 @@ export const fetchBlogs = async (): Promise<Blog[]> => {
     title: blog.title,
     category: blog.category,
     author: blog.author ? blog.author.name : 'Unknown',
+    authorImage: blog.author && blog.author.profile_pic
+      ? (blog.author.profile_pic.startsWith('http') || blog.author.profile_pic.startsWith('data:image') ? blog.author.profile_pic : `http://localhost:5000${blog.author.profile_pic}`)
+      : undefined,
     excerpt: blog.excerpt,
     content: blog.content,
     tags: blog.tags || '',
@@ -436,5 +439,43 @@ export const deleteBlog = async (id: number | string): Promise<void> => {
     }
   });
   if (!response.ok) throw new Error('Failed to delete blog');
+};
+
+// ─── NOTIFICATIONS API ────────────────────────────────────────
+
+export const fetchMyNotifications = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/notifications`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch notifications');
+  const data = await response.json();
+  return data.notifications ?? [];
+};
+
+export const markNotificationAsRead = async (id: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+    method: 'PATCH',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to mark notification as read');
+  return response.json();
+};
+
+export const markAllNotificationsAsRead = async (): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5000/api/notifications/read-all`, {
+    method: 'PATCH',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to mark all as read');
+  return response.json();
 };
 

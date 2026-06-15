@@ -188,8 +188,7 @@ const DashboardPage = () => {
             <motion.button
               whileHover={{ scale: 1.02, backgroundColor: 'rgba(255, 255, 255, 0.08)' }}
               whileTap={{ scale: 0.98 }}
-              className="group flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-tight
-                bg-white/5 text-slate-300 border border-white/10 hover:border-white/20 transition-all backdrop-blur-md"
+              className="group flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-tight bg-white/5 text-slate-300 border border-white/10 hover:border-white/20 transition-all backdrop-blur-md tracking-wider"
             >
               <div className="p-1.5 rounded-lg bg-white/5 group-hover:bg-blue-500/20 group-hover:text-blue-400 transition-colors">
                 <LuUsers className="text-base" />
@@ -199,9 +198,7 @@ const DashboardPage = () => {
             <motion.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="group relative overflow-hidden flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-tight
-                bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-600/30 
-                hover:shadow-blue-600/50 transition-all border border-blue-400/30"
+              className="group relative overflow-hidden flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[13px] font-black uppercase tracking-tight bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-600/30 hover:shadow-blue-600/50 transition-all border border-blue-400/30 tracking-wider"
             >
               <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
               <div className="p-1.5 rounded-lg bg-white/20 group-hover:scale-110 transition-transform">
@@ -266,7 +263,7 @@ const DashboardPage = () => {
         <div className="xl:col-span-2 space-y-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-lg font-black text-white tracking-tight uppercase underline decoration-blue-500/30 underline-offset-8">Recent Listings</h3>
-            <button className="group flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-400 hover:bg-blue-500/5 border border-transparent hover:border-blue-500/20 transition-all">
+            <button className="group flex items-center gap-2 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-wider text-slate-400 hover:text-blue-400 hover:bg-blue-500/5 border border-transparent hover:border-blue-500/20 transition-all">
               View All <LuArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
@@ -343,8 +340,7 @@ const DashboardPage = () => {
                       whileHover={{ scale: 1.1, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       title="Analytics"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center
-                        bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/10 hover:border-blue-500/30 transition-all"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/10 hover:border-blue-500/30 transition-all font-bold uppercase tracking-wider"
                     >
                       <LuChartBar className="text-sm" />
                     </motion.button>
@@ -352,8 +348,7 @@ const DashboardPage = () => {
                       whileHover={{ scale: 1.1, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       title="Edit"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center
-                        bg-slate-700/30 text-slate-400 hover:bg-slate-700/50 hover:text-white border border-white/5 hover:border-white/10 transition-all"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center bg-slate-700/30 text-slate-400 hover:bg-slate-700/50 hover:text-white border border-white/5 hover:border-white/10 transition-all font-bold uppercase tracking-wider"
                     >
                       <LuPencil className="text-sm" />
                     </motion.button>
@@ -361,8 +356,7 @@ const DashboardPage = () => {
                       whileHover={{ scale: 1.1, y: -2 }}
                       whileTap={{ scale: 0.95 }}
                       title="Delete"
-                      className="w-9 h-9 rounded-xl flex items-center justify-center
-                        bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/10 hover:border-red-500/30 transition-all"
+                      className="w-9 h-9 rounded-xl flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/10 hover:border-red-500/30 transition-all font-bold uppercase tracking-wider shadow-lg shadow-red-500/10 hover:shadow-xl hover:shadow-red-500/20"
                     >
                       <LuTrash2 className="text-sm" />
                     </motion.button>
@@ -418,8 +412,7 @@ const DashboardPage = () => {
               ))}
             </motion.ul>
             <div className="px-6 py-4 border-t border-white/[0.04]">
-              <button className="w-full text-xs font-black text-blue-500 hover:text-blue-400 transition-all
-                flex items-center justify-center gap-2 uppercase tracking-widest">
+              <button className="w-full text-xs font-bold uppercase tracking-wider text-blue-500 hover:text-blue-400 transition-all flex items-center justify-center gap-2">
                 View Full Log <LuArrowRight className="text-sm" />
               </button>
             </div>

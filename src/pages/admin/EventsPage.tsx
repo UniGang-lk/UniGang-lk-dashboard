@@ -8,6 +8,7 @@ import {
 import { fetchEvents, updateEventStatus, deleteEvent } from '../../api/api';
 import type { SystemEvent } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
+import { toast as hotToast } from 'react-hot-toast';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -74,7 +75,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
           </div>
           <button
             onClick={onClose}
-            className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90"
+            className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90 font-bold uppercase tracking-wider"
           >
             <LuX className='h-6 w-6'/>
           </button>
@@ -178,8 +179,28 @@ const EventsPage = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const confirmAction = (message: string, onConfirm: () => void) => {
+    hotToast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white tracking-wide">{message}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60">
+            Cancel
+          </button>
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40">
+            Confirm
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
+  };
+
   const handleDelete = async (id: number | string) => {
-    if (window.confirm('Are you sure you want to delete this event?')) {
+    confirmAction('Are you sure you want to delete this event?', async () => {
       try {
         await deleteEvent(id);
         setEvents(events.filter(e => e.id !== id));
@@ -189,7 +210,7 @@ const EventsPage = () => {
         console.error(err);
         toast.error(err.message || 'Failed to delete event.');
       }
-    }
+    });
   };
 
   const handleStatusUpdate = async (id: number | string, status: any) => {
@@ -213,7 +234,7 @@ const EventsPage = () => {
         <motion.button
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-blue-600/20"
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-blue-600 text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all"
         >
           <LuPlus className="text-lg" />
           Create Event

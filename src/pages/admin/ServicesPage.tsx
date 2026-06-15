@@ -15,6 +15,7 @@ import {
 } from '../../api/api';
 import type { ServiceRequest } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
+import { toast as hotToast } from 'react-hot-toast';
 
 
 const containerVariants = {
@@ -158,8 +159,28 @@ const ServicesPage = () => {
     }
   };
 
+  const confirmAction = (message: string, onConfirm: () => void) => {
+    hotToast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white tracking-wide">{message}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60">
+            Cancel
+          </button>
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40">
+            Confirm
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
+  };
+
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this service request? This action is permanent.')) {
+    confirmAction('Are you sure you want to delete this service request? This action is permanent.', async () => {
       try {
         await deleteServiceRequest(id);
         toast.success('Service request deleted.');
@@ -172,7 +193,7 @@ const ServicesPage = () => {
         console.error(err);
         toast.error('Failed to delete request.');
       }
-    }
+    });
   };
 
 
@@ -261,7 +282,7 @@ const ServicesPage = () => {
               <p className="font-bold text-sm mb-4">{error}</p>
               <button 
                 onClick={loadRequests} 
-                className="px-4 py-2 bg-red-500/20 rounded-xl hover:bg-red-500/30 font-black text-xs uppercase tracking-widest transition-all"
+                className="px-6 py-3 bg-red-500/20 rounded-2xl hover:bg-red-500/30 font-bold uppercase tracking-wider text-xs transition-all"
               >
                 Retry Connection
               </button>
@@ -464,7 +485,7 @@ const ServicesPage = () => {
                     <button
                       onClick={handleSaveNotes}
                       disabled={savingNotes}
-                      className="mt-2 w-full py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-[10px] font-black uppercase tracking-widest text-white transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="mt-2 w-full py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-[10px] font-bold uppercase tracking-wider text-white transition-all flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <LuSave size={12} /> {savingNotes ? 'Saving...' : 'Save Notes'}
                     </button>
@@ -517,7 +538,7 @@ const ServicesPage = () => {
                       />
                       <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-xl transition-all shadow-xs flex items-center justify-center cursor-pointer"
+                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-2xl transition-all shadow-xs flex items-center justify-center cursor-pointer font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40"
                         aria-label="Send message"
                       >
                         <LuSend size={14} />

@@ -6,6 +6,7 @@ import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi, updateAnnex as updateAnnexApi, deleteAnnex as deleteAnnexApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
+import { toast as hotToast } from 'react-hot-toast';
 
 
 // Annex Detail Modal Component
@@ -25,7 +26,7 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose }) =
           </div>
           <button
             onClick={onClose}
-            className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90"
+            className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90 font-bold uppercase tracking-wider"
           >
             <IoClose className='h-6 w-6'/>
           </button>
@@ -150,8 +151,28 @@ const AnnexesPage = () => {
     }
   }, [activeTab]);
 
+  const confirmAction = (message: string, onConfirm: () => void) => {
+    hotToast.custom((t) => (
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="flex-1">
+            <p className="text-sm font-bold text-white tracking-wide">{message}</p>
+          </div>
+        </div>
+        <div className="flex gap-3 justify-end">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60">
+            Cancel
+          </button>
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40">
+            Confirm
+          </button>
+        </div>
+      </div>
+    ), { duration: Infinity, position: 'top-center' });
+  };
+
   const handleApproveReview = async (reviewId: number | string) => {
-    if (window.confirm(`Do you want to approve this review?`)) {
+    confirmAction(`Do you want to approve this review?`, async () => {
       try {
         await approveReviewApi(reviewId);
         setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
@@ -160,12 +181,11 @@ const AnnexesPage = () => {
         console.error("Failed to approve review:", error);
         toast.error("Failed to approve review.");
       }
-
-    }
+    });
   };
 
   const handleDeleteReview = async (reviewId: number | string) => {
-    if (window.confirm(`Do you want to delete this review?`)) {
+    confirmAction(`Do you want to delete this review?`, async () => {
       try {
         await deleteReviewApi(reviewId);
         setPendingReviews(prev => prev.filter(r => r.id !== reviewId));
@@ -174,8 +194,7 @@ const AnnexesPage = () => {
         console.error("Failed to delete review:", error);
         toast.error("Failed to delete review.");
       }
-
-    }
+    });
   };
 
   // Annex data loading simulation (for future API integration)
@@ -205,7 +224,7 @@ const AnnexesPage = () => {
 
   // Handle annex approval
   const handleApproveAnnex = async (annexId: number) => {
-    if (window.confirm(`Do you want to approve this ads? (ID: ${annexId})`)) {
+    confirmAction(`Do you want to approve this ads? (ID: ${annexId})`, async () => {
       try {
         await updateAnnexStatusApi(annexId, 'approved');
         setAnnexes(prevAnnexes =>
@@ -218,13 +237,12 @@ const AnnexesPage = () => {
         console.error("Failed to approve annex:", error);
         toast.error("Failed to approve ads.");
       }
-
-    }
+    });
   };
 
   // Handle annex rejection
   const handleRejectAnnex = async (annexId: number) => {
-    if (window.confirm(`Do you want to reject this ads? (ID: ${annexId})`)) {
+    confirmAction(`Do you want to reject this ads? (ID: ${annexId})`, async () => {
       try {
         await updateAnnexStatusApi(annexId, 'rejected');
         setAnnexes(prevAnnexes =>
@@ -237,8 +255,7 @@ const AnnexesPage = () => {
         console.error("Failed to reject annex:", error);
         toast.error("Failed to reject ads.");
       }
-
-    }
+    });
   };
 
   // CHANGED: Annex edit functionality
@@ -249,7 +266,7 @@ const AnnexesPage = () => {
 
   // Handle annex delete
   const handleDeleteAnnex = async (annexId: number) => {
-    if (window.confirm(`Do you want to delete ads? (ID ${annexId})`)) {
+    confirmAction(`Do you want to delete ads? (ID ${annexId})`, async () => {
       try {
         await deleteAnnexApi(annexId);
         setAnnexes(annexes.filter(annex => annex.id !== annexId));
@@ -258,8 +275,7 @@ const AnnexesPage = () => {
         console.error("Failed to delete annex:", error);
         toast.error("Failed to delete ads.");
       }
-
-    }
+    });
   };
 
   const handleViewAnnex = (annex: Annex) => {

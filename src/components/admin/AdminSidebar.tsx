@@ -86,7 +86,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         {/* Mobile close */}
         <button
           onClick={onClose}
-          className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+          className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-bold uppercase tracking-wider"
         >
           <LuX className="text-lg" />
         </button>
@@ -105,13 +105,13 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 return (
                   <li key={item.path}>
                     <motion.button
-                      whileHover={{ x: 6 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={{ x: 6, scale: 1.02 }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => handleNav(item.path)}
-                      className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-[13px] font-bold transition-all duration-300 group relative overflow-hidden
+                      className={`w-full flex items-center gap-3.5 px-6 py-4 rounded-2xl text-[12px] font-bold uppercase tracking-wider transition-all duration-300 group relative overflow-hidden
                         ${active
-                          ? 'bg-blue-600/10 text-white shadow-[inset_0_0_20px_rgba(59,130,246,0.08)]'
-                          : 'text-slate-400 hover:text-white'
+                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                          : 'text-slate-400 hover:text-white hover:bg-white/5'
                         }`}
                     >
                       {/* Hover Glass Effect */}
@@ -124,7 +124,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                         />
                       )}
 
-                      <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-blue-500/20 text-blue-400' : 'text-slate-500 group-hover:text-slate-300 group-hover:bg-white/5'}`}>
+                      <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-white/20 text-white' : 'text-slate-500 group-hover:text-slate-300 group-hover:bg-white/10'}`}>
                         <item.icon className="text-lg flex-shrink-0" />
                       </div>
 
@@ -155,17 +155,17 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             await logout();
             navigate('/login');
           }}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-white/[0.05] transition-colors cursor-pointer group"
+          className="flex items-center gap-3 px-3 py-3 rounded-full hover:bg-white/[0.05] transition-colors cursor-pointer group"
           title="Sign Out of Command Center"
         >
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
             {initial}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-white truncate capitalize">{adminName}</p>
-            <p className="text-[10px] text-slate-500 truncate">{adminEmail}</p>
+            <p className="text-sm font-medium text-white truncate capitalize">{adminName}</p>
+            <p className="text-xs text-slate-500 truncate">{adminEmail}</p>
           </div>
-          <LuLogOut className="text-slate-600 group-hover:text-red-400 transition-colors text-sm flex-shrink-0" />
+          <LuLogOut className="text-slate-600 group-hover:text-red-400 transition-colors text-lg flex-shrink-0" />
         </div>
       </div>
     </div>
