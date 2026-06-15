@@ -1,4 +1,4 @@
-import type { User, Annex, University, Announcement, SystemEvent } from '../types/schema';
+import type { User, Annex, University, Announcement, SystemEvent, Blog } from '../types/schema';
 import { auth } from '../firebase';
 import universitiesData from '../constants/annex/Universities.json';
 

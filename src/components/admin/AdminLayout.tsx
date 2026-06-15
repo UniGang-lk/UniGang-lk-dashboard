@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  LuMenu, LuBell, LuPlus,
+  LuMenu,
   LuLayoutDashboard, LuUsers, LuClipboardList,
   LuGraduationCap, LuMegaphone, LuChartBar,
   LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone, LuArrowRight
