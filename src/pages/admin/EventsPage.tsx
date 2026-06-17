@@ -54,7 +54,7 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
 // Helper to resolve image URL
 const getImageUrl = (image?: string) => {
   if (!image) return 'https://images.unsplash.com/photo-1540575861501-7ad058ad37fa?q=80&w=800';
-  return image.startsWith('http') ? image : `http://localhost:5000${image}`;
+  return image.startsWith('http') ? image : `http://localhost:5001${image}`;
 };
 
 // Event Detail Modal Component

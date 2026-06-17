@@ -113,7 +113,7 @@ export const fetchStats = async (): Promise<{ totalStudents: number; approvedAnn
 
 export const fetchAnnexes = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('http://localhost:5000/api/annexes/admin', {
+  const response = await fetch('http://localhost:5001/api/annexes/admin', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -128,14 +128,14 @@ export const fetchAnnexes = async (): Promise<any[]> => {
     contactPhone: item.owner ? item.owner.phone : '',
     postedDate: new Date(item.createdAt).toLocaleDateString(),
     features: item.features ? item.features.map((f: any) => f.featureName) : [],
-    images: item.images ? item.images.map((img: any) => `http://localhost:5000${img.imageUrl}`) : []
+    images: item.images ? item.images.map((img: any) => `http://localhost:5001${img.imageUrl}`) : []
   }));
 };
 
 export const updateAnnexStatus = async (id: number | string, status: string): Promise<void> => {
   const token = await getToken();
   const normalizedStatus = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : status;
-  const response = await fetch(`http://localhost:5000/api/annexes/${id}/status`, {
+  const response = await fetch(`http://localhost:5001/api/annexes/${id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -148,7 +148,7 @@ export const updateAnnexStatus = async (id: number | string, status: string): Pr
 
 export const fetchPendingReviews = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('http://localhost:5000/api/annexes/reviews/pending', {
+  const response = await fetch('http://localhost:5001/api/annexes/reviews/pending', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -159,7 +159,7 @@ export const fetchPendingReviews = async (): Promise<any[]> => {
 
 export const approveReview = async (reviewId: number | string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}/approve`, {
+  const response = await fetch(`http://localhost:5001/api/annexes/reviews/${reviewId}/approve`, {
     method: 'PUT',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -170,7 +170,7 @@ export const approveReview = async (reviewId: number | string): Promise<void> =>
 
 export const deleteReview = async (reviewId: number | string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/annexes/reviews/${reviewId}`, {
+  const response = await fetch(`http://localhost:5001/api/annexes/reviews/${reviewId}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -188,7 +188,7 @@ export const fetchAnnouncements = async (): Promise<Announcement[]> => {
 
 export const fetchEvents = async (): Promise<SystemEvent[]> => {
   const token = await getToken();
-  const response = await fetch('http://localhost:5000/api/events/admin/all', {
+  const response = await fetch('http://localhost:5001/api/events/admin/all', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -200,7 +200,7 @@ export const fetchEvents = async (): Promise<SystemEvent[]> => {
 
 export const updateEventStatus = async (id: number | string, status: string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/events/${id}/status`, {
+  const response = await fetch(`http://localhost:5001/api/events/${id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -213,7 +213,7 @@ export const updateEventStatus = async (id: number | string, status: string): Pr
 
 export const deleteEvent = async (id: number | string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/events/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -264,7 +264,7 @@ export const updateAnnex = async (id: number | string, adData: any): Promise<any
     });
   }
 
-  const response = await fetch(`http://localhost:5000/api/annexes/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/annexes/${id}`, {
     method: 'PUT',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -282,7 +282,7 @@ export const updateAnnex = async (id: number | string, adData: any): Promise<any
 
 export const deleteAnnex = async (id: number | string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/annexes/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/annexes/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -301,7 +301,7 @@ export const deleteAnnex = async (id: number | string): Promise<void> => {
 export const fetchServiceRequests = async (status?: string): Promise<any[]> => {
   const token = await getToken();
   const query = status && status !== 'all' ? `?status=${status}` : '';
-  const response = await fetch(`http://localhost:5000/api/services${query}`, {
+  const response = await fetch(`http://localhost:5001/api/services${query}`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -314,7 +314,7 @@ export const fetchServiceRequests = async (status?: string): Promise<any[]> => {
 // @desc  Fetch a single service request by ID
 export const fetchServiceRequestById = async (id: string): Promise<any> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/services/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/services/${id}`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -331,7 +331,7 @@ export const updateServiceRequestStatus = async (
   adminNotes?: string
 ): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/services/${id}/status`, {
+  const response = await fetch(`http://localhost:5001/api/services/${id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -345,7 +345,7 @@ export const updateServiceRequestStatus = async (
 // @desc  Delete a service request
 export const deleteServiceRequest = async (id: string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/services/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/services/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -357,7 +357,7 @@ export const deleteServiceRequest = async (id: string): Promise<void> => {
 // @desc  Fetch messages for a service request
 export const fetchServiceMessages = async (id: string): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/services/${id}/messages`, {
+  const response = await fetch(`http://localhost:5001/api/services/${id}/messages`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -370,7 +370,7 @@ export const fetchServiceMessages = async (id: string): Promise<any[]> => {
 // @desc  Add a message to a service request
 export const addServiceMessage = async (id: string, message: string): Promise<any> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/services/${id}/messages`, {
+  const response = await fetch(`http://localhost:5001/api/services/${id}/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -390,7 +390,7 @@ export const addServiceMessage = async (id: string, message: string): Promise<an
 
 export const fetchBlogs = async (): Promise<Blog[]> => {
   const token = await getToken();
-  const response = await fetch('http://localhost:5000/api/blogs/admin/all', {
+  const response = await fetch('http://localhost:5001/api/blogs/admin/all', {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -403,13 +403,13 @@ export const fetchBlogs = async (): Promise<Blog[]> => {
     category: blog.category,
     author: blog.author ? blog.author.name : 'Unknown',
     authorImage: blog.author && blog.author.profile_pic
-      ? (blog.author.profile_pic.startsWith('http') || blog.author.profile_pic.startsWith('data:image') ? blog.author.profile_pic : `http://localhost:5000${blog.author.profile_pic}`)
+      ? (blog.author.profile_pic.startsWith('http') || blog.author.profile_pic.startsWith('data:image') ? blog.author.profile_pic : `http://localhost:5001${blog.author.profile_pic}`)
       : undefined,
     excerpt: blog.excerpt,
     content: blog.content,
     tags: blog.tags || '',
     image: blog.featuredImage 
-      ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5000${blog.featuredImage}`)
+      ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `http://localhost:5001${blog.featuredImage}`)
       : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800',
     status: blog.status.toLowerCase() as 'pending' | 'approved' | 'rejected',
     createdAt: blog.createdAt
@@ -419,7 +419,7 @@ export const fetchBlogs = async (): Promise<Blog[]> => {
 export const updateBlogStatus = async (id: number | string, status: string): Promise<void> => {
   const token = await getToken();
   const normalizedStatus = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : 'Pending';
-  const response = await fetch(`http://localhost:5000/api/blogs/${id}/status`, {
+  const response = await fetch(`http://localhost:5001/api/blogs/${id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -432,7 +432,7 @@ export const updateBlogStatus = async (id: number | string, status: string): Pro
 
 export const deleteBlog = async (id: number | string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/blogs/${id}`, {
+  const response = await fetch(`http://localhost:5001/api/blogs/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -445,7 +445,7 @@ export const deleteBlog = async (id: number | string): Promise<void> => {
 
 export const fetchMyNotifications = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/notifications`, {
+  const response = await fetch(`http://localhost:5001/api/notifications`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -457,7 +457,7 @@ export const fetchMyNotifications = async (): Promise<any[]> => {
 
 export const markNotificationAsRead = async (id: string): Promise<any> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/notifications/${id}/read`, {
+  const response = await fetch(`http://localhost:5001/api/notifications/${id}/read`, {
     method: 'PATCH',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -469,7 +469,7 @@ export const markNotificationAsRead = async (id: string): Promise<any> => {
 
 export const markAllNotificationsAsRead = async (): Promise<any> => {
   const token = await getToken();
-  const response = await fetch(`http://localhost:5000/api/notifications/read-all`, {
+  const response = await fetch(`http://localhost:5001/api/notifications/read-all`, {
     method: 'PATCH',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -479,3 +479,29 @@ export const markAllNotificationsAsRead = async (): Promise<any> => {
   return response.json();
 };
 
+// ─── ADVERTISEMENTS API ────────────────────────────────────────
+
+export const fetchAdvertisements = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/advertisements`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch advertisements');
+  const data = await response.json();
+  return data.data ?? [];
+};
+
+export const updateAdvertisementStatus = async (id: string | number, status: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/advertisements/${id}/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update advertisement status');
+};

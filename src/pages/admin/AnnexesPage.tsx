@@ -302,7 +302,7 @@ const AnnexesPage = () => {
           contactPhone: result.owner ? result.owner.phone : updatedData.contactPhone,
           postedDate: new Date(result.createdAt).toLocaleDateString(),
           features: result.features ? result.features.map((f: any) => f.featureName || f) : [],
-          images: result.images ? result.images.map((img: any) => typeof img === 'object' ? `http://localhost:5000${img.imageUrl}` : img) : []
+          images: result.images ? result.images.map((img: any) => typeof img === 'object' ? `http://localhost:5001${img.imageUrl}` : img) : []
         };
 
         setAnnexes(prevAnnexes =>
