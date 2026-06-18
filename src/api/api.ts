@@ -505,3 +505,37 @@ export const updateAdvertisementStatus = async (id: string | number, status: str
   });
   if (!response.ok) throw new Error('Failed to update advertisement status');
 };
+
+export const updateAdvertisement = async (id: string | number, data: any): Promise<any> => {
+  const token = await getToken();
+  const formData = new FormData();
+  
+  if (data.company_name) formData.append('company_name', data.company_name);
+  if (data.contact_email) formData.append('contact_email', data.contact_email);
+  if (data.contact_phone) formData.append('contact_phone', data.contact_phone);
+  if (data.ad_title) formData.append('ad_title', data.ad_title);
+  if (data.ad_description) formData.append('ad_description', data.ad_description);
+  if (data.target_link) formData.append('target_link', data.target_link);
+  if (data.placement_type) formData.append('placement_type', data.placement_type);
+  if (data.duration_days) formData.append('duration_days', data.duration_days);
+
+  if (data.image) {
+    formData.append('image', data.image);
+  }
+
+  const response = await fetch(`http://localhost:5001/api/advertisements/${id}`, {
+    method: 'PUT',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.message || 'Failed to update advertisement');
+  }
+
+  const result = await response.json();
+  return result.data;
+};

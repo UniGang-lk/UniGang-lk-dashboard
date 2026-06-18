@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaAd, FaChartLine, FaHourglassHalf, FaMoneyBillWave } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { fetchAdvertisements, updateAdvertisementStatus } from '../../api/api';
+import { fetchAdvertisements, updateAdvertisementStatus, updateAdvertisement } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { toast as hotToast } from 'react-hot-toast';
 
@@ -120,6 +120,109 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
   );
 };
 
+// Edit Ad Modal Component
+interface EditAdModalProps {
+  ad: any;
+  onClose: () => void;
+  onUpdate: (updatedAd: any) => void;
+}
+
+const EditAdModal: React.FC<EditAdModalProps> = ({ ad, onClose, onUpdate }) => {
+  const [formData, setFormData] = useState({
+    company_name: ad.company_name,
+    ad_title: ad.ad_title,
+    ad_description: ad.ad_description,
+    target_link: ad.target_link || '',
+    placement_type: ad.placement_type,
+    duration_days: ad.duration_days,
+  });
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  const isDurationLocked = ad.status === 'ACTIVE';
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const updatedAd = await updateAdvertisement(ad.id, formData);
+      onUpdate(updatedAd);
+      toast.success('Advertisement updated successfully!');
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update advertisement.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div 
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
+      >
+        <motion.div 
+          initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+          className="bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl max-w-xl w-full p-6 relative"
+        >
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-black text-white">Edit Advertisement</h3>
+            <button onClick={onClose} className="text-slate-400 hover:text-white"><IoClose size={24} /></button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-1 block">Company Name</label>
+              <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" required />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-1 block">Ad Title</label>
+              <input type="text" name="ad_title" value={formData.ad_title} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" required />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-1 block">Target Link</label>
+              <input type="url" name="target_link" value={formData.target_link} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-slate-400 mb-1 block">Placement</label>
+                <select name="placement_type" value={formData.placement_type} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:border-blue-500">
+                  <option value="BANNER">Banner</option>
+                  <option value="SIDEBAR">Sidebar Widget</option>
+                  <option value="NATIVE_FEED">Native Feed</option>
+                  <option value="POPUP">Popup</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-slate-400 mb-1 block">Duration (Days)</label>
+                <input type="number" name="duration_days" value={formData.duration_days} onChange={handleChange} disabled={isDurationLocked} className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500 ${isDurationLocked ? 'opacity-50 cursor-not-allowed' : ''}`} required min="1" />
+                {isDurationLocked && <p className="text-[10px] text-amber-500 mt-1">Locked (Ad is ACTIVE)</p>}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-bold text-slate-400 mb-1 block">Description</label>
+              <textarea name="ad_description" value={formData.ad_description} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500 h-24" required></textarea>
+            </div>
+            
+            <div className="flex justify-end gap-3 mt-6">
+              <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-slate-800">Cancel</button>
+              <button type="submit" disabled={loading} className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 disabled:opacity-50">
+                {loading ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+};
+
+
 
 const AdvertisementsPage = () => {
   const { toast } = useToast();
@@ -129,6 +232,9 @@ const AdvertisementsPage = () => {
   const [loading, setLoading] = useState(false);
   const [selectedAdForView, setSelectedAdForView] = useState<any | null>(null);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [selectedAdForEdit, setSelectedAdForEdit] = useState<any | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [now, setNow] = useState(new Date().getTime());
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     hotToast.custom((t) => (
@@ -163,6 +269,12 @@ const AdvertisementsPage = () => {
       }
     };
     loadAds();
+
+    // Timer for countdown updates
+    const interval = setInterval(() => {
+      setNow(new Date().getTime());
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
   }, []);
 
   const filteredAds = ads.filter(ad => {
@@ -206,6 +318,32 @@ const AdvertisementsPage = () => {
   const handleCloseViewModal = () => {
     setSelectedAdForView(null);
     setShowViewModal(false);
+  };
+
+  const handleEditAd = (ad: any) => {
+    setSelectedAdForEdit(ad);
+    setShowEditModal(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setSelectedAdForEdit(null);
+    setShowEditModal(false);
+  };
+
+  const handleUpdateAd = (updatedAd: any) => {
+    setAds(prev => prev.map(a => a.id === updatedAd.id ? { ...a, ...updatedAd } : a));
+    handleCloseEditModal();
+  };
+
+  // Helper for Countdown
+  const getRemainingTime = (endDateStr: string) => {
+    if (!endDateStr) return 'N/A';
+    const end = new Date(endDateStr).getTime();
+    const diff = end - now;
+    if (diff <= 0) return 'Expired';
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return `${days}d ${hours}h`;
   };
 
   // Calculate Metrics
@@ -334,7 +472,14 @@ const AdvertisementsPage = () => {
                         </div>
                       </td>
                       <td className="py-5 px-6">
-                        <span className="font-bold text-slate-300">{ad.duration_days} Days</span>
+                        <div className="flex flex-col gap-1">
+                          <span className="font-bold text-slate-300">{ad.duration_days} Days</span>
+                          {ad.status === 'ACTIVE' && ad.end_date && (
+                            <span className="text-[10px] font-black text-amber-400 uppercase">
+                              {getRemainingTime(ad.end_date)} left
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="py-5 px-6">
                         <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
@@ -368,6 +513,14 @@ const AdvertisementsPage = () => {
                             title="Inspect Campaign"
                           >
                             <FaEye className="text-sm" />
+                          </button>
+                          
+                          <button
+                            onClick={() => handleEditAd(ad)}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-purple-500/20 text-white hover:text-purple-400 border border-white/5 hover:border-purple-500/30 transition-all shadow-lg"
+                            title="Edit Campaign"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                           </button>
 
                           {ad.status === 'PENDING' && (
@@ -408,9 +561,12 @@ const AdvertisementsPage = () => {
         </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Modals */}
       {showViewModal && selectedAdForView && (
         <AdDetailModal ad={selectedAdForView} onClose={handleCloseViewModal} />
+      )}
+      {showEditModal && selectedAdForEdit && (
+        <EditAdModal ad={selectedAdForEdit} onClose={handleCloseEditModal} onUpdate={handleUpdateAd} />
       )}
     </div>
   );
