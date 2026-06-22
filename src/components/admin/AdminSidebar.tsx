@@ -4,7 +4,7 @@ import {
   LuUsers, LuClipboardList, LuGraduationCap,
   LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
-  LuMonitor, LuMessageCircle, LuPhone, LuSparkles
+  LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,6 +27,7 @@ const navItems = [
       { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes' },
       { label: 'Services', icon: LuMonitor, path: '/admin/services' },
       { label: 'Advertisements', icon: LuSparkles, path: '/admin/advertisements' },
+      { label: 'Hustle Hub', icon: LuShoppingBag, path: '/admin/marketplace' },
     ],
   },
   {

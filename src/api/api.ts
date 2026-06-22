@@ -85,18 +85,32 @@ seedData();
 
 // --- API EXPORTS ---
 
-export const fetchUsers = async (): Promise<User[]> => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(getStorage<User>(STORAGE_KEYS.USERS)), 300);
+export const fetchUsers = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/admin/users', {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
+  if (!response.ok) throw new Error('Failed to fetch users');
+  const data = await response.json();
+  return data;
 };
 
-export const deleteUser = async (id: number): Promise<void> => {
-  return new Promise((resolve) => {
-    const users = getStorage<User>(STORAGE_KEYS.USERS);
-    setStorage(STORAGE_KEYS.USERS, users.filter(u => u.id !== id));
-    setTimeout(resolve, 300);
+export const verifyUser = async (id: number | string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/users/${id}/verify`, {
+    method: 'PUT',
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
+  if (!response.ok) throw new Error('Failed to verify user');
+};
+
+export const deleteUser = async (id: number | string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/users/${id}`, {
+    method: 'DELETE',
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to delete user');
 };
 
 export const fetchStats = async (): Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }> => {
@@ -539,3 +553,152 @@ export const updateAdvertisement = async (id: string | number, data: any): Promi
   const result = await response.json();
   return result.data;
 };
+
+// ─── MARKETPLACE ADMIN API ────────────────────────────────────────
+
+export const fetchAdminMarketItems = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/admin/market', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch admin marketplace items');
+  return await response.json();
+};
+
+export const updateMarketItemStatus = async (id: string | number, status: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/market/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update marketplace listing status');
+};
+
+export const deleteMarketItem = async (id: string | number): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/market/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete marketplace listing');
+};
+
+export const updateUserProfile = async (id: number | string, data: any): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify(data)
+  });
+  if (!response.ok) throw new Error('Failed to update user profile');
+};
+
+export const createMarketItem = async (itemData: any): Promise<any> => {
+  const token = await getToken();
+  const formData = new FormData();
+  formData.append('title', itemData.title);
+  formData.append('type', itemData.type);
+  formData.append('price', itemData.price);
+  if (itemData.condition) {
+    formData.append('condition', itemData.condition);
+  }
+  formData.append('description', itemData.description);
+
+  if (itemData.images && itemData.images.length > 0) {
+    itemData.images.forEach((file: File) => {
+      formData.append('images', file);
+    });
+  }
+
+  const response = await fetch('http://localhost:5001/api/market', {
+    method: 'POST',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    try {
+      const err = await response.json();
+      throw new Error(err.message || `Server error (${response.status})`);
+    } catch {
+      throw new Error(`Failed to create marketplace item (HTTP ${response.status})`);
+    }
+  }
+
+  return await response.json();
+};
+
+export const fetchAdminOrders = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/market/orders/admin', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch admin orders');
+  return await response.json();
+};
+
+export const updateOrderStatus = async (orderId: string | number, status: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/market/orders/${orderId}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update order status');
+};
+
+export const updateMarketItem = async (itemId: string | number, itemData: any): Promise<any> => {
+  const token = await getToken();
+  const formData = new FormData();
+  if (itemData.title !== undefined) formData.append('title', itemData.title);
+  if (itemData.price !== undefined) formData.append('price', itemData.price);
+  if (itemData.description !== undefined) formData.append('description', itemData.description);
+  if (itemData.status !== undefined) formData.append('status', itemData.status);
+  if (itemData.condition !== undefined) formData.append('condition', itemData.condition);
+
+  if (itemData.images && itemData.images.length > 0) {
+    itemData.images.forEach((file: File) => {
+      formData.append('images', file);
+    });
+  }
+
+  const response = await fetch(`http://localhost:5001/api/admin/market/${itemId}`, {
+    method: 'PUT',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    try {
+      const err = await response.json();
+      throw new Error(err.message || `Server error (${response.status})`);
+    } catch {
+      throw new Error(`Failed to update marketplace item (HTTP ${response.status}). Make sure you are logged in as admin.`);
+    }
+  }
+
+  return await response.json();
+};
+
+
+

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaAd, FaChartLine, FaHourglassHalf, FaMoneyBillWave } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaAd, FaChartLine, FaHourglassHalf } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { fetchAdvertisements, updateAdvertisementStatus, updateAdvertisement } from '../../api/api';
 import { useToast } from '../../context/ToastContext';

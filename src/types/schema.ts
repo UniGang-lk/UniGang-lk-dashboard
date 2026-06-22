@@ -6,6 +6,8 @@ export interface User {
   status: 'active' | 'suspended';
   profile_pic?: string;
   phone?: string;
+  is_verified_student?: boolean;
+  is_verified_landlord?: boolean;
   created_at: string;
   updated_at: string;
 }

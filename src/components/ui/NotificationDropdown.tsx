@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { LuBell, LuCheck, LuInfo, LuFileText, LuCalendar, LuWrench, LuClipboardList } from 'react-icons/lu';
+import { LuBell, LuCheck, LuInfo, LuFileText, LuCalendar, LuWrench, LuClipboardList, LuShoppingBag } from 'react-icons/lu';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchMyNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../../api/api';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +10,7 @@ const getNotificationIcon = (type: string) => {
     case 'Event': return <LuCalendar className="w-4 h-4 text-emerald-400" />;
     case 'Service': return <LuWrench className="w-4 h-4 text-orange-400" />;
     case 'Annex': return <LuClipboardList className="w-4 h-4 text-rose-400" />;
+    case 'Marketplace': return <LuShoppingBag className="w-4 h-4 text-indigo-400" />;
     case 'System':
     default: return <LuInfo className="w-4 h-4 text-blue-400" />;
   }
@@ -21,6 +22,7 @@ const getNotificationColor = (type: string) => {
     case 'Event': return 'bg-emerald-500/10 border-emerald-500/20';
     case 'Service': return 'bg-orange-500/10 border-orange-500/20';
     case 'Annex': return 'bg-rose-500/10 border-rose-500/20';
+    case 'Marketplace': return 'bg-indigo-500/10 border-indigo-500/20';
     case 'System':
     default: return 'bg-blue-500/10 border-blue-500/20';
   }
