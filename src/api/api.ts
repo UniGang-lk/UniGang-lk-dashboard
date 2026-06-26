@@ -700,5 +700,82 @@ export const updateMarketItem = async (itemId: string | number, itemData: any): 
   return await response.json();
 };
 
+// --- SUPPORT & FEEDBACK ADMIN API ---
+
+export const fetchAdminFeedbacks = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/support/admin/feedbacks', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch admin feedbacks');
+  const data = await response.json();
+  return data.feedbacks || [];
+};
+
+export const updateAdminFeedback = async (id: string | number, feedbackData: any): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/support/admin/feedbacks/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify(feedbackData)
+  });
+  if (!response.ok) throw new Error('Failed to update feedback');
+  return await response.json();
+};
+
+export const deleteAdminFeedback = async (id: string | number): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/support/admin/feedbacks/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete feedback');
+};
+
+export const fetchAdminProblems = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/support/admin/problems', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch support tickets');
+  const data = await response.json();
+  return data.problems || [];
+};
+
+export const replyToAdminProblem = async (id: string | number, adminReply: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/support/admin/problems/${id}/reply`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ adminReply })
+  });
+  if (!response.ok) throw new Error('Failed to submit reply to support ticket');
+  return await response.json();
+};
+
+export const deleteAdminProblem = async (id: string | number): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/support/admin/problems/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to delete support ticket');
+};
+
+
 
 
