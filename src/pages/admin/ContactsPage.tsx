@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LuSearch, LuStar, LuUser, LuMail,
-  LuTrash2, LuCircleCheck, LuCalendar,
-  LuEdit, LuVolume2, LuVolumeX, LuX, LuMessageSquare, LuBuilding,
-  LuHelpCircle, LuCheck, LuArrowRight
+  LuTrash2, LuPencil, LuVolume2, LuVolumeX, 
+  LuX, LuMessageSquare, LuInfo, LuCheck, LuArrowRight
 } from 'react-icons/lu';
 import { 
   fetchAdminFeedbacks, 
@@ -49,7 +48,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 100 } }
 };
 
 const ContactsPage = () => {
@@ -305,7 +304,7 @@ const ContactsPage = () => {
                             className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all"
                             title="Edit Feedback"
                           >
-                            <LuEdit size={13} />
+                            <LuPencil size={13} />
                           </button>
                           <button 
                             onClick={() => handleDeleteFeedback(fb.id)}
@@ -446,7 +445,7 @@ const ContactsPage = () => {
       {!loading && (
         ((activeTab === 'feedback' && filteredFeedbacks.length === 0) || (activeTab === 'problem' && filteredProblems.length === 0)) && (
           <div className="py-32 text-center border border-white/5 border-dashed rounded-[2.5rem] bg-white/[0.01]">
-            <LuHelpCircle className="mx-auto text-slate-700 size-10 mb-4" />
+            <LuInfo className="mx-auto text-slate-700 size-10 mb-4" />
             <p className="text-slate-400 font-black uppercase tracking-widest text-sm">No entries found</p>
             <p className="text-slate-600 text-xs mt-1">Try refining your search terms or verify database connectivity.</p>
           </div>
@@ -480,7 +479,7 @@ const ContactsPage = () => {
 
                 <div className="mb-6">
                   <h3 className="text-xl font-black text-white uppercase tracking-wider flex items-center gap-2">
-                    <LuEdit className="text-pink-500" /> Edit & Review Testimonial
+                    <LuPencil className="text-pink-500" /> Edit & Review Testimonial
                   </h3>
                   <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Refine and set approval state before publishing</p>
                 </div>

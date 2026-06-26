@@ -14,7 +14,6 @@ import {
   FaBoxOpen,
   FaClipboardList,
   FaSpinner,
-  FaUser,
   FaPhone,
   FaMapMarkerAlt,
   FaEdit
@@ -1259,7 +1258,7 @@ const MarketplacePage = () => {
                     value={selectedOrder.status}
                     onChange={(e) => {
                       handleUpdateOrderStatus(selectedOrder.id, e.target.value);
-                      setSelectedOrder(prev => prev ? { ...prev, status: e.target.value } : null);
+                      setSelectedOrder((prev: any) => prev ? { ...prev, status: e.target.value } : null);
                     }}
                     className="bg-slate-950 text-white text-xs font-semibold border border-white/[0.1] rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
                   >

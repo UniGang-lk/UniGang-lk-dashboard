@@ -8,6 +8,7 @@ export interface User {
   phone?: string;
   is_verified_student?: boolean;
   is_verified_landlord?: boolean;
+  verification_id_url?: string | null;
   created_at: string;
   updated_at: string;
 }
