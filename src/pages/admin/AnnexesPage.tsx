@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaStar } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { LuExternalLink } from 'react-icons/lu';
+import { LuExternalLink, LuClipboardList, LuMessageSquare } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import { fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi, fetchPendingReviews, approveReview as approveReviewApi, deleteReview as deleteReviewApi, updateAnnex as updateAnnexApi, deleteAnnex as deleteAnnexApi } from '../../api/api';
 import type { Annex } from '../../types/schema';
@@ -337,41 +337,70 @@ const AnnexesPage = () => {
         </div>
       </div>
 
-      {/* Modern Premium Tabs */}
-      <div className="flex gap-4 border-b border-white/[0.08] pb-2">
-        <button
+      {/* Modern Premium Tabs Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Tab 1: Ads Management */}
+        <div
           onClick={() => {
             setActiveTab('ads');
             setCurrentView('table');
           }}
-          className={`pb-2.5 px-2 text-xs font-black uppercase tracking-widest transition-all relative ${
-            activeTab === 'ads' ? 'text-blue-500' : 'text-slate-500 hover:text-white'
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            activeTab === 'ads'
+              ? 'bg-blue-600/10 border-blue-500/60 shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          Ads Management
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'ads' ? 'bg-blue-500/25 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 text-slate-400'
+            }`}>
+              <LuClipboardList className="text-xl" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm tracking-tight">Ads Management</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Approve and manage property listings</p>
+            </div>
+          </div>
           {activeTab === 'ads' && (
-            <span className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-blue-500 rounded-full" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-t-full shadow-[0_-2px_10px_rgba(59,130,246,0.8)]"></div>
           )}
-        </button>
-        <button
+        </div>
+
+        {/* Tab 2: Reviews Moderation */}
+        <div
           onClick={() => {
             setActiveTab('reviews');
             setCurrentView('table');
           }}
-          className={`pb-2.5 px-2 text-xs font-black uppercase tracking-widest transition-all relative flex items-center gap-1.5 ${
-            activeTab === 'reviews' ? 'text-blue-500' : 'text-slate-500 hover:text-white'
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            activeTab === 'reviews'
+              ? 'bg-emerald-600/10 border-emerald-500/60 shadow-[0_0_25px_-5px_rgba(16,185,129,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          Reviews Moderation
-          {pendingReviews.length > 0 && (
-            <span className="bg-blue-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">
-              {pendingReviews.length}
-            </span>
-          )}
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'reviews' ? 'bg-emerald-500/25 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-slate-400'
+            }`}>
+              <LuMessageSquare className="text-xl" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-white text-sm tracking-tight">Reviews Moderation</h4>
+                {pendingReviews.length > 0 && (
+                  <span className="bg-emerald-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-md shadow-md animate-pulse">
+                    {pendingReviews.length}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Moderate student ratings & feedback</p>
+            </div>
+          </div>
           {activeTab === 'reviews' && (
-            <span className="absolute bottom-[-2px] left-0 right-0 h-[2px] bg-blue-500 rounded-full" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-emerald-500 rounded-t-full shadow-[0_-2px_10px_rgba(16,185,129,0.8)]"></div>
           )}
-        </button>
+        </div>
       </div>
 
       {activeTab === 'reviews' ? (

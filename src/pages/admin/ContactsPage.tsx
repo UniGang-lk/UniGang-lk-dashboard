@@ -228,33 +228,61 @@ const ContactsPage = () => {
         </div>
       </div>
 
-      {/* Tabs & Search controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/[0.02] border border-white/5 rounded-3xl p-4">
-        {/* Tab Switcher */}
-        <div className="flex gap-2 p-1.5 rounded-2xl bg-black/20 border border-white/5 w-fit">
-          <button
-            onClick={() => { setActiveTab('feedback'); setSearchTerm(''); }}
-            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-              activeTab === 'feedback' 
-              ? 'bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-rose-600/20' 
-              : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            Feedbacks ({feedbacks.length})
-          </button>
-          <button
-            onClick={() => { setActiveTab('problem'); setSearchTerm(''); }}
-            className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
-              activeTab === 'problem' 
-              ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
-              : 'text-slate-500 hover:text-slate-300'
-            }`}
-          >
-            Problem Reports ({problems.length})
-          </button>
+      {/* Premium Glassmorphic Tab Grid Selector */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Tab 1: Client Feedbacks */}
+        <div
+          onClick={() => { setActiveTab('feedback'); setSearchTerm(''); }}
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            activeTab === 'feedback'
+              ? 'bg-rose-600/10 border-rose-500/60 shadow-[0_0_25px_-5px_rgba(244,63,94,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'feedback' ? 'bg-rose-500/25 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : 'bg-white/5 text-slate-400'
+            }`}>
+              <LuMessageSquare className="text-xl" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm tracking-tight">Client Feedbacks ({feedbacks.length})</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Review student testimonials and ratings</p>
+            </div>
+          </div>
+          {activeTab === 'feedback' && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-rose-500 rounded-t-full shadow-[0_-2px_10px_rgba(244,63,94,0.8)]"></div>
+          )}
         </div>
 
-        {/* Search */}
+        {/* Tab 2: Support Tickets */}
+        <div
+          onClick={() => { setActiveTab('problem'); setSearchTerm(''); }}
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            activeTab === 'problem'
+              ? 'bg-blue-600/10 border-blue-500/60 shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'problem' ? 'bg-blue-500/25 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 text-slate-400'
+            }`}>
+              <LuInfo className="text-xl" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm tracking-tight">Problem Reports ({problems.length})</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Manage support tickets and admin replies</p>
+            </div>
+          </div>
+          {activeTab === 'problem' && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-t-full shadow-[0_-2px_10px_rgba(59,130,246,0.8)]"></div>
+          )}
+        </div>
+      </div>
+
+      {/* Search Filter row */}
+      <div className="flex justify-between items-center bg-white/[0.02] border border-white/5 rounded-3xl p-4">
         <div className="relative w-full md:max-w-md">
           <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
           <input
@@ -262,7 +290,7 @@ const ContactsPage = () => {
             placeholder={`Search ${activeTab === 'feedback' ? 'client testimonials' : 'problem tickets'}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3.5 bg-black/30 border border-white/10 rounded-2xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 transition-all"
+            className="w-full pl-11 pr-4 py-3 bg-black/30 border border-white/10 rounded-2xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 transition-all"
           />
         </div>
       </div>

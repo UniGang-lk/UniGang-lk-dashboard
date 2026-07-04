@@ -16,7 +16,8 @@ import {
   FaSpinner,
   FaPhone,
   FaMapMarkerAlt,
-  FaEdit
+  FaEdit,
+  FaHistory
 } from 'react-icons/fa';
 import { useToast } from '../../context/ToastContext';
 import { 
@@ -28,6 +29,7 @@ import {
   updateOrderStatus,
   updateMarketItem
 } from '../../api/api';
+import { AuditPanel } from '../../components/admin/AuditPanel';
 
 const MarketplacePage = () => {
   const { toast } = useToast();
@@ -38,8 +40,9 @@ const MarketplacePage = () => {
   const [activeImgIndex, setActiveImgIndex] = useState(0);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
   
-  // Tabs: gigs, products, store, orders
-  const [activeTab, setActiveTab] = useState<'gigs' | 'products' | 'store' | 'orders'>('gigs');
+  // Tabs: gigs, products, store, orders, audit
+  const [activeTab, setActiveTab] = useState<'gigs' | 'products' | 'store' | 'orders' | 'audit'>('gigs');
+  const [selectedAuditChatId, setSelectedAuditChatId] = useState<string | null>(null);
   
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
@@ -325,139 +328,168 @@ const MarketplacePage = () => {
       </div>
 
       {/* Premium Glassmorphic Tab Grid Selector */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {/* Tab 1: Peer Gigs */}
         <div
           onClick={() => setActiveTab('gigs')}
-          className={`relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl ${
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
             activeTab === 'gigs'
-              ? 'bg-blue-600/10 border-blue-500/50 shadow-[0_0_20px_rgba(59,130,246,0.15)]'
-              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.1]'
+              ? 'bg-blue-600/10 border-blue-500/60 shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${
-              activeTab === 'gigs' ? 'bg-blue-600/20 text-blue-400' : 'bg-white/5 text-slate-400'
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'gigs' ? 'bg-blue-500/25 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 text-slate-400'
             }`}>
               <FaBriefcase className="text-xl" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Peer Gigs</h4>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">Student freelance services</p>
+              <h4 className="font-bold text-white text-sm tracking-tight">Peer Gigs</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Student freelance services</p>
             </div>
           </div>
           {activeTab === 'gigs' && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-t-full"></div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-t-full shadow-[0_-2px_10px_rgba(59,130,246,0.8)]"></div>
           )}
         </div>
 
         {/* Tab 2: Peer Products */}
         <div
           onClick={() => setActiveTab('products')}
-          className={`relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl ${
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
             activeTab === 'products'
-              ? 'bg-emerald-600/10 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
-              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.1]'
+              ? 'bg-emerald-600/10 border-emerald-500/60 shadow-[0_0_25px_-5px_rgba(16,185,129,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${
-              activeTab === 'products' ? 'bg-emerald-600/20 text-emerald-400' : 'bg-white/5 text-slate-400'
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'products' ? 'bg-emerald-500/25 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-slate-400'
             }`}>
               <FaShoppingBag className="text-xl" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Peer Products</h4>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">Used student items & gear</p>
+              <h4 className="font-bold text-white text-sm tracking-tight">Peer Products</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Used student items & gear</p>
             </div>
           </div>
           {activeTab === 'products' && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-emerald-500 rounded-t-full"></div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-emerald-500 rounded-t-full shadow-[0_-2px_10px_rgba(16,185,129,0.8)]"></div>
           )}
         </div>
 
         {/* Tab 3: Official Store */}
         <div
           onClick={() => setActiveTab('store')}
-          className={`relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl ${
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
             activeTab === 'store'
-              ? 'bg-amber-600/10 border-amber-500/50 shadow-[0_0_20px_rgba(245,158,11,0.15)]'
-              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.1]'
+              ? 'bg-amber-600/10 border-amber-500/60 shadow-[0_0_25px_-5px_rgba(245,158,11,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${
-              activeTab === 'store' ? 'bg-amber-600/20 text-amber-400' : 'bg-white/5 text-slate-400'
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'store' ? 'bg-amber-500/25 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-white/5 text-slate-400'
             }`}>
               <FaBoxOpen className="text-xl" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Official Store</h4>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">Bouquets, bears & merch</p>
+              <h4 className="font-bold text-white text-sm tracking-tight">Official Store</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Bouquets, bears & merch</p>
             </div>
           </div>
           {activeTab === 'store' && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-amber-500 rounded-t-full"></div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-amber-500 rounded-t-full shadow-[0_-2px_10px_rgba(245,158,11,0.8)]"></div>
           )}
         </div>
 
         {/* Tab 4: Customer Orders */}
         <div
           onClick={() => setActiveTab('orders')}
-          className={`relative p-5 rounded-2xl border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl ${
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
             activeTab === 'orders'
-              ? 'bg-purple-600/10 border-purple-500/50 shadow-[0_0_20px_rgba(139,92,246,0.15)]'
-              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.1]'
+              ? 'bg-purple-600/10 border-purple-500/60 shadow-[0_0_25px_-5px_rgba(139,92,246,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
           }`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`p-3 rounded-xl ${
-              activeTab === 'orders' ? 'bg-purple-600/20 text-purple-400' : 'bg-white/5 text-slate-400'
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'orders' ? 'bg-purple-500/25 text-purple-400 shadow-[0_0_15px_rgba(139,92,246,0.2)]' : 'bg-white/5 text-slate-400'
             }`}>
               <FaClipboardList className="text-xl" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm">Customer Orders</h4>
-              <p className="text-xs text-slate-500 mt-0.5 font-medium">Track & fulfill user sales</p>
+              <h4 className="font-bold text-white text-sm tracking-tight">Customer Orders</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Track & fulfill user sales</p>
             </div>
           </div>
           {activeTab === 'orders' && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-purple-500 rounded-t-full"></div>
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-purple-500 rounded-t-full shadow-[0_-2px_10px_rgba(139,92,246,0.8)]"></div>
+          )}
+        </div>
+
+        {/* Tab 5: Audit Logs */}
+        <div
+          onClick={() => setActiveTab('audit')}
+          className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+            activeTab === 'audit'
+              ? 'bg-rose-600/10 border-rose-500/60 shadow-[0_0_25px_-5px_rgba(244,63,94,0.3)]'
+              : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+          }`}
+        >
+          <div className="flex items-center gap-3.5">
+            <div className={`p-3 rounded-xl transition-all duration-300 ${
+              activeTab === 'audit' ? 'bg-rose-500/25 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]' : 'bg-white/5 text-slate-400'
+            }`}>
+              <FaHistory className="text-xl" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-sm tracking-tight">Audit Logs</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Dispute chat transcripts</p>
+            </div>
+          </div>
+          {activeTab === 'audit' && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-rose-500 rounded-t-full shadow-[0_-2px_10px_rgba(244,63,94,0.8)]"></div>
           )}
         </div>
       </div>
 
       {/* Search Input Bar */}
-      <div className="flex gap-3">
-        <div className="relative flex-grow">
-          {activeTab !== 'orders' ? (
-            <>
-              <input
-                type="text"
-                placeholder="Search by title or seller..."
-                className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
-            </>
-          ) : (
-            <>
-              <input
-                type="text"
-                placeholder="Search orders by customer, product title, phone, or university..."
-                className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500/50"
-                value={orderSearchTerm}
-                onChange={(e) => setOrderSearchTerm(e.target.value)}
-              />
-              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
-            </>
-          )}
+      {activeTab !== 'audit' && (
+        <div className="flex gap-3">
+          <div className="relative flex-grow">
+            {activeTab !== 'orders' ? (
+              <>
+                <input
+                  type="text"
+                  placeholder="Search by title or seller..."
+                  className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
+              </>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  placeholder="Search orders by customer, product title, phone, or university..."
+                  className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500/50"
+                  value={orderSearchTerm}
+                  onChange={(e) => setOrderSearchTerm(e.target.value)}
+                />
+                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Table Data View */}
-      {((activeTab !== 'orders' && loading) || (activeTab === 'orders' && ordersLoading)) ? (
+      {activeTab === 'audit' ? (
+        <AuditPanel selectedChatId={selectedAuditChatId} onSelectChat={setSelectedAuditChatId} />
+      ) : ((activeTab !== 'orders' && loading) || (activeTab === 'orders' && ordersLoading)) ? (
         <div className="text-center py-16 text-slate-500 text-sm flex items-center justify-center gap-2">
           <FaSpinner className="animate-spin text-blue-500" /> Loading data...
         </div>
@@ -525,6 +557,22 @@ const MarketplacePage = () => {
                             <button onClick={() => handleEditClick(item)} className="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-500/10 text-amber-400 hover:bg-amber-500/25 transition-all cursor-pointer border-none" title="Edit Item">
                               <FaEdit className="text-sm" />
                             </button>
+                            {item.type === 'GIG' && (
+                              <button 
+                                onClick={() => {
+                                  if (item.chats && item.chats.length > 0) {
+                                    setSelectedAuditChatId(item.chats[0].id);
+                                    setActiveTab('audit');
+                                  } else {
+                                    toast.error('No chat sessions started for this gig yet.');
+                                  }
+                                }} 
+                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-400 hover:bg-rose-500/25 transition-all cursor-pointer border-none" 
+                                title="View Chat History"
+                              >
+                                <FaHistory className="text-sm" />
+                              </button>
+                            )}
                             {activeTab !== 'store' && (
                               <>
                                 {(item.status === 'PENDING_VERIFICATION' || item.status === 'PENDING') && (
@@ -626,6 +674,20 @@ const MarketplacePage = () => {
                             <div className="flex items-center justify-center gap-2">
                               <button onClick={() => setSelectedOrder(order)} className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 hover:bg-blue-500/25 transition-all cursor-pointer border-none" title="View/Edit Order Details">
                                 <FaEye className="text-sm" />
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  if (order.chatId) {
+                                    setSelectedAuditChatId(order.chatId);
+                                    setActiveTab('audit');
+                                  } else {
+                                    toast.error('No active chat history found for this order.');
+                                  }
+                                }} 
+                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-500/10 text-rose-400 hover:bg-rose-500/25 transition-all cursor-pointer border-none" 
+                                title="View Chat History"
+                              >
+                                <FaHistory className="text-sm" />
                               </button>
                               <select
                                 value={order.status}

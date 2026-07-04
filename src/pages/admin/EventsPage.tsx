@@ -53,7 +53,7 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
 
 // Helper to resolve image URL
 const getImageUrl = (image?: string) => {
-  if (!image) return 'https://images.unsplash.com/photo-1540575861501-7ad058ad37fa?q=80&w=800';
+  if (!image) return 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800';
   return image.startsWith('http') ? image : `http://localhost:5001${image}`;
 };
 
@@ -120,7 +120,7 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
         <div className="space-y-6 mb-10">
           <div className="p-6 rounded-[2rem] bg-white/[0.03] border border-white/[0.06]">
             <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Event Description</p>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">{event.description || 'No description provided.'}</p>
+            <p className="text-sm text-slate-300 leading-relaxed font-medium whitespace-pre-wrap">{event.description || 'No description provided.'}</p>
           </div>
 
           {event.extra && (
