@@ -700,6 +700,28 @@ export const updateMarketItem = async (itemId: string | number, itemData: any): 
   return await response.json();
 };
 
+export const fetchAdminChats = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch('http://localhost:5001/api/admin/chats', {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch active chats');
+  return await response.json();
+};
+
+export const fetchAdminChatMessages = async (chatId: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`http://localhost:5001/api/admin/chats/${chatId}/messages`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) throw new Error('Failed to fetch chat messages');
+  return await response.json();
+};
+
 // --- SUPPORT & FEEDBACK ADMIN API ---
 
 export const fetchAdminFeedbacks = async (): Promise<any[]> => {

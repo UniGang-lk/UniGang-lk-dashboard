@@ -53,6 +53,117 @@ const navItems = [
   },
 ];
 
+const itemThemes: Record<string, { color: string; bgActive: string; borderActive: string; textActive: string; iconActive: string; glow: string; indicator: string }> = {
+  '/admin/dashboard': {
+    color: 'blue',
+    bgActive: 'bg-blue-600/10',
+    borderActive: 'border-blue-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
+    indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
+  },
+  '/admin/settings/analytics': {
+    color: 'blue',
+    bgActive: 'bg-blue-600/10',
+    borderActive: 'border-blue-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
+    indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
+  },
+  '/admin/annexes': {
+    color: 'indigo',
+    bgActive: 'bg-indigo-600/10',
+    borderActive: 'border-indigo-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(99,102,241,0.35)]',
+    indicator: 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]'
+  },
+  '/admin/services': {
+    color: 'cyan',
+    bgActive: 'bg-cyan-600/10',
+    borderActive: 'border-cyan-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(6,182,212,0.35)]',
+    indicator: 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]'
+  },
+  '/admin/advertisements': {
+    color: 'pink',
+    bgActive: 'bg-pink-600/10',
+    borderActive: 'border-pink-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(236,72,153,0.35)]',
+    indicator: 'bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.8)]'
+  },
+  '/admin/marketplace': {
+    color: 'emerald',
+    bgActive: 'bg-emerald-600/10',
+    borderActive: 'border-emerald-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(16,185,129,0.35)]',
+    indicator: 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]'
+  },
+  '/admin/events': {
+    color: 'amber',
+    bgActive: 'bg-amber-600/10',
+    borderActive: 'border-amber-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.35)]',
+    indicator: 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]'
+  },
+  '/admin/blogs': {
+    color: 'purple',
+    bgActive: 'bg-purple-600/10',
+    borderActive: 'border-purple-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
+    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
+  },
+  '/admin/contacts': {
+    color: 'rose',
+    bgActive: 'bg-rose-600/10',
+    borderActive: 'border-rose-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(244,63,94,0.35)]',
+    indicator: 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]'
+  },
+  '/admin/notifications': {
+    color: 'amber',
+    bgActive: 'bg-amber-600/10',
+    borderActive: 'border-amber-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.35)]',
+    indicator: 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]'
+  },
+  '/admin/settings/universities': {
+    color: 'indigo',
+    bgActive: 'bg-indigo-600/10',
+    borderActive: 'border-indigo-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(99,102,241,0.35)]',
+    indicator: 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]'
+  },
+  '/admin/users': {
+    color: 'purple',
+    bgActive: 'bg-purple-600/10',
+    borderActive: 'border-purple-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
+    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
+  }
+};
+
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -101,36 +212,37 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500/60 px-4 mb-4">
               {group.section}
             </p>
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {group.items.map((item) => {
                 const active = isActive(item.path);
+                const theme = itemThemes[item.path] || itemThemes['/admin/dashboard'];
                 return (
                   <li key={item.path}>
                     <motion.button
                       whileHover={{ x: 6, scale: 1.02 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => handleNav(item.path)}
-                      className={`w-full flex items-center gap-3.5 px-6 py-4 rounded-2xl text-[12px] font-bold uppercase tracking-wider transition-all duration-300 group relative overflow-hidden
+                      className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-[22px] border text-[13px] font-black uppercase tracking-wider transition-all duration-300 group relative overflow-hidden
                         ${active
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                          : 'text-slate-400 hover:text-white hover:bg-white/5'
+                          ? `${theme.bgActive} ${theme.borderActive} ${theme.textActive} ${theme.glow}`
+                          : 'bg-white/[0.02] border-white/[0.05] text-slate-400 hover:text-white hover:bg-white/[0.05] hover:border-white/[0.12]'
                         }`}
                     >
                       {/* Hover Glass Effect */}
-                      <div className="absolute inset-0 bg-white/[0.03] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
 
                       {active && (
                         <motion.div
                           layoutId="activeIndicator"
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-7 bg-blue-500 rounded-r-full shadow-[4px_0_15px_rgba(59,130,246,0.6)]"
+                          className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-7 rounded-r-full ${theme.indicator}`}
                         />
                       )}
 
-                      <div className={`relative z-10 p-2 rounded-xl transition-all duration-300 ${active ? 'bg-white/20 text-white' : 'text-slate-500 group-hover:text-slate-300 group-hover:bg-white/10'}`}>
-                        <item.icon className="text-lg flex-shrink-0" />
+                      <div className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0 ${active ? theme.iconActive : 'bg-white/5 text-slate-500 group-hover:text-slate-200 group-hover:bg-white/10'}`}>
+                        <item.icon className="text-lg" />
                       </div>
 
-                      <span className="flex-1 text-left relative z-10 font-bold tracking-tight">{item.label}</span>
+                      <span className="flex-1 text-left relative z-10 font-black tracking-wider leading-none uppercase">{item.label}</span>
 
                       {active && (
                         <motion.div
@@ -138,7 +250,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                           animate={{ opacity: 1, x: 0 }}
                           className="relative z-10"
                         >
-                          <LuChevronRight className="text-xs text-blue-500/80" />
+                          <LuChevronRight className="text-sm text-white/80" />
                         </motion.div>
                       )}
                     </motion.button>
