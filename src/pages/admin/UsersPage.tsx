@@ -281,7 +281,7 @@ const UsersPage = () => {
     {/* View User Details Modal */}
     {selectedUser && (
       <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-        <div className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-8 relative overflow-hidden">
+        <div className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh]">
           <button
             onClick={() => setSelectedUser(null)}
             className="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full cursor-pointer border-none bg-transparent"
@@ -349,7 +349,7 @@ const UsersPage = () => {
     {/* Edit User Modal */}
     {editingUser && (
       <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-        <form onSubmit={handleSaveUser} className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-8 relative overflow-hidden">
+        <form onSubmit={handleSaveUser} className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh]">
           <button
             type="button"
             onClick={() => setEditingUser(null)}
