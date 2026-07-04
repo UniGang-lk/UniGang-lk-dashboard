@@ -22,40 +22,53 @@ export const AuditPanel: React.FC<AuditPanelProps> = ({ selectedChatId, onSelect
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load all chat rooms
-  const loadChats = async () => {
-    setLoading(true);
+  const loadChats = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const data = await fetchAdminChats();
       setChats(data);
     } catch (error) {
       console.error(error);
-      toast.error('Failed to load active chats for audit.');
+      if (!silent) toast.error('Failed to load active chats for audit.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadChats();
+    loadChats(false);
+    // Poll the list of chats silently in the background
+    const interval = setInterval(() => {
+      loadChats(true);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
 
   // Fetch messages if a chatId is selected/changed
   useEffect(() => {
     if (selectedChatId) {
-      const fetchChatLogs = async () => {
-        setMessagesLoading(true);
+      const fetchChatLogs = async (silent = false) => {
+        if (!silent) setMessagesLoading(true);
         try {
           const res = await fetchAdminChatMessages(selectedChatId);
           setActiveChat(res.chat);
           setMessages(res.messages);
         } catch (error) {
           console.error(error);
-          toast.error('Failed to load chat transcript.');
+          if (!silent) toast.error('Failed to load chat transcript.');
         } finally {
-          setMessagesLoading(false);
+          if (!silent) setMessagesLoading(false);
         }
       };
-      fetchChatLogs();
+      
+      fetchChatLogs(false);
+
+      // Poll messages silently every 4 seconds
+      const interval = setInterval(() => {
+        fetchChatLogs(true);
+      }, 4000);
+
+      return () => clearInterval(interval);
     } else {
       setActiveChat(null);
       setMessages([]);
@@ -67,7 +80,7 @@ export const AuditPanel: React.FC<AuditPanelProps> = ({ selectedChatId, onSelect
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, messagesLoading]);
+  }, [messages]);
 
   const getAvatarUrl = (profilePic: string | null, name: string) => {
     if (profilePic) {
