@@ -42,6 +42,7 @@ const navItems = [
     items: [
       { label: 'Contacts', icon: LuPhone, path: '/admin/contacts' },
       { label: 'Notifications', icon: LuMegaphone, path: '/admin/notifications' },
+      { label: 'Announcements', icon: LuMegaphone, path: '/admin/announcements' },
     ],
   },
   {
@@ -143,6 +144,15 @@ const itemThemes: Record<string, { color: string; bgActive: string; borderActive
     iconActive: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
     glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.35)]',
     indicator: 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]'
+  },
+  '/admin/announcements': {
+    color: 'blue',
+    bgActive: 'bg-blue-600/10',
+    borderActive: 'border-blue-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
+    indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
   },
   '/admin/settings/universities': {
     color: 'indigo',

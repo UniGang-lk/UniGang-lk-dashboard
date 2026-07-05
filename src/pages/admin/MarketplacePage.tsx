@@ -287,7 +287,7 @@ const MarketplacePage = () => {
   const getImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('data:image')) return url;
-    return `http://localhost:5001${url}`;
+    return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
   };
 
   const filteredItems = items.filter(item => {
@@ -1285,12 +1285,12 @@ const MarketplacePage = () => {
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Bank Deposit Slip</h4>
                     <div className="relative group overflow-hidden rounded-xl border border-white/10 bg-slate-950/40 p-2 flex items-center justify-center">
                       <img 
-                        src={`http://localhost:5001${selectedOrder.payment_slip}`} 
+                        src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedOrder.payment_slip}`} 
                         alt="Bank receipt" 
                         className="max-h-64 object-contain rounded-lg hover:scale-105 transition-transform duration-300"
                       />
                       <a 
-                        href={`http://localhost:5001${selectedOrder.payment_slip}`} 
+                        href={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedOrder.payment_slip}`} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="absolute bottom-4 right-4 bg-slate-905/90 hover:bg-slate-800 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-white/10 no-underline"

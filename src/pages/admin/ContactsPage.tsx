@@ -352,7 +352,7 @@ const ContactsPage = () => {
                       {/* Avatar & author profile information */}
                       <div className="flex items-center gap-3 pt-4 border-t border-white/5">
                         {fb.avatar ? (
-                          <img src={fb.avatar.startsWith('http') ? fb.avatar : `http://localhost:5001${fb.avatar}`} alt={fb.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
+                          <img src={fb.avatar.startsWith('http') ? fb.avatar : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${fb.avatar}`} alt={fb.name} className="w-10 h-10 rounded-full object-cover border border-white/10" />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 font-black text-sm">
                             {fb.name.charAt(0)}

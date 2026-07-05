@@ -13,6 +13,7 @@ import BlogsPage from './pages/admin/BlogsPage';
 import ContactsPage from './pages/admin/ContactsPage';
 import NotificationsPage from './pages/admin/NotificationsPage';
 import MarketplacePage from './pages/admin/MarketplacePage';
+import AnnouncementsPage from './pages/admin/AnnouncementsPage';
 import LoginPage from './pages/LoginPage';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -51,6 +52,7 @@ function App() {
             <Route path="blogs"                       element={<BlogsPage />} />
             <Route path="contacts"                    element={<ContactsPage />} />
             <Route path="notifications"               element={<NotificationsPage />} />
+            <Route path="announcements"               element={<AnnouncementsPage />} />
             <Route path="marketplace"                 element={<MarketplacePage />} />
             <Route path="settings/universities"       element={<UniversitiesPage />} />
 

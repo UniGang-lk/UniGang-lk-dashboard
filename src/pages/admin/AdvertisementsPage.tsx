@@ -43,7 +43,7 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
 
           {ad.image_url && (
             <div className="mb-8 relative aspect-video rounded-2xl overflow-hidden border border-white/10 group shadow-2xl shadow-blue-500/10">
-              <img src={`http://localhost:5001${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+              <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
               <span className="absolute bottom-4 left-4 px-3 py-1.5 bg-blue-600/90 backdrop-blur-sm text-[10px] font-black text-white rounded-lg shadow-lg uppercase tracking-widest">{ad.placement_type}</span>
             </div>

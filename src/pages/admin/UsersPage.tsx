@@ -335,7 +335,7 @@ const UsersPage = () => {
               <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] text-center">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2 text-left">Uploaded Student ID Card</span>
                 <img
-                  src={`http://localhost:5001${selectedUser.verification_id_url}`}
+                  src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedUser.verification_id_url}`}
                   alt="Student ID"
                   className="max-h-48 rounded-xl object-contain mx-auto border border-white/10"
                 />

@@ -85,7 +85,7 @@ export const AuditPanel: React.FC<AuditPanelProps> = ({ selectedChatId, onSelect
   const getAvatarUrl = (profilePic: string | null, name: string) => {
     if (profilePic) {
       if (profilePic.startsWith('http') || profilePic.startsWith('data:image')) return profilePic;
-      return `http://localhost:5001${profilePic}`;
+      return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${profilePic}`;
     }
     return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'User')}`;
   };
@@ -104,7 +104,7 @@ export const AuditPanel: React.FC<AuditPanelProps> = ({ selectedChatId, onSelect
     }
     if (!imgPath) return '';
     if (imgPath.startsWith('http') || imgPath.startsWith('data:image')) return imgPath;
-    return `http://localhost:5001${imgPath}`;
+    return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${imgPath}`;
   };
 
   const filteredChats = chats.filter(chat => {
