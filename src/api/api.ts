@@ -1,4 +1,4 @@
-import type { User, Annex, University, Announcement, SystemEvent, Blog } from '../types/schema';
+import type { Announcement, SystemEvent, Blog } from '../types/schema';
 import { auth } from '../firebase';
 import universitiesData from '../constants/annex/Universities.json';
 
@@ -211,23 +211,6 @@ export const deleteEvent = async (id: number | string): Promise<void> => {
   if (!response.ok) throw new Error('Failed to delete event');
 };
 
-
-export const deleteEntity = async (key: string, id: number): Promise<void> => {
-  return new Promise((resolve) => {
-    const items = getStorage<any>(key);
-    setStorage(key, items.filter((item: any) => item.id !== id));
-    setTimeout(resolve, 300);
-  });
-};
-
-export const updateEntity = async <T extends { id: number }>(key: string, id: number, data: Partial<T>): Promise<void> => {
-  return new Promise((resolve) => {
-    const items = getStorage<T>(key);
-    const updated = items.map(item => item.id === id ? { ...item, ...data, updated_at: new Date().toISOString() } : item);
-    setStorage(key, updated);
-    setTimeout(resolve, 300);
-  });
-};
 
 export const updateAnnex = async (id: number | string, adData: any): Promise<any> => {
   const token = await getToken();

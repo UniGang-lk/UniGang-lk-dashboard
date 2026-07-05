@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LuSearch, LuMegaphone, LuPlus, LuTrash2, 
-  LuCircleCheck, LuX, LuPencilLine, LuAlertCircle 
+  LuPencilLine, LuTriangleAlert 
 } from 'react-icons/lu';
 import { 
   fetchAnnouncements, 
@@ -61,7 +61,7 @@ const AnnouncementsPage = () => {
     toast.custom((t) => (
       <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
         <div className="flex items-center gap-3 mb-5">
-          <LuAlertCircle size={20} className="text-amber-500" />
+          <LuTriangleAlert size={20} className="text-amber-500" />
           <div className="flex-1">
             <p className="text-sm font-bold text-white tracking-wide">{message}</p>
           </div>
@@ -216,7 +216,7 @@ const AnnouncementsPage = () => {
                 <div className="flex-1 min-w-0 py-1">
                   <div className="flex justify-between items-start mb-1">
                     <span className="text-[9px] font-bold text-slate-500">
-                      {new Date(announcement.created_at || announcement.createdAt || '').toLocaleDateString()}
+                      {new Date(announcement.created_at || '').toLocaleDateString()}
                     </span>
                   </div>
 
@@ -299,7 +299,7 @@ const AnnouncementsPage = () => {
               >
                 <div className="flex justify-between items-start mb-6">
                   <span className="text-[10px] font-bold text-slate-500">
-                    Published on {new Date(selectedAnnouncement.created_at || selectedAnnouncement.createdAt || '').toLocaleString()}
+                    Published on {new Date(selectedAnnouncement.created_at || '').toLocaleString()}
                   </span>
                   
                   <div className="flex gap-2">
