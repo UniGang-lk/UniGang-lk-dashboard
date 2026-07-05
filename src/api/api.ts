@@ -20,76 +20,11 @@ const getToken = async (): Promise<string | null> => {
   }
 };
 
-// --- MOCK STORAGE SERVICE ---
-
-export const STORAGE_KEYS = {
-  USERS: 'uni_gang_users',
-  ANNEXES: 'uni_gang_annexes',
-  UNIVERSITIES: 'uni_gang_universities',
-  ANNOUNCEMENTS: 'uni_gang_announcements',
-  EVENTS: 'uni_gang_events',
-  SERVICES: 'uni_gang_services',
-  BLOGS: 'uni_gang_blogs',
-  FEEDBACK: 'uni_gang_feedback',
-  PROBLEMS: 'uni_gang_problems'
-};
-
-const getStorage = <T>(key: string): T[] => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
-};
-
-const setStorage = <T>(key: string, data: T[]) => {
-  localStorage.setItem(key, JSON.stringify(data));
-};
-
-// --- INITIAL SEED DATA ---
-
-const seedData = () => {
-  if (getStorage(STORAGE_KEYS.USERS).length === 0) {
-    const users: User[] = [
-      { id: 1, name: 'Admin Kaja', email: 'admin@unigung.lk', role: 'admin', status: 'active', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { id: 2, name: 'John Landlord', email: 'john@example.com', role: 'landlord', status: 'active', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { id: 3, name: 'Saman Perera', email: 'saman@student.lk', role: 'student', status: 'active', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-    ];
-    setStorage(STORAGE_KEYS.USERS, users);
-
-    const universities: University[] = [
-      { id: 1, name: 'University of Moratuwa', location: 'Katubedda', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { id: 2, name: 'SLIIT', location: 'Malabe', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-    ];
-    setStorage(STORAGE_KEYS.UNIVERSITIES, universities);
-
-    const annexes: Annex[] = [
-      { 
-        id: 1, owner_id: 2, university_id: 1, title: 'Luxury Studio - Moratuwa', status: 'Pending', price: '25,000', 
-        address: 'No 45, Bandaranayake Mawatha', campus: 'UOM', description: 'Prime location near UOM',
-        images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=800'], 
-        features: ['WiFi', 'Kitchen'], contactName: 'John Landlord', contactPhone: '+94 77 123 4567',
-        securityDeposit: '50,000', proximityHub: '100m to UOM Main Gate', googleMapsUrl: 'https://maps.google.com'
-      },
-    ];
-    setStorage(STORAGE_KEYS.ANNEXES, annexes);
-
-    const events: SystemEvent[] = [
-      {
-        id: 1, title: 'UOM Career Fair 2024', description: 'Annual career fair for engineering students.',
-        date: '2024-11-10', location: 'Civil Auditorium', status: 'upcoming', price: 'Free',
-        image: 'https://images.unsplash.com/photo-1540575861501-7ad0582373f3?q=80&w=800',
-        phone: '+94 11 265 0301', extra: 'Bring your printed CVs.'
-      }
-    ];
-    setStorage(STORAGE_KEYS.EVENTS, events);
-  }
-};
-
-seedData();
-
 // --- API EXPORTS ---
 
 export const fetchUsers = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/admin/users', {
+  const response = await fetch(`${BASE_URL}/api/admin/users`, {
     headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
   if (!response.ok) throw new Error('Failed to fetch users');
@@ -116,20 +51,19 @@ export const deleteUser = async (id: number | string): Promise<void> => {
 };
 
 export const fetchStats = async (): Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }> => {
-  const users = getStorage<User>(STORAGE_KEYS.USERS);
-  const annexes = getStorage<Annex>(STORAGE_KEYS.ANNEXES);
-  return new Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }>((resolve) => {
-    setTimeout(() => resolve({
-      totalStudents: users.filter(u => u.role === 'student').length,
-      approvedAnnexes: annexes.filter(a => a.status === 'approved').length,
-      pendingAnnexes: annexes.filter(a => a.status === 'pending').length,
-    }), 300);
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/stats`, {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
   });
+  if (!response.ok) throw new Error('Failed to fetch stats');
+  return response.json();
 };
 
 export const fetchAnnexes = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/annexes/admin', {
+  const response = await fetch(`${BASE_URL}/api/annexes/admin`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -164,7 +98,7 @@ export const updateAnnexStatus = async (id: number | string, status: string): Pr
 
 export const fetchPendingReviews = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/annexes/reviews/pending', {
+  const response = await fetch(`${BASE_URL}/api/annexes/reviews/pending`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -243,7 +177,7 @@ export const deleteAnnouncement = async (id: number | string): Promise<void> => 
 
 export const fetchEvents = async (): Promise<SystemEvent[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/events/admin/all', {
+  const response = await fetch(`${BASE_URL}/api/events/admin/all`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -445,7 +379,7 @@ export const addServiceMessage = async (id: string, message: string): Promise<an
 
 export const fetchBlogs = async (): Promise<Blog[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/blogs/admin/all', {
+  const response = await fetch(`${BASE_URL}/api/blogs/admin/all`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -599,7 +533,7 @@ export const updateAdvertisement = async (id: string | number, data: any): Promi
 
 export const fetchAdminMarketItems = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/admin/market', {
+  const response = await fetch(`${BASE_URL}/api/admin/market`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -662,7 +596,7 @@ export const createMarketItem = async (itemData: any): Promise<any> => {
     });
   }
 
-  const response = await fetch('${BASE_URL}/api/market', {
+  const response = await fetch(`${BASE_URL}/api/market`, {
     method: 'POST',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
@@ -684,7 +618,7 @@ export const createMarketItem = async (itemData: any): Promise<any> => {
 
 export const fetchAdminOrders = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/market/orders/admin', {
+  const response = await fetch(`${BASE_URL}/api/market/orders/admin`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -743,7 +677,7 @@ export const updateMarketItem = async (itemId: string | number, itemData: any): 
 
 export const fetchAdminChats = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/admin/chats', {
+  const response = await fetch(`${BASE_URL}/api/admin/chats`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -767,7 +701,7 @@ export const fetchAdminChatMessages = async (chatId: string): Promise<any> => {
 
 export const fetchAdminFeedbacks = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/support/admin/feedbacks', {
+  const response = await fetch(`${BASE_URL}/api/support/admin/feedbacks`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
@@ -804,7 +738,7 @@ export const deleteAdminFeedback = async (id: string | number): Promise<void> =>
 
 export const fetchAdminProblems = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch('${BASE_URL}/api/support/admin/problems', {
+  const response = await fetch(`${BASE_URL}/api/support/admin/problems`, {
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
