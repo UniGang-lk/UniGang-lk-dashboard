@@ -9,6 +9,8 @@ export interface User {
   is_verified_student?: boolean;
   is_verified_landlord?: boolean;
   verification_id_url?: string | null;
+  campus_email?: string | null;
+  campus_email_verification_code?: string | null;
   created_at: string;
   updated_at: string;
 }

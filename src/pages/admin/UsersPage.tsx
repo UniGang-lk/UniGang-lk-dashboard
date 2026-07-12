@@ -191,6 +191,10 @@ const UsersPage = () => {
                           <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-blue-500/10 text-blue-400 border-blue-500/20">
                             Verified
                           </span>
+                        ) : user.role === 'student' && user.campus_email ? (
+                          <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-amber-500/10 text-amber-400 border-amber-500/20" title={`Campus Email: ${user.campus_email}`}>
+                            Pending Code
+                          </span>
                         ) : (
                           <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-amber-500/10 text-amber-400 border-amber-500/20">
                             Pending
@@ -207,19 +211,19 @@ const UsersPage = () => {
                           >
                             <FaEye className="text-sm" />
                           </button>
-                          {user.verification_id_url && (
+                          {((user.verification_id_url) || (user.role === 'student' && !user.is_verified_student && user.campus_email)) && (
                             <button
                               onClick={async () => {
                                 try {
                                   await verifyUser(user.id);
-                                  toast.success(`Verified user ${user.id} and safely destroyed ID photo.`);
+                                  toast.success(`Verified student status for ${user.name}.`);
                                   loadUsers();
                                 } catch (err) {
                                   toast.error('Failed to verify user.');
                                 }
                               }}
                               className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-400 hover:text-white hover:bg-emerald-500/30 transition-all border-none cursor-pointer"
-                              title="Approve ID & Delete Photo"
+                              title="Approve Student Verification"
                             >
                               <FaUserShield className="text-sm" />
                             </button>
@@ -331,6 +335,15 @@ const UsersPage = () => {
                 </span>
               </div>
             </div>
+            {selectedUser.campus_email && (
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] text-left">
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Campus Email</span>
+                <span className="text-sm font-semibold text-white block truncate">{selectedUser.campus_email}</span>
+                {selectedUser.campus_email_verification_code && (
+                  <p className="text-xs text-amber-500 font-bold mt-1">Pending Code: {selectedUser.campus_email_verification_code}</p>
+                )}
+              </div>
+            )}
             {selectedUser.verification_id_url && (
               <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] text-center">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2 text-left">Uploaded Student ID Card</span>
