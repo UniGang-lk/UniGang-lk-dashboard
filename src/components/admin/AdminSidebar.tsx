@@ -25,6 +25,7 @@ const navItems = [
     section: 'Marketplace',
     items: [
       { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes' },
+      { label: 'Reviews', icon: LuMessageCircle, path: '/admin/reviews' },
       { label: 'Services', icon: LuMonitor, path: '/admin/services' },
       { label: 'Advertisements', icon: LuSparkles, path: '/admin/advertisements' },
       { label: 'Hustle Hub', icon: LuShoppingBag, path: '/admin/marketplace' },
@@ -80,6 +81,15 @@ const itemThemes: Record<string, { color: string; bgActive: string; borderActive
     iconActive: 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
     glow: 'shadow-[0_0_20px_-5px_rgba(99,102,241,0.35)]',
     indicator: 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]'
+  },
+  '/admin/reviews': {
+    color: 'purple',
+    bgActive: 'bg-purple-600/10',
+    borderActive: 'border-purple-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
+    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
   },
   '/admin/services': {
     color: 'cyan',

@@ -3,6 +3,7 @@ import AdminLayout from './components/admin/AdminLayout';
 import DashboardPage from './pages/admin/DashboardPage';
 import UsersPage from './pages/admin/UsersPage';
 import AnnexesPage from './pages/admin/AnnexesPage';
+import ReviewsPage from './pages/admin/ReviewsPage';
 import AdvertisementsPage from './pages/admin/AdvertisementsPage';
 import UniversitiesPage from './pages/admin/UniversitiesPage';
 
@@ -45,6 +46,7 @@ function App() {
             <Route path="dashboard"                   element={<DashboardPage />} />
             <Route path="users"                       element={<UsersPage />} />
             <Route path="annexes"                     element={<AnnexesPage />} />
+            <Route path="reviews"                     element={<ReviewsPage />} />
             <Route path="events"                      element={<EventsPage />} />
             <Route path="advertisements"              element={<AdvertisementsPage />} />
             <Route path="services"                    element={<ServicesPage />} />

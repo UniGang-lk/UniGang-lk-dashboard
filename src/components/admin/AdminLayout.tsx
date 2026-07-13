@@ -14,6 +14,7 @@ const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
   '/admin/dashboard':               { label: 'Dashboard', icon: LuLayoutDashboard },
   '/admin/users':                   { label: 'User Management', icon: LuUsers },
   '/admin/annexes':                 { label: 'Annex Management', icon: LuClipboardList },
+  '/admin/reviews':                 { label: 'Review Moderation', icon: LuMessageCircle },
   '/admin/services':                { label: 'Service Requests', icon: LuMonitor },
   '/admin/events':                  { label: 'Event Hub', icon: LuCalendarDays },
   '/admin/blogs':                   { label: 'Campus Blogs', icon: LuMessageCircle },

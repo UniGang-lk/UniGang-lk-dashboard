@@ -36,6 +36,7 @@ export interface Annex {
   status: string;
   images: string[];
   features: string[];
+  listing_type?: 'LANDLORD_RENT' | 'ROOMMATE_WANTED';
   securityDeposit?: string;
   proximityHub?: string;
   googleMapsUrl?: string;
@@ -47,6 +48,29 @@ export interface Annex {
   updated_at?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface AnnexReview {
+  id: string;
+  overallRating: number;
+  cleanlinessRating: number;
+  landlordRating: number;
+  comment?: string;
+  isApproved: boolean;
+  annexId: string;
+  userId: string;
+  created_at?: string;
+  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  annex?: {
+    id: string;
+    title: string;
+  };
+  user?: {
+    name: string;
+    email: string;
+  };
 }
 
 export interface Announcement {
