@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  LuSearch, LuMessageSquare, LuTrash2, 
-  LuCheck, LuX, LuStar, LuHome, LuUser 
+  LuSearch, LuMessageSquare, 
+  LuCheck, LuX, LuStar, LuUser 
 } from 'react-icons/lu';
+import { FiHome } from 'react-icons/fi';
 import { fetchPendingReviews, approveReview, deleteReview } from '../../api/api';
 import type { AnnexReview } from '../../types/schema';
 import { toast } from 'react-hot-toast';
@@ -178,7 +179,7 @@ const ReviewsPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2 bg-white/[0.02] border border-white/[0.04] p-3 rounded-xl">
-                  <LuHome className="w-4 h-4 text-amber-500 shrink-0" />
+                  <FiHome className="w-4 h-4 text-amber-500 shrink-0" />
                   <span className="text-xs font-semibold text-slate-300 truncate">{review.annex?.title || 'Unknown Annex'}</span>
                 </div>
 
