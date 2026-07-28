@@ -512,6 +512,21 @@ export const updateAdvertisement = async (id: string | number, data: any): Promi
   return result.data;
 };
 
+export const deleteAdvertisement = async (id: string | number): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/advertisements/${id}`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error('DELETE Error response:', response.status, errorText);
+    throw new Error(`Failed to delete advertisement: ${response.status} ${errorText}`);
+  }
+};
+
 // ─── MARKETPLACE ADMIN API ────────────────────────────────────────
 
 export const fetchAdminMarketItems = async (): Promise<any[]> => {

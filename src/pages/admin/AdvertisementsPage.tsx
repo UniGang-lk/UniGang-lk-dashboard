@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCheckCircle, FaTimesCircle, FaSearch, FaEye, FaAd, FaChartLine, FaHourglassHalf } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { fetchAdvertisements, updateAdvertisementStatus, updateAdvertisement } from '../../api/api';
+import { LuTrash2 } from 'react-icons/lu';
+import { fetchAdvertisements, updateAdvertisementStatus, updateAdvertisement, deleteAdvertisement } from '../../api/api';
 import { useToast } from '../../context/ToastContext';
 import { toast as hotToast } from 'react-hot-toast';
 
@@ -310,6 +311,19 @@ const AdvertisementsPage = () => {
     });
   };
 
+  const handleDeleteAd = async (id: number) => {
+    confirmAction(`Are you sure you want to completely delete this advertisement? This action cannot be undone.`, async () => {
+      try {
+        await deleteAdvertisement(id);
+        setAds(prev => prev.filter(ad => ad.id !== id));
+        toast.success(`Advertisement deleted permanently.`);
+      } catch (error) {
+        console.error("Failed to delete ad:", error);
+        toast.error("Failed to delete advertisement.");
+      }
+    });
+  };
+
   const handleViewAd = (ad: any) => {
     setSelectedAdForView(ad);
     setShowViewModal(true);
@@ -521,6 +535,14 @@ const AdvertisementsPage = () => {
                             title="Edit Campaign"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                          </button>
+
+                          <button
+                            onClick={() => handleDeleteAd(ad.id)}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-rose-500/20 text-white hover:text-rose-400 border border-white/5 hover:border-rose-500/30 transition-all shadow-lg"
+                            title="Delete Campaign"
+                          >
+                            <LuTrash2 size={16} />
                           </button>
 
                           {ad.status === 'PENDING' && (
