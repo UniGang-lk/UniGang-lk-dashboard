@@ -4,7 +4,7 @@ import {
   LuUsers, LuClipboardList, LuGraduationCap,
   LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
-  LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag
+  LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag, LuHeartHandshake
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
 
@@ -39,6 +39,12 @@ const navItems = [
     ],
   },
   {
+    section: 'Matchmaking',
+    items: [
+      { label: 'Proposals', icon: LuHeartHandshake, path: '/admin/proposals' },
+    ],
+  },
+  {
     section: 'Communication',
     items: [
       { label: 'Contacts', icon: LuPhone, path: '/admin/contacts' },
@@ -63,6 +69,15 @@ const itemThemes: Record<string, { color: string; bgActive: string; borderActive
     iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
     glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
     indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
+  },
+  '/admin/proposals': {
+    color: 'rose',
+    bgActive: 'bg-rose-600/10',
+    borderActive: 'border-rose-500/60',
+    textActive: 'text-white',
+    iconActive: 'bg-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]',
+    glow: 'shadow-[0_0_20px_-5px_rgba(244,63,94,0.35)]',
+    indicator: 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]'
   },
   '/admin/settings/analytics': {
     color: 'blue',

@@ -771,6 +771,43 @@ export const deleteAdminProblem = async (id: string | number): Promise<void> => 
   if (!response.ok) throw new Error('Failed to delete support ticket');
 };
 
+// --- PROPOSAL ADMIN API ---
+export const fetchAdminProposals = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/admin`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to fetch admin proposals');
+  return await response.json();
+};
 
+export const updateAdminProposalStatus = async (id: string | number, status: string): Promise<void> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/admin/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update proposal status');
+};
 
+export const fetchAdminProposalChats = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/admin/chats`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to fetch active proposal chats');
+  return await response.json();
+};
 
+export const fetchAdminProposalChatMessages = async (chatId: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/admin/chats/${chatId}/messages`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to fetch proposal chat messages');
+  return await response.json();
+};

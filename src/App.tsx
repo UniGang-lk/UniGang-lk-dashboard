@@ -11,6 +11,7 @@ import AnalyticsPage from './pages/admin/AnalyticsPage';
 import EventsPage from './pages/admin/EventsPage';
 import ServicesPage from './pages/admin/ServicesPage';
 import BlogsPage from './pages/admin/BlogsPage';
+import ProposalsPage from './pages/admin/ProposalsPage';
 import ContactsPage from './pages/admin/ContactsPage';
 import NotificationsPage from './pages/admin/NotificationsPage';
 import MarketplacePage from './pages/admin/MarketplacePage';
@@ -51,6 +52,7 @@ function App() {
             <Route path="advertisements"              element={<AdvertisementsPage />} />
             <Route path="services"                    element={<ServicesPage />} />
             <Route path="blogs"                       element={<BlogsPage />} />
+            <Route path="proposals"                   element={<ProposalsPage />} />
             <Route path="contacts"                    element={<ContactsPage />} />
             <Route path="notifications"               element={<NotificationsPage />} />
             <Route path="marketplace"                 element={<MarketplacePage />} />
