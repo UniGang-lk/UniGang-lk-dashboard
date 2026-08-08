@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { LuCheck, LuX, LuGraduationCap, LuBriefcase, LuChevronLeft, LuEye } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import { fetchAdminProposals, fetchAdminProposalChats, updateAdminProposalStatus, fetchAdminProposalChatMessages } from '../../api/api';
@@ -231,7 +231,7 @@ const ProposalsPage = () => {
             {chatMessages.length === 0 ? (
               <div className="text-center text-sm font-bold text-slate-500 mt-10">No messages exchanged yet.</div>
             ) : (
-              chatMessages.map((msg, index) => {
+              chatMessages.map((msg) => {
                 const isUser1 = msg.sender_id === activeChat.sender_id;
 
                 return (

@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ShieldAlert, CheckCircle, Ban, Search } from 'lucide-react';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // In a real app, use the actual authenticated API call here
+  const fetchAlerts = () => {
     fetch('http://localhost:5000/api/proposals/privacy/alerts')
       .then(res => res.json())
       .then(data => {
@@ -14,7 +13,28 @@ export default function SecurityAlerts() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchAlerts();
   }, []);
+
+  const handleUpdateStatus = (id: string, status: string) => {
+    fetch(`http://localhost:5000/api/proposals/privacy/alerts/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          fetchAlerts();
+        } else {
+          alert('Failed to update alert');
+        }
+      })
+      .catch(console.error);
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -95,10 +115,18 @@ export default function SecurityAlerts() {
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <button className="p-2 text-slate-400 hover:text-emerald-600 bg-slate-50 hover:bg-emerald-50 rounded-lg transition-colors" title="Mark as Reviewed">
+                      <button 
+                        onClick={() => handleUpdateStatus(alert.id, 'Reviewed')}
+                        className="p-2 text-slate-400 hover:text-emerald-600 bg-slate-50 hover:bg-emerald-50 rounded-lg transition-colors" 
+                        title="Mark as Reviewed"
+                      >
                         <CheckCircle size={18} />
                       </button>
-                      <button className="p-2 text-slate-400 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-lg transition-colors" title="Ban User">
+                      <button 
+                        onClick={() => handleUpdateStatus(alert.id, 'Banned')}
+                        className="p-2 text-slate-400 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-lg transition-colors" 
+                        title="Ban User"
+                      >
                         <Ban size={18} />
                       </button>
                     </div>
