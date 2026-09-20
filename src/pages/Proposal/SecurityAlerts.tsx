@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShieldAlert, CheckCircle, Ban, Search } from 'lucide-react';
+import { LuShieldAlert, LuCircleCheck, LuBan, LuSearch } from 'react-icons/lu';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -41,13 +41,13 @@ export default function SecurityAlerts() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
-            <ShieldAlert className="text-rose-500" size={32} /> Security & Privacy Alerts
+            <LuShieldAlert className="text-rose-500" size={32} /> Security & Privacy Alerts
           </h1>
           <p className="text-slate-500 mt-2">Monitor screenshot attempts and privacy violations.</p>
         </div>
         
         <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <LuSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input 
             type="text" 
             placeholder="Search users..." 
@@ -61,7 +61,7 @@ export default function SecurityAlerts() {
           <div className="p-8 text-center text-slate-500">Loading alerts...</div>
         ) : alerts.length === 0 ? (
           <div className="p-12 text-center">
-            <CheckCircle className="mx-auto text-emerald-500 mb-4" size={48} />
+            <LuCircleCheck className="mx-auto text-emerald-500 mb-4" size={48} />
             <h3 className="text-lg font-bold text-slate-900">All Clear</h3>
             <p className="text-slate-500">No security alerts logged yet.</p>
           </div>
@@ -98,7 +98,7 @@ export default function SecurityAlerts() {
                   </td>
                   <td className="p-4">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold bg-rose-100 text-rose-700">
-                      <ShieldAlert size={12} /> {alert.action_type}
+                      <LuShieldAlert size={12} /> {alert.action_type}
                     </span>
                   </td>
                   <td className="p-4 text-sm text-slate-600">
@@ -120,14 +120,14 @@ export default function SecurityAlerts() {
                         className="p-2 text-slate-400 hover:text-emerald-600 bg-slate-50 hover:bg-emerald-50 rounded-lg transition-colors" 
                         title="Mark as Reviewed"
                       >
-                        <CheckCircle size={18} />
+                        <LuCircleCheck size={18} />
                       </button>
                       <button 
                         onClick={() => handleUpdateStatus(alert.id, 'Banned')}
                         className="p-2 text-slate-400 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 rounded-lg transition-colors" 
                         title="Ban User"
                       >
-                        <Ban size={18} />
+                        <LuBan size={18} />
                       </button>
                     </div>
                   </td>
