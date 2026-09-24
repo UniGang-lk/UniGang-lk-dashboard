@@ -22,6 +22,7 @@ const BlogsPage = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [selectedBlog, setSelectedBlog] = useState<Blog | null>(null);
 
   const loadBlogs = async () => {
@@ -40,11 +41,22 @@ const BlogsPage = () => {
     loadBlogs();
   }, []);
 
-  const filteredBlogs = blogs.filter(b => 
-    b.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    b.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    b.tags.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const pendingCount = blogs.filter(b => (b.status || '').toLowerCase() === 'pending').length;
+  const approvedCount = blogs.filter(b => (b.status || '').toLowerCase() === 'approved').length;
+  const rejectedCount = blogs.filter(b => (b.status || '').toLowerCase() === 'rejected').length;
+
+  const filteredBlogs = blogs.filter(b => {
+    const term = searchTerm.toLowerCase();
+    const matchesSearch = 
+      (b.title || '').toLowerCase().includes(term) || 
+      (b.author || '').toLowerCase().includes(term) ||
+      (b.tags || '').toLowerCase().includes(term) ||
+      (b.category || '').toLowerCase().includes(term);
+    
+    const blogStatus = (b.status || 'pending').toLowerCase();
+    if (statusFilter === 'all') return matchesSearch;
+    return matchesSearch && blogStatus === statusFilter;
+  });
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     toast.custom((t) => (
@@ -115,17 +127,46 @@ const BlogsPage = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
+      {/* Filters & Status Tabs */}
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1 min-w-[280px]">
           <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input
             type="text"
-            placeholder="Search by title, author or tags..."
+            placeholder="Search by title, author, category or tags..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-xs"
           />
+        </div>
+
+        {/* Status Filter Tabs */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80 overflow-x-auto">
+          {[
+            { key: 'all', label: 'All', count: blogs.length },
+            { key: 'pending', label: 'Pending', count: pendingCount, highlight: pendingCount > 0 },
+            { key: 'approved', label: 'Approved', count: approvedCount },
+            { key: 'rejected', label: 'Rejected', count: rejectedCount }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setStatusFilter(tab.key as any)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                statusFilter === tab.key
+                  ? 'bg-white text-slate-900 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              {tab.label}
+              <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                statusFilter === tab.key
+                  ? tab.highlight ? 'bg-amber-100 text-amber-800' : 'bg-slate-200 text-slate-800'
+                  : tab.highlight ? 'bg-amber-200/70 text-amber-800' : 'bg-slate-200/60 text-slate-500'
+              }`}>
+                {tab.count}
+              </span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -231,7 +272,7 @@ const BlogsPage = () => {
                       {selectedBlog.authorImage ? (
                         <img src={selectedBlog.authorImage} alt={selectedBlog.author} className="w-full h-full object-cover" />
                       ) : (
-                        selectedBlog.author.charAt(0)
+                        (selectedBlog.author || 'U').charAt(0).toUpperCase()
                       )}
                     </div>
                     <div>
@@ -257,7 +298,7 @@ const BlogsPage = () => {
                     </div>
 
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {selectedBlog.tags.split(',').map(tag => {
+                      {(selectedBlog.tags || '').split(',').map(tag => {
                         const trimmedTag = tag.trim();
                         if (!trimmedTag) return null;
                         return (

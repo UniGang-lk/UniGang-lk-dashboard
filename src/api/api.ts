@@ -383,7 +383,7 @@ export const fetchBlogs = async (): Promise<Blog[]> => {
     image: blog.featuredImage 
       ? (blog.featuredImage.startsWith('http') ? blog.featuredImage : `${BASE_URL}${blog.featuredImage}`)
       : 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=800',
-    status: blog.status.toLowerCase() as 'pending' | 'approved' | 'rejected',
+    status: (blog.status || 'Pending').toLowerCase() as 'pending' | 'approved' | 'rejected',
     createdAt: blog.createdAt
   }));
 };
