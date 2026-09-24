@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   FaTrash, FaCheckCircle, FaTimesCircle, FaSearch, FaShoppingBag, 
   FaBriefcase, FaStar, FaEye, FaChevronLeft, FaChevronRight,
@@ -123,7 +123,8 @@ const MarketplacePage = () => {
   const getImageUrl = (url: string) => {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('data:image')) return url;
-    return ${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'};
+    const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+    return `${base}${url.startsWith('/') ? '' : '/'}${url}`;
   };
   const filteredItems = items.filter(item => {
     const m = (item.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || (item.seller?.name || '').toLowerCase().includes(searchTerm.toLowerCase());
