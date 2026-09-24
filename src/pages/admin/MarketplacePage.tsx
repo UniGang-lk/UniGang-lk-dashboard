@@ -175,16 +175,25 @@ const MarketplacePage = () => {
           const c = colorMap[tab.color];
           const Icon = tab.icon;
           return (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key as any)}
-              className={elative p-4 rounded-2xl border cursor-pointer transition-all duration-200 text-left }>
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as any)}
+              className={`relative p-4 rounded-2xl border cursor-pointer transition-all duration-200 text-left ${
+                isActive
+                  ? `${c.active} shadow-xs`
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+              }`}
+            >
               <div className="flex flex-col gap-2">
-                <div className={p-2 rounded-xl w-fit }><Icon className="text-base" /></div>
+                <div className={`p-2 rounded-xl w-fit ${isActive ? c.icon : 'bg-slate-100 text-slate-600'}`}>
+                  <Icon className="text-base" />
+                </div>
                 <div>
                   <h4 className="font-bold text-slate-900 text-xs leading-tight">{tab.label}</h4>
                   <p className="text-[10px] text-slate-500 mt-0.5 font-medium leading-tight">{tab.sub}</p>
                 </div>
               </div>
-              {isActive && <div className={bsolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5  rounded-t-full} />}
+              {isActive && <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 ${c.dot} rounded-t-full`} />}
             </button>
           );
         })}
@@ -230,7 +239,7 @@ const MarketplacePage = () => {
                       <td className="py-3.5 px-5 font-semibold text-slate-900"><div className="flex items-center gap-2">{item.is_featured && <FaStar className="text-amber-400" />}{item.title}</div></td>
                       <td className="py-3.5 px-5 text-slate-600">Rs. {parseFloat(item.price).toLocaleString()}</td>
                       {activeTab !== 'store' && <td className="py-3.5 px-5"><p className="font-medium text-slate-900">{item.seller?.name || 'Unknown'}</p><p className="text-xs text-slate-400">{item.seller?.email || ''}</p></td>}
-                      <td className="py-3.5 px-5"><span className={py-1 px-2.5 rounded-full text-[10px] font-black uppercase }>{item.status === 'AVAILABLE' ? 'Approved' : item.status === 'SUSPENDED' ? 'Suspended' : item.status === 'SOLD' ? 'Sold' : 'Pending'}</span></td>
+                      <td className="py-3.5 px-5"><span className={`py-1 px-2.5 rounded-full text-[10px] font-black uppercase ${statusBadge(item.status)}`}>{item.status === 'AVAILABLE' ? 'Approved' : item.status === 'SUSPENDED' ? 'Suspended' : item.status === 'SOLD' ? 'Sold' : 'Pending'}</span></td>
                       <td className="py-3.5 px-5"><div className="flex items-center justify-center gap-1.5">
                         <button onClick={() => { setSelectedItem(item); setActiveImgIndex(0); }} className="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 text-blue-500 hover:bg-blue-100 transition-all cursor-pointer border-none"><FaEye className="text-xs" /></button>
                         <button onClick={() => handleEditClick(item)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all cursor-pointer border-none"><FaEdit className="text-xs" /></button>
@@ -250,10 +259,10 @@ const MarketplacePage = () => {
                     return (
                       <tr key={order.id} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-3.5 px-5"><div className="font-semibold text-slate-900 text-xs truncate max-w-[100px]">{order.id.substring(0, 8)}...</div><span className="text-[10px] text-slate-400">{new Date(order.createdAt).toLocaleDateString()}</span></td>
-                        <td className="py-3.5 px-5"><div className="flex items-center gap-2"><img src={order.buyer?.profile_pic || https://api.dicebear.com/7.x/avataaars/svg?seed=} alt="" className="w-7 h-7 rounded-full object-cover border border-slate-200" /><div><p className="font-medium text-slate-900 text-xs">{order.buyer?.name || 'Customer'}</p><p className="text-[10px] text-slate-400">{order.buyer?.email}</p></div></div></td>
+                        <td className="py-3.5 px-5"><div className="flex items-center gap-2"><img src={order.buyer?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(order.buyer?.name || 'Customer')}`} alt="" className="w-7 h-7 rounded-full object-cover border border-slate-200" /><div><p className="font-medium text-slate-900 text-xs">{order.buyer?.name || 'Customer'}</p><p className="text-[10px] text-slate-400">{order.buyer?.email}</p></div></div></td>
                         <td className="py-3.5 px-5"><div className="flex items-center gap-2">{img ? <img src={img} alt="" className="w-8 h-8 object-cover rounded-lg border border-slate-200" /> : <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[10px]">N/A</div>}<div><p className="font-medium text-slate-900 text-xs">{order.item?.title || 'Unknown'}</p><p className="text-[10px] text-slate-400">Qty: {order.quantity}</p><p className="text-[11px] font-black text-indigo-500">Rs. {parseFloat(order.total_price || '0').toLocaleString()}</p></div></div></td>
                         <td className="py-3.5 px-5"><div className="text-xs text-slate-500 space-y-0.5"><p className="flex items-center gap-1"><FaPhone className="text-[9px] text-indigo-400" />{order.delivery_phone}</p><p className="flex items-center gap-1 max-w-[130px] truncate"><FaMapMarkerAlt className="text-[9px] text-indigo-400" />{order.delivery_location}</p></div></td>
-                        <td className="py-3.5 px-5"><span className={py-1 px-2.5 rounded-full text-[10px] font-black uppercase }>{order.status}</span></td>
+                        <td className="py-3.5 px-5"><span className={`py-1 px-2.5 rounded-full text-[10px] font-black uppercase ${statusBadge(item.status)}`}>{order.status}</span></td>
                         <td className="py-3.5 px-5"><div className="flex items-center justify-center gap-1.5">
                           <button onClick={() => setSelectedOrder(order)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 text-blue-500 hover:bg-blue-100 transition-all cursor-pointer border-none"><FaEye className="text-xs" /></button>
                           <button onClick={() => { if (order.chatId) { setSelectedAuditChatId(order.chatId); setActiveTab('audit'); } else toast.error('No chat history.'); }} className="w-7 h-7 rounded-lg flex items-center justify-center bg-rose-50 text-rose-400 hover:bg-rose-100 transition-all cursor-pointer border-none"><FaHistory className="text-xs" /></button>
@@ -304,9 +313,9 @@ const MarketplacePage = () => {
             <div className="w-full md:w-1/2 p-7 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-full">
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest }>{selectedItem.type}</span>
+                  <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-blue-100 text-blue-700">{selectedItem.type}</span>
                   {selectedItem.type === 'PRODUCT' && selectedItem.condition && <span className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-slate-100 text-slate-600">{selectedItem.condition}</span>}
-                  <span className={px-2.5 py-1 rounded-full text-[9px] font-black uppercase }>{selectedItem.status}</span>
+                  <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase ${statusBadge(selectedItem.status)}`}>{selectedItem.status}</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{selectedItem.title}</h3>
                 <div className="text-xl font-black text-indigo-500 mb-5">Rs. {parseFloat(selectedItem.price).toLocaleString()}</div>
@@ -322,7 +331,7 @@ const MarketplacePage = () => {
               <div className="border-t border-slate-100 pt-5">
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Merchant Information</h4>
                 <div className="flex items-center gap-3">
-                  <img src={selectedItem.seller?.profile_pic || https://api.dicebear.com/7.x/avataaars/svg?seed=} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                  <img src={selectedItem.seller?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedItem.seller?.name || 'Seller')}`} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
                   <div><h5 className="text-sm font-semibold text-slate-900">{selectedItem.seller?.name || 'Official Store'}</h5><p className="text-xs text-slate-500">{selectedItem.seller?.email || 'store@unigung.lk'}</p></div>
                 </div>
               </div>
@@ -404,7 +413,7 @@ const MarketplacePage = () => {
                     <div className="absolute top-[14px] left-[10%] h-0.5 bg-indigo-500 transition-all duration-500" style={{ width: selectedOrder.status === 'DELIVERED' ? '80%' : selectedOrder.status === 'PROCESSING' ? '40%' : '0%' }} />
                     {[{ label: 'Pending', s: ['PENDING','PROCESSING','DELIVERED'] }, { label: 'Processing', s: ['PROCESSING','DELIVERED'] }, { label: 'Delivered', s: ['DELIVERED'] }].map((step, i) => {
                       const active = step.s.includes(selectedOrder.status);
-                      return <div key={i} className="flex flex-col items-center gap-1.5 z-10"><div className={w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all }>{i+1}</div><span className={	ext-[10px] font-bold }>{step.label}</span></div>;
+                      return <div key={i} className="flex flex-col items-center gap-1.5 z-10"><div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border transition-all ${active ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-slate-400 border-slate-200"}`}>{i+1}</div><span className={`text-[10px] font-bold ${active ? "text-indigo-600" : "text-slate-400"}`}>{step.label}</span></div>;
                     })}
                   </div>
                 )}
@@ -419,7 +428,7 @@ const MarketplacePage = () => {
                 </div>
                 <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Customer Details</h4>
-                  <div className="flex items-center gap-3 mb-3"><img src={selectedOrder.buyer?.profile_pic || https://api.dicebear.com/7.x/avataaars/svg?seed=} alt="" className="w-9 h-9 rounded-full object-cover border border-slate-200" /><div><h5 className="text-sm font-semibold text-slate-900">{selectedOrder.buyer?.name || 'Customer'}</h5><p className="text-xs text-slate-500">{selectedOrder.buyer?.email}</p></div></div>
+                  <div className="flex items-center gap-3 mb-3"><img src={selectedOrder.buyer?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedOrder.buyer?.name || 'Customer')}`} alt="" className="w-9 h-9 rounded-full object-cover border border-slate-200" /><div><h5 className="text-sm font-semibold text-slate-900">{selectedOrder.buyer?.name || 'Customer'}</h5><p className="text-xs text-slate-500">{selectedOrder.buyer?.email}</p></div></div>
                   <div className="space-y-1 text-xs text-slate-500"><div className="flex items-center gap-1.5"><FaPhone className="text-[9px] text-indigo-400" />{selectedOrder.delivery_phone}</div><div className="flex items-center gap-1.5"><FaMapMarkerAlt className="text-[9px] text-indigo-400" />{selectedOrder.delivery_location}</div></div>
                 </div>
               </div>
@@ -432,8 +441,8 @@ const MarketplacePage = () => {
                   <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Bank Deposit Slip</h4>
                     <div className="relative overflow-hidden rounded-xl border border-slate-200 p-2 flex items-center justify-center bg-white">
-                      <img src={${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}} alt="Receipt" className="max-h-64 object-contain rounded-lg" />
-                      <a href={${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}} target="_blank" rel="noopener noreferrer" className="absolute bottom-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg no-underline">View Full</a>
+                      <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedOrder.payment_slip}`} alt="Receipt" className="max-h-64 object-contain rounded-lg" />
+                      <a href={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedOrder.payment_slip}`} target="_blank" rel="noopener noreferrer" className="absolute bottom-4 right-4 bg-slate-900/80 hover:bg-slate-900 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg no-underline">View Full</a>
                     </div>
                   </div>
                 )}
