@@ -20,100 +20,99 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4"
       >
         <motion.div 
-          initial={{ scale: 0.9, y: 20 }}
+          initial={{ scale: 0.95, y: 15 }}
           animate={{ scale: 1, y: 0 }}
-          exit={{ scale: 0.9, y: 20 }}
+          exit={{ scale: 0.95, y: 15 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="bg-slate-900/90 backdrop-blur-2xl border border-white/[0.08] rounded-[2.5rem] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-8 custom-scrollbar"
+          className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-8 custom-scrollbar"
         >
-          <div className='flex justify-between items-center mb-8'>
+          <div className='flex justify-between items-center mb-6'>
             <div>
-              <h2 className="text-3xl font-black text-white tracking-tight leading-none mb-2">{ad.ad_title}</h2>
-              <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em]">{ad.company_name}</p>
+              <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">{ad.ad_title}</h2>
+              <p className="text-blue-600 text-xs font-bold uppercase tracking-wider">{ad.company_name}</p>
             </div>
             <button
               onClick={onClose}
-              className="w-12 h-12 rounded-2xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90 font-bold uppercase tracking-wider"
+              className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
             >
-              <IoClose className='h-6 w-6'/>
+              <IoClose size={20} />
             </button>
           </div>
 
           {ad.image_url && (
-            <div className="mb-8 relative aspect-video rounded-2xl overflow-hidden border border-white/10 group shadow-2xl shadow-blue-500/10">
-              <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
-              <span className="absolute bottom-4 left-4 px-3 py-1.5 bg-blue-600/90 backdrop-blur-sm text-[10px] font-black text-white rounded-lg shadow-lg uppercase tracking-widest">{ad.placement_type}</span>
+            <div className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
+              <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover" />
+              <span className="absolute bottom-3 left-3 px-2.5 py-1 bg-blue-600 text-[10px] font-bold text-white rounded-lg shadow-sm uppercase tracking-wider">{ad.placement_type}</span>
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-6">
-              <div className="p-6 rounded-[2rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] hover:border-white/[0.15] transition-colors">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Placement Details</p>
-                <div className="flex flex-col gap-2">
-                  <p className="text-xl font-black text-white">{ad.placement_type}</p>
-                  <p className="text-sm text-slate-400">Duration: <span className="text-white font-bold">{ad.duration_days} Days</span></p>
+          <div className="grid md:grid-cols-2 gap-4 mb-4">
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Placement Details</p>
+                <div className="flex flex-col gap-1.5">
+                  <p className="text-base font-bold text-slate-900">{ad.placement_type}</p>
+                  <p className="text-xs text-slate-600 font-medium">Duration: <span className="text-slate-900 font-bold">{ad.duration_days} Days</span></p>
                   {ad.target_link && (
-                    <a href={ad.target_link} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-400 font-bold hover:text-blue-300 hover:underline mt-2 inline-flex items-center gap-1">
+                    <a href={ad.target_link} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1">
                       Target Link &rarr;
                     </a>
                   )}
                 </div>
               </div>
 
-              <div className="p-6 rounded-[2rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] hover:border-white/[0.15] transition-colors">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Engagement Metrics</p>
-                <div className="space-y-4 text-sm font-bold">
-                  <div className="flex justify-between items-center text-slate-300">
-                    <span className="flex items-center gap-2"><FaEye className="text-emerald-400"/> Views</span> 
-                    <span className="text-white text-lg bg-white/5 px-3 py-1 rounded-lg">{ad.views}</span>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Engagement Metrics</p>
+                <div className="space-y-2 text-xs font-semibold">
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span className="flex items-center gap-1.5"><FaEye className="text-emerald-600"/> Views</span> 
+                    <span className="text-slate-900 font-bold bg-white border border-slate-200 px-2.5 py-0.5 rounded-md">{ad.views}</span>
                   </div>
-                  <div className="flex justify-between items-center text-slate-300">
-                    <span className="flex items-center gap-2"><FaChartLine className="text-blue-400"/> Clicks</span> 
-                    <span className="text-white text-lg bg-white/5 px-3 py-1 rounded-lg">{ad.clicks}</span>
+                  <div className="flex justify-between items-center text-slate-600">
+                    <span className="flex items-center gap-1.5"><FaChartLine className="text-blue-600"/> Clicks</span> 
+                    <span className="text-slate-900 font-bold bg-white border border-slate-200 px-2.5 py-0.5 rounded-md">{ad.clicks}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="p-6 rounded-[2rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] hover:border-white/[0.15] transition-colors h-full">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Status & Contact</p>
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 h-full">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Status & Contact</p>
                 
-                <div className="mb-6 flex items-center gap-3">
-                  <span className={`py-1.5 px-4 rounded-full text-xs font-black border uppercase tracking-widest shadow-lg ${
-                    ad.status === 'ACTIVE' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30 shadow-emerald-500/20' :
-                    ad.status === 'PENDING' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30 shadow-amber-500/20' :
-                    ad.status === 'REJECTED' ? 'bg-red-500/20 text-red-400 border-red-500/30 shadow-red-500/20' :
-                    'bg-slate-500/20 text-slate-400 border-slate-500/30 shadow-slate-500/20'
+                <div className="mb-4">
+                  <span className={`py-1 px-3 rounded-full text-xs font-bold border uppercase tracking-wider ${
+                    ad.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                    ad.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                    ad.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                    'bg-slate-100 text-slate-700 border-slate-200'
                   }`}>{ad.status}</span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">Company</p>
-                    <p className="text-sm font-black text-white">{ad.company_name}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">Company</p>
+                    <p className="text-xs font-bold text-slate-900">{ad.company_name}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">Email</p>
-                    <p className="text-sm text-slate-300">{ad.contact_email}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">Email</p>
+                    <p className="text-xs text-slate-700 font-medium">{ad.contact_email}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase">Phone</p>
-                    <p className="text-sm text-slate-300">{ad.contact_phone || 'N/A'}</p>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">Phone</p>
+                    <p className="text-xs text-slate-700 font-medium">{ad.contact_phone || 'N/A'}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="p-6 rounded-[2rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] hover:border-white/[0.15] transition-colors">
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Ad Description</p>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium">{ad.ad_description}</p>
+          <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Ad Description</p>
+            <p className="text-xs text-slate-700 leading-relaxed font-normal">{ad.ad_description}</p>
           </div>
         </motion.div>
       </motion.div>
@@ -165,54 +164,54 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ ad, onClose, onUpdate }) => {
     <AnimatePresence>
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4"
       >
         <motion.div 
-          initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
-          className="bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl max-w-xl w-full p-6 relative"
+          initial={{ scale: 0.95, y: 15 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, y: 15 }}
+          className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-xl w-full p-6 relative"
         >
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-black text-white">Edit Advertisement</h3>
-            <button onClick={onClose} className="text-slate-400 hover:text-white"><IoClose size={24} /></button>
+          <div className="flex justify-between items-center mb-5">
+            <h3 className="text-lg font-bold text-slate-900">Edit Advertisement</h3>
+            <button onClick={onClose} className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all cursor-pointer"><IoClose size={20} /></button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-slate-400 mb-1 block">Company Name</label>
-              <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" required />
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Company Name</label>
+              <input type="text" name="company_name" value={formData.company_name} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs" required />
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 mb-1 block">Ad Title</label>
-              <input type="text" name="ad_title" value={formData.ad_title} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" required />
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Ad Title</label>
+              <input type="text" name="ad_title" value={formData.ad_title} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs" required />
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 mb-1 block">Target Link</label>
-              <input type="url" name="target_link" value={formData.target_link} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500" />
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Target Link</label>
+              <input type="url" name="target_link" value={formData.target_link} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs" />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-slate-400 mb-1 block">Placement</label>
-                <select name="placement_type" value={formData.placement_type} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-white outline-none focus:border-blue-500">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Placement</label>
+                <select name="placement_type" value={formData.placement_type} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs">
                   <option value="BANNER">Banner</option>
                   <option value="SIDEBAR">Sidebar Widget</option>
                   <option value="NATIVE_FEED">Native Feed</option>
                   <option value="POPUP">Popup</option>
                 </select>
               </div>
-              <div>
-                <label className="text-xs font-bold text-slate-400 mb-1 block">Duration (Days)</label>
-                <input type="number" name="duration_days" value={formData.duration_days} onChange={handleChange} disabled={isDurationLocked} className={`w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500 ${isDurationLocked ? 'opacity-50 cursor-not-allowed' : ''}`} required min="1" />
-                {isDurationLocked && <p className="text-[10px] text-amber-500 mt-1">Locked (Ad is ACTIVE)</p>}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-700">Duration (Days)</label>
+                <input type="number" name="duration_days" value={formData.duration_days} onChange={handleChange} disabled={isDurationLocked} className={`w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs ${isDurationLocked ? 'opacity-50 cursor-not-allowed' : ''}`} required min="1" />
+                {isDurationLocked && <p className="text-[10px] text-amber-600 font-semibold mt-0.5">Locked (Ad is ACTIVE)</p>}
               </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-slate-400 mb-1 block">Description</label>
-              <textarea name="ad_description" value={formData.ad_description} onChange={handleChange} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white outline-none focus:border-blue-500 h-24" required></textarea>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-700">Description</label>
+              <textarea name="ad_description" value={formData.ad_description} onChange={handleChange} className="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 h-20 resize-none shadow-xs" required></textarea>
             </div>
             
-            <div className="flex justify-end gap-3 mt-6">
-              <button type="button" onClick={onClose} className="px-5 py-2 rounded-xl border border-slate-700 text-slate-300 font-bold hover:bg-slate-800">Cancel</button>
-              <button type="submit" disabled={loading} className="px-5 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-500 disabled:opacity-50">
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <button type="button" onClick={onClose} className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider cursor-pointer transition-all">Cancel</button>
+              <button type="submit" disabled={loading} className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm disabled:opacity-50 cursor-pointer transition-all">
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
@@ -222,8 +221,6 @@ const EditAdModal: React.FC<EditAdModalProps> = ({ ad, onClose, onUpdate }) => {
     </AnimatePresence>
   );
 };
-
-
 
 const AdvertisementsPage = () => {
   const { toast } = useToast();
@@ -239,17 +236,17 @@ const AdvertisementsPage = () => {
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     hotToast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-[2rem] pointer-events-auto flex flex-col p-6 backdrop-blur-xl`}>
-        <div className="flex items-center gap-3 mb-6">
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5`}>
+        <div className="flex items-center gap-3 mb-5">
           <div className="flex-1">
-            <p className="text-sm font-bold text-white tracking-wide leading-relaxed">{message}</p>
+            <p className="text-sm font-bold text-slate-800 tracking-wide leading-relaxed">{message}</p>
           </div>
         </div>
-        <div className="flex gap-3 justify-end">
-          <button onClick={() => hotToast.dismiss(t.id)} className="px-6 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-black uppercase tracking-widest rounded-xl transition-all">
+        <div className="flex gap-2.5 justify-end">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all">
             Cancel
           </button>
-          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5">
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-blue-500/20">
             Confirm
           </button>
         </div>
@@ -271,10 +268,9 @@ const AdvertisementsPage = () => {
     };
     loadAds();
 
-    // Timer for countdown updates
     const interval = setInterval(() => {
       setNow(new Date().getTime());
-    }, 60000); // Update every minute
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -290,7 +286,7 @@ const AdvertisementsPage = () => {
       try {
         await updateAdvertisementStatus(id, 'ACTIVE');
         setAds(prev => prev.map(ad => ad.id === id ? { ...ad, status: 'ACTIVE' } : ad));
-        toast.success(`Advertisement approved successfully! Notification sent to the user.`);
+        toast.success(`Advertisement approved successfully!`);
       } catch (error) {
         console.error("Failed to approve ad:", error);
         toast.error("Failed to approve advertisement.");
@@ -349,7 +345,6 @@ const AdvertisementsPage = () => {
     handleCloseEditModal();
   };
 
-  // Helper for Countdown
   const getRemainingTime = (endDateStr: string) => {
     if (!endDateStr) return 'N/A';
     const end = new Date(endDateStr).getTime();
@@ -360,228 +355,191 @@ const AdvertisementsPage = () => {
     return `${days}d ${hours}h`;
   };
 
-  // Calculate Metrics
   const activeAdsCount = ads.filter(a => a.status === 'ACTIVE').length;
   const pendingAdsCount = ads.filter(a => a.status === 'PENDING').length;
   const totalViews = ads.reduce((sum, ad) => sum + (ad.views || 0), 0);
   const totalClicks = ads.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-      >
-        <div>
-          <h2 className="text-3xl font-black text-white tracking-tight uppercase">Advertisement <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Hub</span></h2>
-          <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mt-2">Manage global ad campaigns and monetization</p>
-        </div>
-      </motion.div>
+      <div>
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Advertisement Hub</h2>
+        <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Manage partner promotional banners, placements, and billing</p>
+      </div>
 
-      {/* Premium Metric Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Metric Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { icon: FaAd, label: 'Active Campaigns', value: activeAdsCount, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-          { icon: FaHourglassHalf, label: 'Pending Reviews', value: pendingAdsCount, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-          { icon: FaEye, label: 'Total Impressions', value: totalViews.toLocaleString(), color: 'text-blue-400', bg: 'bg-blue-400/10' },
-          { icon: FaChartLine, label: 'Total Clicks', value: totalClicks.toLocaleString(), color: 'text-purple-400', bg: 'bg-purple-400/10' }
+          { icon: FaAd, label: 'Active Campaigns', value: activeAdsCount, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100' },
+          { icon: FaHourglassHalf, label: 'Pending Reviews', value: pendingAdsCount, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100' },
+          { icon: FaEye, label: 'Total Impressions', value: totalViews.toLocaleString(), color: 'text-blue-600', bg: 'bg-blue-50 border-blue-100' },
+          { icon: FaChartLine, label: 'Total Clicks', value: totalClicks.toLocaleString(), color: 'text-purple-600', bg: 'bg-purple-50 border-purple-100' }
         ].map((stat, idx) => (
-          <motion.div 
+          <div 
             key={idx}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: idx * 0.1 }}
-            className="p-6 rounded-[2rem] bg-gradient-to-br from-white/[0.05] to-transparent border border-white/[0.08] relative overflow-hidden group hover:border-white/[0.15] transition-colors shadow-2xl"
+            className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-between"
           >
-            <div className={`absolute top-0 right-0 w-32 h-32 ${stat.bg} rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity`} />
-            <div className="relative z-10 flex items-start justify-between">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">{stat.label}</p>
-                <h3 className="text-4xl font-black text-white tracking-tighter">{stat.value}</h3>
-              </div>
-              <div className={`w-12 h-12 rounded-2xl ${stat.bg} ${stat.color} flex items-center justify-center text-xl`}>
-                <stat.icon />
-              </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">{stat.label}</p>
+              <h3 className="text-2xl font-extrabold text-slate-900">{stat.value}</h3>
             </div>
-          </motion.div>
+            <div className={`w-10 h-10 rounded-xl ${stat.bg} ${stat.color} border flex items-center justify-center text-base`}>
+              <stat.icon />
+            </div>
+          </div>
         ))}
       </div>
 
       {/* Controls */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="flex flex-col sm:flex-row gap-4 items-center bg-white/[0.02] p-4 rounded-[2rem] border border-white/[0.05]"
-      >
-        <div className="relative w-full sm:flex-grow">
+      <div className="flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[280px]">
+          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
           <input
             type="text"
-            placeholder="Search campaigns..."
-            className="w-full pl-12 pr-4 py-3.5 text-white text-sm bg-white/[0.03] border border-white/[0.08] rounded-2xl
-              focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:bg-white/[0.05] transition-all font-bold placeholder:text-slate-600"
+            placeholder="Search campaigns by company or title..."
+            className="w-full pl-9 pr-4 py-2.5 text-slate-900 text-sm bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs placeholder:text-slate-400"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm" />
         </div>
 
         <select
-          className="w-full sm:w-auto text-sm font-bold text-white bg-white/[0.03] border border-white/[0.08] rounded-2xl
-            py-3.5 pl-4 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500/50 appearance-none cursor-pointer hover:bg-white/[0.05] transition-colors"
+          className="text-xs font-bold uppercase tracking-wider text-slate-700 bg-white border border-slate-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs"
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
         >
-          <option value="All" className="bg-slate-900 text-white font-bold">All Statuses</option>
-          <option value="PENDING" className="bg-slate-900 text-amber-400 font-bold">Pending Review</option>
-          <option value="ACTIVE" className="bg-slate-900 text-emerald-400 font-bold">Active</option>
-          <option value="REJECTED" className="bg-slate-900 text-red-400 font-bold">Rejected</option>
-          <option value="EXPIRED" className="bg-slate-900 text-slate-400 font-bold">Expired</option>
+          <option value="All">All Statuses</option>
+          <option value="PENDING">Pending Review</option>
+          <option value="ACTIVE">Active</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="EXPIRED">Expired</option>
         </select>
-      </motion.div>
+      </div>
 
       {/* Main Table */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="rounded-[2.5rem] overflow-hidden border border-white/[0.08] bg-slate-900/50 shadow-2xl relative"
-      >
-        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <div className="overflow-x-auto custom-scrollbar">
+      <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
+        <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06] bg-white/[0.02]">
-                <th className="py-5 px-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Campaign Details</th>
-                <th className="py-5 px-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Duration</th>
-                <th className="py-5 px-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Placement</th>
-                <th className="py-5 px-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Status</th>
-                <th className="py-5 px-6 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Performance</th>
-                <th className="py-5 px-6 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Actions</th>
+              <tr className="border-b border-slate-200 bg-slate-50/75">
+                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Campaign Details</th>
+                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Duration</th>
+                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Placement</th>
+                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Status</th>
+                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Performance</th>
+                <th className="py-3 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.04]">
-              <AnimatePresence>
-                {loading ? (
-                  <tr>
-                    <td colSpan={6} className="py-24 text-center">
-                      <div className="inline-block w-8 h-8 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center text-slate-400 font-bold uppercase tracking-wider text-xs animate-pulse">
+                    Loading Campaigns...
+                  </td>
+                </tr>
+              ) : filteredAds.length > 0 ? (
+                filteredAds.map((ad: any) => (
+                  <tr key={ad.id} className="hover:bg-slate-50/60 transition-colors">
+                    <td className="py-3.5 px-5">
+                      <div className="flex flex-col">
+                        <span className="font-bold text-slate-900 text-sm">{ad.ad_title}</span>
+                        <span className="text-slate-400 text-[11px] font-semibold">{ad.company_name}</span>
+                      </div>
                     </td>
-                  </tr>
-                ) : filteredAds.length > 0 ? (
-                  filteredAds.map((ad: any) => (
-                    <motion.tr 
-                      key={ad.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="hover:bg-white/[0.03] transition-colors group"
-                    >
-                      <td className="py-5 px-6">
-                        <div className="flex flex-col">
-                          <span className="font-black text-white text-base group-hover:text-blue-400 transition-colors">{ad.ad_title}</span>
-                          <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">{ad.company_name}</span>
-                        </div>
-                      </td>
-                      <td className="py-5 px-6">
-                        <div className="flex flex-col gap-1">
-                          <span className="font-bold text-slate-300">{ad.duration_days} Days</span>
-                          {ad.status === 'ACTIVE' && ad.end_date && (
-                            <span className="text-[10px] font-black text-amber-400 uppercase">
-                              {getRemainingTime(ad.end_date)} left
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="py-5 px-6">
-                        <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
-                          ad.placement_type === 'POPUP' ? 'bg-purple-500/10 text-purple-400' :
-                          'bg-blue-500/10 text-blue-400'
-                        }`}>
-                          {ad.placement_type}
-                        </span>
-                      </td>
-                      <td className="py-5 px-6">
-                        <span className={`py-1.5 px-3 rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg ${
-                          ad.status === 'ACTIVE' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 shadow-emerald-500/10' :
-                          ad.status === 'PENDING' ? 'bg-amber-500/15 text-amber-400 border border-amber-500/20 shadow-amber-500/10' :
-                          ad.status === 'REJECTED' ? 'bg-red-500/15 text-red-400 border border-red-500/20 shadow-red-500/10' :
-                          'bg-slate-500/20 text-slate-400 border border-slate-500/20 shadow-slate-500/10'
-                        }`}>
-                          {ad.status}
-                        </span>
-                      </td>
-                      <td className="py-5 px-6">
-                        <div className="flex flex-col gap-1 text-xs font-bold">
-                          <span className="text-slate-400 flex justify-between w-16">Views: <span className="text-white">{ad.views}</span></span>
-                          <span className="text-slate-400 flex justify-between w-16">Clicks: <span className="text-white">{ad.clicks}</span></span>
-                        </div>
-                      </td>
-                      <td className="py-5 px-6">
-                        <div className="flex items-center justify-center gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleViewAd(ad)}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-blue-500/20 text-white hover:text-blue-400 border border-white/5 hover:border-blue-500/30 transition-all shadow-lg"
-                            title="Inspect Campaign"
-                          >
-                            <FaEye className="text-sm" />
-                          </button>
-                          
-                          <button
-                            onClick={() => handleEditAd(ad)}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-purple-500/20 text-white hover:text-purple-400 border border-white/5 hover:border-purple-500/30 transition-all shadow-lg"
-                            title="Edit Campaign"
-                          >
-                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                          </button>
+                    <td className="py-3.5 px-5">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-semibold text-slate-800 text-xs">{ad.duration_days} Days</span>
+                        {ad.status === 'ACTIVE' && ad.end_date && (
+                          <span className="text-[10px] font-bold text-amber-600">
+                            {getRemainingTime(ad.end_date)} left
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        ad.placement_type === 'POPUP' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                        'bg-blue-50 text-blue-700 border border-blue-200'
+                      }`}>
+                        {ad.placement_type}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <span className={`py-0.5 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                        ad.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' :
+                        ad.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border-amber-200' :
+                        ad.status === 'REJECTED' ? 'bg-rose-50 text-rose-700 border-rose-200' :
+                        'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}>
+                        {ad.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <div className="flex items-center gap-3 text-xs font-semibold text-slate-600">
+                        <span>Views: <b className="text-slate-900">{ad.views}</b></span>
+                        <span>Clicks: <b className="text-slate-900">{ad.clicks}</b></span>
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-5">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => handleViewAd(ad)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                          title="Inspect Campaign"
+                        >
+                          <FaEye className="text-xs" />
+                        </button>
+                        
+                        <button
+                          onClick={() => handleEditAd(ad)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                          title="Edit Campaign"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                        </button>
 
-                          <button
-                            onClick={() => handleDeleteAd(ad.id)}
-                            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-rose-500/20 text-white hover:text-rose-400 border border-white/5 hover:border-rose-500/30 transition-all shadow-lg"
-                            title="Delete Campaign"
-                          >
-                            <LuTrash2 size={16} />
-                          </button>
+                        <button
+                          onClick={() => handleDeleteAd(ad.id)}
+                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                          title="Delete Campaign"
+                        >
+                          <LuTrash2 size={14} />
+                        </button>
 
-                          {ad.status === 'PENDING' && (
-                            <>
-                              <button
-                                onClick={() => handleApproveAd(ad.id)}
-                                className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-emerald-500/20 text-white hover:text-emerald-400 border border-white/5 hover:border-emerald-500/30 transition-all shadow-lg"
-                                title="Approve Campaign"
-                              >
-                                <FaCheckCircle className="text-sm" />
-                              </button>
-                              <button
-                                onClick={() => handleRejectAd(ad.id)}
-                                className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-red-500/20 text-white hover:text-red-400 border border-white/5 hover:border-red-500/30 transition-all shadow-lg"
-                                title="Reject Campaign"
-                              >
-                                <FaTimesCircle className="text-sm" />
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </motion.tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="py-24 text-center">
-                      <div className="inline-flex flex-col items-center">
-                        <FaAd className="text-4xl text-white/10 mb-4" />
-                        <span className="text-slate-500 font-bold uppercase tracking-widest text-xs">No Campaigns Found</span>
+                        {ad.status === 'PENDING' && (
+                          <>
+                            <button
+                              onClick={() => handleApproveAd(ad.id)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all cursor-pointer border border-emerald-100"
+                              title="Approve Campaign"
+                            >
+                              <FaCheckCircle className="text-xs" />
+                            </button>
+                            <button
+                              onClick={() => handleRejectAd(ad.id)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                              title="Reject Campaign"
+                            >
+                              <FaTimesCircle className="text-xs" />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
-                )}
-              </AnimatePresence>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-16 text-center text-slate-400 font-bold uppercase tracking-wider text-xs">
+                    No Campaigns Found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
-      </motion.div>
+      </div>
 
       {/* Modals */}
       {showViewModal && selectedAdForView && (

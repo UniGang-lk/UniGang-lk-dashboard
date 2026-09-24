@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -12,14 +12,13 @@
   --color-primary-700: #1d4ed8;
   --color-primary-800: #1e40af;
   --color-primary-950: #172554;
-
-  --color-slate-950: #020617;
 }
+
 :root {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: dark;
+  color-scheme: light;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -38,32 +37,34 @@ html, body, #root {
 }
 
 body {
-  background-color: #020617; /* Solid Slate 950 base */
+  background-color: #f8fafc; /* Crisp, clean soft slate base */
   background-attachment: fixed;
-  color: #f1f5f9;
+  color: #0f172a;
 }
 
-/* Better button reset for Tailwind */
-button {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+@layer base {
+  button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
-/* ── Custom Scrollbar ────────────────────────────────────── */
+/* 🌟 Custom Light SaaS Scrollbar 🌟 */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
+  height: 5px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -71,54 +72,68 @@ button {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #94a3b8;
 }
 
-/* ── Glassmorphism Utility (Sharper) ─────────────────────── */
-.glass {
-  background: rgba(15, 23, 42, 0.85); /* More opaque */
-  backdrop-filter: blur(8px); /* Reduced blur (md) */
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08); /* More visible border */
+/* 🌟 Clean Corporate Card & Table Utilities 🌟 */
+.saas-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
 }
 
-.glass-card {
-  background: rgba(15, 23, 42, 0.4); /* Darker base for contrast */
-  backdrop-filter: blur(12px); /* md-lg blur */
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.5rem;
-  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+.saas-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.saas-card-hover:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.06);
 }
 
-.glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
-  background: rgba(15, 23, 42, 0.5);
-  transition: all 0.3s ease;
+/* 🌟 Blue iOS Style Toggle Switch 🌟 */
+.toggle-switch-track {
+  width: 2.5rem;
+  height: 1.35rem;
+  border-radius: 9999px;
+  transition: background-color 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+}
+.toggle-switch-track.active {
+  background-color: #2563eb;
+}
+.toggle-switch-track.inactive {
+  background-color: #cbd5e1;
 }
 
-/* ── Typography & Effects ────────────────────────────────── */
-.gradient-text {
-  background: linear-gradient(135deg, #60a5fa 0%, #a5b4fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.toggle-switch-thumb {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease-in-out;
+}
+.toggle-switch-thumb.active {
+  transform: translateX(1.15rem);
+}
+.toggle-switch-thumb.inactive {
+  transform: translateX(0);
 }
 
-.glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
-}
-
-/* ── Blog Content Styles ────────────────────────────────── */
+/* 🌟 Blog Content Styles 🌟 */
 .blog-content {
   font-size: 0.875rem;
   line-height: 1.7;
-  color: #cbd5e1; /* slate-300 */
+  color: #334155;
   white-space: pre-wrap;
 }
 
@@ -127,7 +142,7 @@ button {
 }
 
 .blog-content h1, .blog-content h2, .blog-content h3, .blog-content h4 {
-  color: #f8fafc; /* slate-50 */
+  color: #0f172a;
   font-weight: 800;
   margin-top: 2rem;
   margin-bottom: 1rem;
@@ -156,35 +171,35 @@ button {
 }
 
 .blog-content li::marker {
-  color: #3b82f6; /* blue-500 */
+  color: #2563eb;
 }
 
 .blog-content strong {
-  color: #f1f5f9;
+  color: #0f172a;
   font-weight: 600;
 }
 
 .blog-content a {
-  color: #60a5fa; /* blue-400 */
+  color: #2563eb;
   text-decoration: underline;
-  text-decoration-color: rgba(96, 165, 250, 0.4);
+  text-decoration-color: rgba(37, 99, 235, 0.4);
   text-underline-offset: 2px;
   transition: all 0.2s;
 }
 
 .blog-content a:hover {
-  color: #93c5fd;
-  text-decoration-color: #93c5fd;
+  color: #1d4ed8;
+  text-decoration-color: #1d4ed8;
 }
 
 .blog-content blockquote {
-  border-left: 4px solid #3b82f6;
+  border-left: 4px solid #2563eb;
   padding-left: 1rem;
   margin-left: 0;
   margin-bottom: 1.25rem;
   font-style: italic;
-  color: #94a3b8; /* slate-400 */
-  background: rgba(59, 130, 246, 0.05);
+  color: #475569;
+  background: rgba(37, 99, 235, 0.04);
   padding: 1rem;
   border-radius: 0 0.5rem 0.5rem 0;
 }
@@ -194,5 +209,5 @@ button {
   height: auto;
   border-radius: 1rem;
   margin-bottom: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid #e2e8f0;
 }

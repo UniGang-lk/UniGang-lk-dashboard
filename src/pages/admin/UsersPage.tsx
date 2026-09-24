@@ -1,6 +1,12 @@
-import { useState, useEffect } from 'react';
-import { FaEdit, FaTrash, FaSearch, FaUserShield, FaUserGraduate, FaUserTag, FaEye, FaTimesCircle } from 'react-icons/fa'; 
-import { fetchUsers, deleteUser as deleteUserApi, verifyUser, updateUserProfile } from '../../api/api';
+﻿import { useState, useEffect } from 'react';
+import {
+  FaEdit, FaTrash, FaSearch, FaEye, FaTimesCircle
+} from 'react-icons/fa';
+import {
+  LuUsers, LuChevronLeft, LuChevronRight,
+  LuChevronsLeft, LuChevronsRight
+} from 'react-icons/lu';
+import { fetchUsers, deleteUser as deleteUserApi, updateUserProfile } from '../../api/api';
 import type { User } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
 
@@ -16,6 +22,10 @@ const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [confirmDeleteUserId, setConfirmDeleteUserId] = useState<string | number | null>(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Edit user form fields
   const [editName, setEditName] = useState('');
@@ -62,407 +72,545 @@ const UsersPage = () => {
       const data = await fetchUsers();
       setUsers(data);
     } catch (error) {
-      console.error("Failed to load users:", error);
-      toast.error("Failed to load users.");
+      console.error('Failed to load users:', error);
+      toast.error('Failed to load users.');
     } finally {
       setLoading(false);
     }
   };
 
-  // User data loading
   useEffect(() => {
     loadUsers();
   }, []);
 
-  // Filtered users based on search term, role, and status
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'All' || user.role === filterRole;
-    const matchesStatus = filterStatus === 'All' || user.status === filterStatus;
-    return matchesSearch && matchesRole && matchesStatus;
-  });
-
-  // Handle user delete
-  const handleDeleteUser = async (userId: number | string) => {
-    setConfirmDeleteUserId(userId);
+  const handleToggleVerification = async (user: any) => {
+    const newStatus = !user.is_verified_student;
+    try {
+      await updateUserProfile(user.id, {
+        is_verified_student: newStatus
+      });
+      toast.success(`${user.name}'s student verification updated to ${newStatus ? 'Verified' : 'Unverified'}.`);
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update verification.');
+    }
   };
 
   const executeDeleteUser = async () => {
     if (!confirmDeleteUserId) return;
     try {
       await deleteUserApi(confirmDeleteUserId);
-      setUsers(users.filter(user => user.id !== confirmDeleteUserId));
-      toast.success('User deleted successfully.');
-    } catch (error) {
-      console.error("Failed to delete user:", error);
-      toast.error("Failed to delete user.");
-    } finally {
+      toast.success('User account deleted successfully.');
       setConfirmDeleteUserId(null);
+      loadUsers();
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete user.');
     }
   };
 
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      (user.name?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+      (user.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false);
+    const matchesRole = filterRole === 'All' || user.role?.toLowerCase() === filterRole.toLowerCase();
+    const matchesStatus = filterStatus === 'All' || user.status?.toLowerCase() === filterStatus.toLowerCase();
+    return matchesSearch && matchesRole && matchesStatus;
+  });
+
+  const totalItems = filteredUsers.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const studentsCount = users.filter(u => u.role === 'student').length;
+  const landlordsCount = users.filter(u => u.role === 'landlord').length;
+  const adminsCount = users.filter(u => u.role === 'admin').length;
+
   return (
-    <>
-      <div className="space-y-6">
-      <h2 className="text-2xl font-extrabold text-white tracking-tight">User Management</h2>
-
-      {/* Search and Filter Section */}
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="relative flex-grow">
-          <input
-            type="text"
-            placeholder="Search by name or email..."
-            className="w-full pl-10 pr-4 py-2.5 text-white text-sm bg-white/[0.05] border border-white/[0.08] rounded-xl
-              focus:outline-none focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500/50
-              placeholder:text-slate-600 transition-all"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-600 text-sm" />
+    <div className="space-y-6">
+      {/* ðŸŒŸ 1. Header (Icon + Title) ðŸŒŸ */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-sm">
+            <LuUsers className="text-xl" />
+          </div>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              User Management
+            </h1>
+            <p className="text-xs text-slate-500 font-medium">
+              Manage undergraduate students, verified landlords, and platform administrators
+            </p>
+          </div>
         </div>
-
-        <select
-          className="text-sm text-white bg-white/[0.05] border border-white/[0.08] rounded-xl
-            py-2.5 pl-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500/50 appearance-none"
-          value={filterRole}
-          onChange={(e) => setFilterRole(e.target.value)}
-        >
-          <option value="All" className="bg-slate-900">All Roles</option>
-          <option value="student" className="bg-slate-900">Student</option>
-          <option value="landlord" className="bg-slate-900">Landlord</option>
-          <option value="admin" className="bg-slate-900">Admin</option>
-        </select>
-
-        <select
-          className="text-sm text-white bg-white/[0.05] border border-white/[0.08] rounded-xl
-            py-2.5 pl-3 pr-8 focus:outline-none focus:ring-1 focus:ring-blue-500/50 appearance-none"
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-        >
-          <option value="All" className="bg-slate-900">All Status</option>
-          <option value="Active" className="bg-slate-900">Active</option>
-          <option value="Suspended" className="bg-slate-900">Suspended</option>
-        </select>
       </div>
 
-      {loading ? (
-        <div className="text-center py-16 text-slate-500 text-sm">Loading users...</div>
-      ) : (
-        <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
-          <div className="overflow-x-auto custom-scrollbar">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Name</th>
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Email</th>
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Role</th>
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Status</th>
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Verification</th>
-                  <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Joined</th>
-                  <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Actions</th>
+      {/* ðŸŒŸ 2. Filter Tabs (Sigma Underline Style) ðŸŒŸ */}
+      <div className="flex items-center gap-6 border-b border-slate-200 text-sm font-bold overflow-x-auto custom-scrollbar">
+        <button
+          onClick={() => { setFilterRole('All'); setCurrentPage(1); }}
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+            filterRole === 'All'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <span>ALL USERS</span>
+          <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-bold">
+            {users.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setFilterRole('student'); setCurrentPage(1); }}
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+            filterRole === 'student'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <span>STUDENTS</span>
+          <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[11px] font-bold">
+            {studentsCount}
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setFilterRole('landlord'); setCurrentPage(1); }}
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+            filterRole === 'landlord'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <span>LANDLORDS</span>
+          <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold">
+            {landlordsCount}
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setFilterRole('admin'); setCurrentPage(1); }}
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+            filterRole === 'admin'
+              ? 'border-blue-600 text-blue-600'
+              : 'border-transparent text-slate-500 hover:text-slate-900'
+          }`}
+        >
+          <span>ADMINS</span>
+          <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-bold">
+            {adminsCount}
+          </span>
+        </button>
+      </div>
+
+      {/* ðŸŒŸ 3. Floating White Card Container (Table & Controls) ðŸŒŸ */}
+      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+        {/* Top Control Bar */}
+        <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="Search by student name or email..."
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 transition-all"
+            />
+            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => { setFilterStatus(e.target.value); setCurrentPage(1); }}
+              className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:outline-none"
+            >
+              <option value="All">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Data Table */}
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50/70 text-slate-400 font-bold uppercase text-[11px] tracking-wider">
+                <th className="py-3 px-4 w-12 text-center">#</th>
+                <th className="py-3 px-4">User Details</th>
+                <th className="py-3 px-4">Email Address</th>
+                <th className="py-3 px-4">System Role</th>
+                <th className="py-3 px-4 text-center">Student Verified (Switch)</th>
+                <th className="py-3 px-4 text-center">Status</th>
+                <th className="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400 font-medium">
+                    Loading users database...
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-white/[0.04]">
-                {filteredUsers.length > 0 ? (
-                  filteredUsers.map(user => (
-                    <tr key={user.id} className="hover:bg-white/[0.04] transition-colors">
-                      <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{user.name}</td>
-                      <td className="py-3.5 px-5 text-slate-400">{user.email}</td>
-                      <td className="py-3.5 px-5">
-                        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 w-fit">
-                          {user.role === 'admin' && <FaUserShield className="text-blue-400 text-xs" />}
-                          {user.role === 'landlord' && <FaUserTag className="text-blue-400 text-xs" />}
-                          {user.role === 'student' && <FaUserGraduate className="text-blue-400 text-xs" />}
-                          <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">{user.role}</span>
+              ) : paginatedUsers.length > 0 ? (
+                paginatedUsers.map((user, index) => {
+                  const isVerified = Boolean(user.is_verified_student);
+                  const isUserActive = String(user.status || '').toLowerCase() === 'active';
+                  return (
+                    <tr key={user.id} className="hover:bg-blue-50/20 transition-colors">
+                      {/* Index */}
+                      <td className="py-3.5 px-4 text-center font-bold text-slate-400 text-xs">
+                        {(currentPage - 1) * itemsPerPage + index + 1}
+                      </td>
+
+                      {/* Name & Avatar */}
+                      <td className="py-3.5 px-4 font-bold text-slate-900 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={user.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`}
+                            alt={user.name}
+                            className="w-8 h-8 rounded-full object-cover border border-slate-200"
+                          />
+                          <span
+                            onClick={() => setSelectedUser(user)}
+                            className="cursor-pointer hover:text-blue-600 hover:underline"
+                          >
+                            {user.name}
+                          </span>
                         </div>
                       </td>
-                      <td className="py-3.5 px-5">
-                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter ${
-                          user.status === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                          user.status === 'suspended' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                          'bg-slate-500/10 text-slate-400 border-slate-500/20'
+
+                      {/* Email */}
+                      <td className="py-3.5 px-4 text-slate-600 font-medium whitespace-nowrap">
+                        {user.email}
+                      </td>
+
+                      {/* Role */}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
+                          user.role === 'admin' ? 'bg-purple-100 text-purple-800' :
+                          user.role === 'landlord' ? 'bg-amber-100 text-amber-800' :
+                          'bg-blue-100 text-blue-800'
                         }`}>
-                          {user.status}
+                          {user.role}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5">
-                        {(user.role === 'student' && user.is_verified_student) || (user.role === 'landlord' && user.is_verified_landlord) ? (
-                          <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-blue-500/10 text-blue-400 border-blue-500/20">
-                            Verified
-                          </span>
-                        ) : user.role === 'student' && user.campus_email ? (
-                          <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-amber-500/10 text-amber-400 border-amber-500/20" title={`Campus Email: ${user.campus_email}`}>
-                            Pending Code
-                          </span>
-                        ) : (
-                          <span className="py-1 px-2.5 rounded-full text-[10px] font-black border uppercase tracking-tighter bg-amber-500/10 text-amber-400 border-amber-500/20">
-                            Pending
-                          </span>
-                        )}
+
+                      {/* ðŸŒŸ Blue iOS Toggle Switch for Student Verification ðŸŒŸ */}
+                      <td className="py-3.5 px-4 text-center">
+                        <div
+                          onClick={() => handleToggleVerification(user)}
+                          className={`toggle-switch-track mx-auto ${isVerified ? 'active' : 'inactive'}`}
+                          title={isVerified ? 'Click to mark unverified' : 'Click to verify student'}
+                        >
+                          <div className={`toggle-switch-thumb ${isVerified ? 'active' : 'inactive'}`} />
+                        </div>
                       </td>
-                      <td className="py-3.5 px-5 text-slate-500 text-xs">{user.created_at ? new Date(user.created_at).toLocaleDateString() : '—'}</td>
-                      <td className="py-3.5 px-5 whitespace-nowrap">
-                        <div className="flex items-center justify-center gap-2">
+
+                      {/* Status */}
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold capitalize ${
+                          isUserActive ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {user.status || 'Active'}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => setSelectedUser(user)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 hover:text-white hover:bg-blue-500/35 transition-all border-none cursor-pointer"
-                            title="View User Details"
+                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 flex items-center justify-center transition-colors cursor-pointer"
+                            title="View Profile Details"
                           >
-                            <FaEye className="text-sm" />
+                            <FaEye className="text-xs" />
                           </button>
-                          {((user.verification_id_url) || (user.role === 'student' && !user.is_verified_student && user.campus_email)) && (
-                            <button
-                              onClick={async () => {
-                                try {
-                                  await verifyUser(user.id);
-                                  toast.success(`Verified student status for ${user.name}.`);
-                                  loadUsers();
-                                } catch (err) {
-                                  toast.error('Failed to verify user.');
-                                }
-                              }}
-                              className="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-500/10 text-emerald-400 hover:text-white hover:bg-emerald-500/30 transition-all border-none cursor-pointer"
-                              title="Approve Student Verification"
-                            >
-                              <FaUserShield className="text-sm" />
-                            </button>
-                          )}
                           <button
                             onClick={() => startEditUser(user)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all border-none cursor-pointer"
-                            title="Edit"
+                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-amber-600 hover:bg-amber-50 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Edit User"
                           >
-                            <FaEdit className="text-sm" />
+                            <FaEdit className="text-xs" />
                           </button>
                           <button
-                            onClick={() => handleDeleteUser(user.id)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all border-none cursor-pointer"
-                            title="Delete"
+                            onClick={() => setConfirmDeleteUserId(user.id)}
+                            className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Delete User"
                           >
-                            <FaTrash className="text-sm" />
+                            <FaTrash className="text-xs" />
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="py-16 text-center text-slate-600 text-sm">No users found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400 font-medium">
+                    No users found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* ðŸŒŸ Pagination Bar ðŸŒŸ */}
+        <div className="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-medium">
+          <div className="flex items-center gap-2">
+            <span>Items per page:</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+              className="px-2 py-1 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span>
+              {totalItems > 0 ? `${(currentPage - 1) * itemsPerPage + 1}-${Math.min(currentPage * itemsPerPage, totalItems)} of ${totalItems}` : '0 of 0'}
+            </span>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                title="First Page"
+              >
+                <LuChevronsLeft className="text-sm" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                title="Previous Page"
+              >
+                <LuChevronLeft className="text-sm" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                title="Next Page"
+              >
+                <LuChevronRight className="text-sm" />
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="w-7 h-7 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+                title="Last Page"
+              >
+                <LuChevronsRight className="text-sm" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ðŸŒŸ Light Theme Delete Modal ðŸŒŸ */}
+      {confirmDeleteUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="w-full max-w-md p-6 bg-white border border-slate-200 rounded-2xl shadow-2xl space-y-4">
+            <h3 className="text-lg font-black text-slate-900">Delete User Account</h3>
+            <p className="text-slate-600 text-xs leading-relaxed">
+              Are you sure you want to permanently delete this user account? All listings, events, and reviews associated with this account will be removed.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                onClick={() => setConfirmDeleteUserId(null)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={executeDeleteUser}
+                className="px-4 py-2 text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-xs transition-colors cursor-pointer"
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </div>
 
-    {/* Custom Delete Confirmation Modal */}
-    {confirmDeleteUserId && (
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-        <div className="w-full max-w-md p-6 bg-slate-900 border border-white/[0.08] rounded-2xl shadow-xl">
-          <h3 className="text-lg font-bold text-white mb-2">Delete User Account</h3>
-          <p className="text-slate-400 text-sm mb-6">Are you sure you want to permanently delete this user account? All listings, events, and blogs associated with this user will be removed.</p>
-          <div className="flex justify-end gap-3">
+      {/* ðŸŒŸ Light Theme View User Details Modal ðŸŒŸ */}
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="w-full max-w-xl bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 relative overflow-y-auto max-h-[90vh] custom-scrollbar">
             <button
-              onClick={() => setConfirmDeleteUserId(null)}
-              className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] rounded-lg transition-all border-none cursor-pointer"
+              onClick={() => setSelectedUser(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-800 p-2 rounded-full cursor-pointer hover:bg-slate-100 transition-colors"
             >
-              Cancel
+              <FaTimesCircle size={20} />
             </button>
-            <button
-              onClick={executeDeleteUser}
-              className="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all border-none cursor-pointer"
-            >
-              Delete
-            </button>
+            <div className="flex items-center gap-4 mb-6 pb-4 border-b border-slate-100">
+              <img
+                src={selectedUser.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedUser.name}`}
+                alt={selectedUser.name}
+                className="w-16 h-16 rounded-full object-cover border border-slate-200 shadow-xs"
+              />
+              <div>
+                <h3 className="text-2xl font-black text-slate-900 tracking-tight">{selectedUser.name}</h3>
+                <p className="text-xs text-blue-600 font-bold">Account ID: #{selectedUser.id}</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Email Address</span>
+                  <span className="text-xs font-bold text-slate-900 truncate block">{selectedUser.email}</span>
+                </div>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">System Role</span>
+                  <span className="text-xs font-bold text-slate-900 capitalize block">{selectedUser.role}</span>
+                </div>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Account Status</span>
+                  <span className="text-xs font-bold text-emerald-700 capitalize block">{selectedUser.status || 'Active'}</span>
+                </div>
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Mobile Phone</span>
+                  <span className="text-xs font-bold text-slate-900 block">{selectedUser.phone || 'N/A'}</span>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Verification Status</span>
+                <div className="flex gap-2">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUser.is_verified_student ? 'bg-blue-100 text-blue-800' : 'bg-slate-200 text-slate-600'}`}>
+                    Student: {selectedUser.is_verified_student ? 'Verified' : 'Unverified'}
+                  </span>
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUser.is_verified_landlord ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}`}>
+                    Landlord: {selectedUser.is_verified_landlord ? 'Verified' : 'Unverified'}
+                  </span>
+                </div>
+              </div>
+
+              {selectedUser.verification_id_url && (
+                <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 text-center">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2 text-left">Uploaded Student ID Card</span>
+                  <img
+                    src={selectedUser.verification_id_url}
+                    alt="Student ID"
+                    className="max-h-56 mx-auto rounded-xl border border-slate-200"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
-    {/* View User Details Modal */}
-    {selectedUser && (
-      <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-        <div className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh]">
-          <button
-            onClick={() => setSelectedUser(null)}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full cursor-pointer border-none bg-transparent"
-          >
-            <FaTimesCircle size={20} />
-          </button>
-          <div className="flex items-center gap-4 mb-6">
-            <img
-              src={selectedUser.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedUser.name}`}
-              alt={selectedUser.name}
-              className="w-16 h-16 rounded-full object-cover border border-white/10"
-            />
-            <div className="text-left">
-              <h3 className="text-2xl font-bold text-white leading-tight">{selectedUser.name}</h3>
-              <p className="text-xs text-slate-500 font-bold">ID: {selectedUser.id}</p>
-            </div>
-          </div>
-          <div className="space-y-4 text-left">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04]">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Email address</span>
-                <span className="text-sm font-semibold text-white truncate block">{selectedUser.email}</span>
-              </div>
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04]">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">System Role</span>
-                <span className="text-sm font-semibold text-white capitalize block">{selectedUser.role}</span>
-              </div>
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04]">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Account Status</span>
-                <span className={`text-sm font-semibold block capitalize ${selectedUser.status === 'active' ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {selectedUser.status}
-                </span>
-              </div>
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04]">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Mobile Phone</span>
-                <span className="text-sm font-semibold text-white block">{selectedUser.phone || 'N/A'}</span>
-              </div>
-            </div>
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] space-y-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Verification Badges</span>
-              <div className="flex gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUser.is_verified_student ? 'bg-blue-500/10 text-blue-400' : 'bg-white/5 text-slate-500'}`}>
-                  Student: {selectedUser.is_verified_student ? 'Verified' : 'Unverified'}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-bold ${selectedUser.is_verified_landlord ? 'bg-blue-500/10 text-blue-400' : 'bg-white/5 text-slate-500'}`}>
-                  Landlord: {selectedUser.is_verified_landlord ? 'Verified' : 'Unverified'}
-                </span>
-              </div>
-            </div>
-            {selectedUser.campus_email && (
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] text-left">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">Campus Email</span>
-                <span className="text-sm font-semibold text-white block truncate">{selectedUser.campus_email}</span>
-                {selectedUser.campus_email_verification_code && (
-                  <p className="text-xs text-amber-500 font-bold mt-1">Pending Code: {selectedUser.campus_email_verification_code}</p>
-                )}
-              </div>
-            )}
-            {selectedUser.verification_id_url && (
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/[0.04] text-center">
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-2 text-left">Uploaded Student ID Card</span>
-                <img
-                  src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${selectedUser.verification_id_url}`}
-                  alt="Student ID"
-                  className="max-h-48 rounded-xl object-contain mx-auto border border-white/10"
+      {/* ðŸŒŸ Light Theme Edit User Modal ðŸŒŸ */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+          <div className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-8 relative">
+            <h3 className="text-xl font-black text-slate-900 mb-4 pb-2 border-b border-slate-100">
+              Edit User Account
+            </h3>
+            <form onSubmit={handleSaveUser} className="space-y-4">
+              <div>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-blue-500"
+                  required
                 />
               </div>
-            )}
-          </div>
-        </div>
-      </div>
-    )}
 
-    {/* Edit User Modal */}
-    {editingUser && (
-      <div className="fixed inset-0 z-[9998] flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
-        <form onSubmit={handleSaveUser} className="w-full max-w-xl bg-slate-900 border border-white/[0.08] rounded-3xl shadow-2xl p-6 relative overflow-y-auto max-h-[90vh]">
-          <button
-            type="button"
-            onClick={() => setEditingUser(null)}
-            className="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full cursor-pointer border-none bg-transparent"
-          >
-            <FaTimesCircle size={20} />
-          </button>
-          <h3 className="text-2xl font-bold text-white mb-6 text-left">Edit User Profile</h3>
-          
-          <div className="space-y-4 text-left">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Full Name</label>
-              <input
-                type="text"
-                required
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                className="w-full px-4 py-2.5 text-white text-sm bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Email Address</label>
-              <input
-                type="email"
-                required
-                value={editEmail}
-                onChange={(e) => setEditEmail(e.target.value)}
-                className="w-full px-4 py-2.5 text-white text-sm bg-white/5 border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Role</label>
-                <select
-                  value={editRole}
-                  onChange={(e) => setEditRole(e.target.value)}
-                  className="w-full px-4 py-2.5 text-white text-sm bg-slate-800 border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
-                >
-                  <option value="student" className="bg-slate-900">Student</option>
-                  <option value="landlord" className="bg-slate-900">Landlord</option>
-                  <option value="admin" className="bg-slate-900">Admin</option>
-                </select>
+              <div>
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={editEmail}
+                  onChange={(e) => setEditEmail(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-sm font-bold text-slate-900 focus:outline-none focus:bg-white focus:border-blue-500"
+                  required
+                />
               </div>
-              <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Status</label>
-                <select
-                  value={editStatus}
-                  onChange={(e) => setEditStatus(e.target.value)}
-                  className="w-full px-4 py-2.5 text-white text-sm bg-slate-800 border border-white/10 rounded-xl focus:outline-none focus:ring-1 focus:ring-blue-500 appearance-none"
-                >
-                  <option value="active" className="bg-slate-900">Active</option>
-                  <option value="suspended" className="bg-slate-900">Suspended</option>
-                </select>
-              </div>
-            </div>
 
-            <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-2 mt-4">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Verification Status</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 text-white text-xs font-semibold cursor-pointer">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">System Role</label>
+                  <select
+                    value={editRole}
+                    onChange={(e) => setEditRole(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none"
+                  >
+                    <option value="student">Student</option>
+                    <option value="landlord">Landlord</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Status</label>
+                  <select
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6 pt-2">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
                   <input
                     type="checkbox"
                     checked={editIsVerifiedStudent}
                     onChange={(e) => setEditIsVerifiedStudent(e.target.checked)}
-                    className="rounded border-white/20 text-blue-600 focus:ring-0 cursor-pointer"
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
-                  Verified Student
+                  <span>Verified Student</span>
                 </label>
-                <label className="flex items-center gap-2 text-white text-xs font-semibold cursor-pointer">
+                <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700">
                   <input
                     type="checkbox"
                     checked={editIsVerifiedLandlord}
                     onChange={(e) => setEditIsVerifiedLandlord(e.target.checked)}
-                    className="rounded border-white/20 text-blue-600 focus:ring-0 cursor-pointer"
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   />
-                  Verified Landlord
+                  <span>Verified Landlord</span>
                 </label>
               </div>
-            </div>
-          </div>
 
-          <div className="flex justify-end gap-3 mt-8">
-            <button
-              type="button"
-              onClick={() => setEditingUser(null)}
-              className="px-5 py-2.5 text-xs font-semibold text-slate-400 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] rounded-xl transition-all border-none cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all border-none cursor-pointer"
-            >
-              Save Changes
-            </button>
+              <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs transition-colors cursor-pointer"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
-    )}
-    </>
+        </div>
+      )}
+    </div>
   );
 };
 

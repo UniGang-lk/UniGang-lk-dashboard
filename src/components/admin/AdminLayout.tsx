@@ -1,105 +1,138 @@
-import { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+﻿import { useState } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LuMenu,
   LuLayoutDashboard, LuUsers, LuClipboardList,
   LuGraduationCap, LuMegaphone, LuChartBar,
-  LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone, LuArrowRight
+  LuMonitor, LuCalendarDays, LuMessageCircle, LuPhone, LuPlus,
+  LuSparkles, LuShoppingBag, LuHeartHandshake, LuCircleHelp, LuSun, LuShieldAlert
 } from 'react-icons/lu';
 import AdminSidebar from './AdminSidebar';
 import { NotificationDropdown } from '../ui/NotificationDropdown';
+import { useAuth } from '../../context/AuthContext';
 
 const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
-  '/admin/dashboard':               { label: 'Dashboard', icon: LuLayoutDashboard },
-  '/admin/users':                   { label: 'User Management', icon: LuUsers },
-  '/admin/annexes':                 { label: 'Annex Management', icon: LuClipboardList },
-  '/admin/reviews':                 { label: 'Review Moderation', icon: LuMessageCircle },
-  '/admin/services':                { label: 'Service Requests', icon: LuMonitor },
-  '/admin/events':                  { label: 'Event Hub', icon: LuCalendarDays },
-  '/admin/blogs':                   { label: 'Campus Blogs', icon: LuMessageCircle },
-  '/admin/contacts':                { label: 'Contact Hub', icon: LuPhone },
-  '/admin/notifications':           { label: 'Broadcasts', icon: LuMegaphone },
-  '/admin/settings/universities':   { label: 'Universities', icon: LuGraduationCap },
-  '/admin/settings/analytics':      { label: 'Analytics', icon: LuChartBar },
+  '/admin/dashboard':                 { label: 'Dashboard Overview', icon: LuLayoutDashboard },
+  '/admin/users':                     { label: 'User Management', icon: LuUsers },
+  '/admin/annexes':                   { label: 'Annex Management', icon: LuClipboardList },
+  '/admin/reviews':                   { label: 'Review Moderation', icon: LuMessageCircle },
+  '/admin/services':                  { label: 'Service Requests', icon: LuMonitor },
+  '/admin/events':                    { label: 'Campus Events', icon: LuCalendarDays },
+  '/admin/blogs':                     { label: 'Campus Blogs', icon: LuMessageCircle },
+  '/admin/contacts':                  { label: 'Contact Inquiries', icon: LuPhone },
+  '/admin/notifications':             { label: 'Broadcast Notifications', icon: LuMegaphone },
+  '/admin/settings/universities':     { label: 'University Registry', icon: LuGraduationCap },
+  '/admin/settings/analytics':        { label: 'System Analytics', icon: LuChartBar },
+  '/admin/advertisements':            { label: 'Advertisements', icon: LuSparkles },
+  '/admin/marketplace':               { label: 'Hustle Hub Marketplace', icon: LuShoppingBag },
+  '/admin/proposals':                 { label: 'Matchmaking Proposals', icon: LuHeartHandshake },
+  '/admin/proposals/security-alerts': { label: 'Security & Anti-Leak Alerts', icon: LuShieldAlert },
 };
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
-  const current = pageTitles[location.pathname] ?? { label: 'Dashboard', icon: LuLayoutDashboard };
+  const current = pageTitles[location.pathname] || { label: 'Admin Portal', icon: LuLayoutDashboard };
   const PageIcon = current.icon;
+  const initial = (currentUser?.displayName || currentUser?.email || 'Admin').charAt(0).toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-slate-50 text-slate-800 antialiased font-sans">
+      {/* Responsive Left Sidebar */}
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content area — naturally pushes next to the sidebar on desktop */}
+      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* 🌟 Sigma-Style Clean White Top Header 🌟 */}
+        <header className="sticky top-0 z-30 flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 sm:h-18 bg-white border-b border-slate-200/90 shadow-2xs">
+          {/* Left: Mobile Hamburger & Page Title with Blue Icon Badge */}
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Hamburger Button (Mobile / Tablet) */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Open Navigation Menu"
+            >
+              <LuMenu className="text-xl" />
+            </button>
 
-        {/* ── Top Navigation Bar ────────────────────────────── */}
-        <header className="sticky top-0 z-30 flex items-center gap-4 px-4 md:px-8 h-20
-          bg-slate-950/60 backdrop-blur-2xl border-b border-white/[0.06] shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
-
-          {/* Hamburger (mobile) */}
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="lg:hidden w-9 h-9 rounded-xl flex items-center justify-center
-              text-slate-400 hover:text-white hover:bg-white/10 transition-all"
-          >
-            <LuMenu className="text-xl" />
-          </button>
-
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="flex items-center justify-center w-8 h-8 rounded-xl
-              bg-blue-600/10 border border-blue-500/20 shadow-inner">
-              <PageIcon className="text-blue-400 text-sm" />
+            {/* Page Icon in Vibrant Blue Rounded Square */}
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs flex-shrink-0">
+              <PageIcon className="text-base sm:text-lg" />
             </div>
+
+            {/* Page Title */}
             <motion.h1
               key={location.pathname}
-              initial={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, x: -6 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
-              className="text-sm font-extrabold text-white tracking-tight"
+              transition={{ duration: 0.2 }}
+              className="text-base sm:text-lg font-black text-slate-900 tracking-tight truncate"
             >
               {current.label}
             </motion.h1>
           </div>
 
-          {/* Right side actions */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Quick Action */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="hidden sm:flex items-center gap-2 px-8 py-4 rounded-2xl text-[12px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40 transition-all relative overflow-hidden group"
+          {/* Right: Quick Action Button, Help, Theme, Notification, Avatar */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Quick Create Action Button (Sigma style solid blue button) */}
+            <button
+              onClick={() => {
+                if (location.pathname.includes('annexes')) {
+                  // navigate or trigger add
+                } else if (location.pathname.includes('events')) {
+                  navigate('/admin/events');
+                } else {
+                  navigate('/admin/annexes');
+                }
+              }}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-bold text-xs sm:text-sm shadow-xs transition-all cursor-pointer"
             >
-              <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
-              
-              <span>Add New Listing</span>
-              <LuArrowRight className="text-lg transition-transform group-hover:translate-x-1" />
-            </motion.button>
+              <LuPlus className="text-base" />
+              <span>Quick Create</span>
+            </button>
 
-            {/* Notifications */}
+            {/* Help Icon Button */}
+            <button
+              className="w-9 h-9 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer hidden md:inline-flex"
+              title="Help & Support"
+            >
+              <LuCircleHelp className="text-lg" />
+            </button>
+
+            {/* Light / Theme Icon */}
+            <button
+              className="w-9 h-9 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer hidden sm:inline-flex"
+              title="Display Theme"
+            >
+              <LuSun className="text-lg" />
+            </button>
+
+            {/* Notifications Dropdown with Red Badge */}
             <NotificationDropdown />
 
-            {/* Avatar */}
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600
-              flex items-center justify-center text-white text-xs font-bold cursor-pointer
-              ring-2 ring-white/10 hover:ring-blue-500/40 transition-all">
-              A
+            {/* Admin Avatar */}
+            <div
+              className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs ring-2 ring-slate-100 cursor-pointer"
+              title={currentUser?.email || 'Administrator'}
+            >
+              {initial}
             </div>
           </div>
         </header>
 
-        {/* ── Page Content ──────────────────────────────────── */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto custom-scrollbar">
+        {/* 🌟 Main Content View 🌟 */}
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 0.2 }}
+            className="max-w-7xl mx-auto w-full space-y-6"
           >
             <Outlet />
           </motion.div>

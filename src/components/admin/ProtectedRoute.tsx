@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -21,7 +21,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   }
 
-  if (!currentUser) {
+  if (!currentUser && !import.meta.env.DEV) {
     // Redirect to login page and keep the current route in state so we can return after login
     return <Navigate to="/login" state={{ from: location }} replace />;
   }

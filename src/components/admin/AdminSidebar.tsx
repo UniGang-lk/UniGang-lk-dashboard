@@ -1,10 +1,11 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+﻿import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuUsers, LuClipboardList, LuGraduationCap,
   LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
-  LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag, LuHeartHandshake
+  LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag, LuHeartHandshake,
+  LuSettings, LuShieldAlert
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
 
@@ -17,7 +18,7 @@ const navItems = [
   {
     section: 'Overview',
     items: [
-      { label: 'Dashboard', icon: LuLayoutDashboard, path: '/admin/dashboard' },
+      { label: 'Home', icon: LuLayoutDashboard, path: '/admin/dashboard' },
       { label: 'Analytics', icon: LuChartBar, path: '/admin/settings/analytics' },
     ],
   },
@@ -35,13 +36,14 @@ const navItems = [
     section: 'Community',
     items: [
       { label: 'Events', icon: LuCalendarDays, path: '/admin/events' },
-      { label: 'Blogs', icon: LuMessageCircle, path: '/admin/blogs' },
+      { label: 'Campus Blogs', icon: LuMessageCircle, path: '/admin/blogs' },
     ],
   },
   {
     section: 'Matchmaking',
     items: [
-      { label: 'Proposals', icon: LuHeartHandshake, path: '/admin/proposals' },
+      { label: 'Proposals', icon: LuHeartHandshake, path: '/admin/proposals', badge: 'VIP' },
+      { label: 'Security Alerts', icon: LuShieldAlert, path: '/admin/proposals/security-alerts' },
     ],
   },
   {
@@ -56,138 +58,10 @@ const navItems = [
     items: [
       { label: 'Universities', icon: LuGraduationCap, path: '/admin/settings/universities' },
       { label: 'Users', icon: LuUsers, path: '/admin/users' },
+      { label: 'Settings', icon: LuSettings, path: '/admin/settings/universities' },
     ],
   },
 ];
-
-const itemThemes: Record<string, { color: string; bgActive: string; borderActive: string; textActive: string; iconActive: string; glow: string; indicator: string }> = {
-  '/admin/dashboard': {
-    color: 'blue',
-    bgActive: 'bg-blue-600/10',
-    borderActive: 'border-blue-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
-    indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
-  },
-  '/admin/proposals': {
-    color: 'rose',
-    bgActive: 'bg-rose-600/10',
-    borderActive: 'border-rose-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(244,63,94,0.35)]',
-    indicator: 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]'
-  },
-  '/admin/settings/analytics': {
-    color: 'blue',
-    bgActive: 'bg-blue-600/10',
-    borderActive: 'border-blue-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-blue-500/20 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(59,130,246,0.35)]',
-    indicator: 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
-  },
-  '/admin/annexes': {
-    color: 'indigo',
-    bgActive: 'bg-indigo-600/10',
-    borderActive: 'border-indigo-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(99,102,241,0.35)]',
-    indicator: 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]'
-  },
-  '/admin/reviews': {
-    color: 'purple',
-    bgActive: 'bg-purple-600/10',
-    borderActive: 'border-purple-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
-    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
-  },
-  '/admin/services': {
-    color: 'cyan',
-    bgActive: 'bg-cyan-600/10',
-    borderActive: 'border-cyan-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(6,182,212,0.35)]',
-    indicator: 'bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]'
-  },
-  '/admin/advertisements': {
-    color: 'pink',
-    bgActive: 'bg-pink-600/10',
-    borderActive: 'border-pink-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-pink-500/20 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(236,72,153,0.35)]',
-    indicator: 'bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.8)]'
-  },
-  '/admin/marketplace': {
-    color: 'emerald',
-    bgActive: 'bg-emerald-600/10',
-    borderActive: 'border-emerald-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(16,185,129,0.35)]',
-    indicator: 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]'
-  },
-  '/admin/events': {
-    color: 'amber',
-    bgActive: 'bg-amber-600/10',
-    borderActive: 'border-amber-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.35)]',
-    indicator: 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]'
-  },
-  '/admin/blogs': {
-    color: 'purple',
-    bgActive: 'bg-purple-600/10',
-    borderActive: 'border-purple-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
-    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
-  },
-  '/admin/contacts': {
-    color: 'rose',
-    bgActive: 'bg-rose-600/10',
-    borderActive: 'border-rose-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-rose-500/20 text-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(244,63,94,0.35)]',
-    indicator: 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.8)]'
-  },
-  '/admin/notifications': {
-    color: 'amber',
-    bgActive: 'bg-amber-600/10',
-    borderActive: 'border-amber-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(245,158,11,0.35)]',
-    indicator: 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.8)]'
-  },
-  '/admin/settings/universities': {
-    color: 'indigo',
-    bgActive: 'bg-indigo-600/10',
-    borderActive: 'border-indigo-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-indigo-500/20 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(99,102,241,0.35)]',
-    indicator: 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]'
-  },
-  '/admin/users': {
-    color: 'purple',
-    bgActive: 'bg-purple-600/10',
-    borderActive: 'border-purple-500/60',
-    textActive: 'text-white',
-    iconActive: 'bg-purple-500/20 text-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.2)]',
-    glow: 'shadow-[0_0_20px_-5px_rgba(168,85,247,0.35)]',
-    indicator: 'bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]'
-  }
-};
 
 const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const navigate = useNavigate();
@@ -199,86 +73,87 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     onClose();
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/admin/dashboard' && location.pathname === '/admin/dashboard') return true;
+    if (path !== '/admin/dashboard' && location.pathname.startsWith(path)) return true;
+    return location.pathname === path;
+  };
 
   const adminName = currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Admin';
-  const adminEmail = currentUser?.email || 'admin@unigung.lk';
+  const adminEmail = currentUser?.email || 'admin@unigang.lk';
   const initial = adminName.charAt(0).toUpperCase();
 
   const sidebarContent = (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center justify-between px-6 h-20 border-b border-white/[0.04] flex-shrink-0">
-        <div className="flex items-center gap-3.5">
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: -5 }}
-            className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20 ring-1 ring-white/20"
-          >
-            <LuLayoutDashboard className="text-white text-xl" />
-          </motion.div>
-          <div>
-            <p className="text-[10px] font-black tracking-[0.3em] text-slate-500 uppercase leading-none mb-1.5">The Uni Gang</p>
-            <p className="text-[13px] font-black text-white tracking-[0.1em] uppercase leading-none">Admin Portal</p>
+    <div className="flex flex-col h-full bg-white select-none">
+      {/* 🌟 Sigma-Style Blue Gradient Brand Card 🌟 */}
+      <div className="p-4 border-b border-slate-100 flex-shrink-0">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 p-4 text-white shadow-md shadow-blue-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-base shadow-inner text-white">
+                UG
+              </div>
+              <div className="flex flex-col">
+                <span className="text-base font-black tracking-tight leading-none text-white">
+                  The Uni Gang
+                </span>
+                <span className="text-[10px] font-bold text-blue-100 tracking-wider uppercase mt-1">
+                  CAMPUS ADMIN PORTAL
+                </span>
+              </div>
+            </div>
+
+            {/* Mobile Close Button */}
+            <button
+              onClick={onClose}
+              className="lg:hidden w-8 h-8 rounded-lg bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-colors"
+              title="Close Sidebar"
+            >
+              <LuX className="text-lg" />
+            </button>
           </div>
         </div>
-        {/* Mobile close */}
-        <button
-          onClick={onClose}
-          className="lg:hidden w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all font-bold uppercase tracking-wider"
-        >
-          <LuX className="text-lg" />
-        </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 py-8 space-y-8 overflow-y-auto custom-scrollbar">
+      {/* 🌟 Navigation Menu Items 🌟 */}
+      <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto custom-scrollbar">
         {navItems.map((group) => (
-          <div key={group.section}>
-            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500/60 px-4 mb-4">
+          <div key={group.section} className="space-y-1">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-3 mb-2">
               {group.section}
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               {group.items.map((item) => {
                 const active = isActive(item.path);
-                const theme = itemThemes[item.path] || itemThemes['/admin/dashboard'];
+                const ItemIcon = item.icon;
                 return (
                   <li key={item.path}>
-                    <motion.button
-                      whileHover={{ x: 6, scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                    <button
                       onClick={() => handleNav(item.path)}
-                      className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-[22px] border text-[13px] font-black uppercase tracking-wider transition-all duration-300 group relative overflow-hidden
+                      className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-150 cursor-pointer group
                         ${active
-                          ? `${theme.bgActive} ${theme.borderActive} ${theme.textActive} ${theme.glow}`
-                          : 'bg-white/[0.02] border-white/[0.05] text-slate-400 hover:text-white hover:bg-white/[0.05] hover:border-white/[0.12]'
+                          ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90'
                         }`}
                     >
-                      {/* Hover Glass Effect */}
-                      <div className="absolute inset-0 bg-white/[0.02] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <ItemIcon className={`text-base flex-shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
 
-                      {active && (
-                        <motion.div
-                          layoutId="activeIndicator"
-                          className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-7 rounded-r-full ${theme.indicator}`}
-                        />
+                      <span className="flex-1 text-left truncate">{item.label}</span>
+
+                      {item.badge && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          active 
+                            ? 'bg-white/20 text-white' 
+                            : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {item.badge}
+                        </span>
                       )}
 
-                      <div className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 flex-shrink-0 ${active ? theme.iconActive : 'bg-white/5 text-slate-500 group-hover:text-slate-200 group-hover:bg-white/10'}`}>
-                        <item.icon className="text-lg" />
-                      </div>
-
-                      <span className="flex-1 text-left relative z-10 font-black tracking-wider leading-none uppercase">{item.label}</span>
-
                       {active && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -5 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="relative z-10"
-                        >
-                          <LuChevronRight className="text-sm text-white/80" />
-                        </motion.div>
+                        <LuChevronRight className="text-sm text-white/80" />
                       )}
-                    </motion.button>
+                    </button>
                   </li>
                 );
               })}
@@ -287,24 +162,33 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="px-3 py-4 border-t border-white/[0.06]">
-        <div 
-          onClick={async () => {
-            await logout();
-            navigate('/login');
-          }}
-          className="flex items-center gap-3 px-3 py-3 rounded-full hover:bg-white/[0.05] transition-colors cursor-pointer group"
-          title="Sign Out of Command Center"
-        >
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-            {initial}
+      {/* 🌟 Clean Light User Profile Footer 🌟 */}
+      <div className="p-3 border-t border-slate-100 bg-slate-50/50 flex-shrink-0">
+        <div className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-white transition-colors border border-transparent hover:border-slate-200/80">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0">
+              {initial}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-bold text-slate-800 truncate capitalize">
+                {adminName}
+              </span>
+              <span className="text-[11px] text-slate-400 truncate">
+                {adminEmail}
+              </span>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate capitalize">{adminName}</p>
-            <p className="text-xs text-slate-500 truncate">{adminEmail}</p>
-          </div>
-          <LuLogOut className="text-slate-600 group-hover:text-red-400 transition-colors text-lg flex-shrink-0" />
+
+          <button
+            onClick={async () => {
+              await logout();
+              navigate('/login');
+            }}
+            className="w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+            title="Sign Out"
+          >
+            <LuLogOut className="text-base" />
+          </button>
         </div>
       </div>
     </div>
@@ -312,13 +196,12 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 flex-col flex-shrink-0 sticky top-0 h-screen z-40
-        bg-slate-950 border-r border-white/[0.05] shadow-[1px_0_0_0_rgba(255,255,255,0.05)]">
+      {/* Desktop Sidebar (Fixed 250px) */}
+      <aside className="hidden lg:flex w-64 flex-col flex-shrink-0 sticky top-0 h-screen z-40 bg-white border-r border-slate-200/90 shadow-xs">
         {sidebarContent}
       </aside>
 
-      {/* Mobile Overlay + Drawer */}
+      {/* Mobile / Tablet Drawer */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -328,17 +211,16 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs lg:hidden"
               onClick={onClose}
             />
             <motion.aside
               key="drawer"
-              initial={{ x: -260 }}
+              initial={{ x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -260 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
-              className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col
-                bg-slate-900/98 border-r border-slate-800 lg:hidden"
+              exit={{ x: -280 }}
+              transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+              className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-white border-r border-slate-200 shadow-2xl lg:hidden"
             >
               {sidebarContent}
             </motion.aside>

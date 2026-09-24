@@ -38,7 +38,7 @@ const DUMMY_ANALYTICS_DATA = {
     ],
 };
 
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#f44336', '#4caf50', '#2196f3']; // Pie chart colors
+const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
 
 const AnalyticsPage = () => {
     const [analyticsData, setAnalyticsData] = useState(DUMMY_ANALYTICS_DATA);
@@ -71,55 +71,58 @@ const AnalyticsPage = () => {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-extrabold text-white tracking-tight">Analytics Dashboard</h2>
+            <div>
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Analytics Dashboard</h2>
+                <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Platform metrics, user demographics, and listing distribution</p>
+            </div>
 
             {loading ? (
-                <div className="text-center py-10 text-white">Loading Data...</div>
+                <div className="text-center py-20 text-slate-400 font-bold uppercase tracking-wider text-xs animate-pulse">Loading Platform Metrics...</div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Summary Cards */}
-                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-4 gap-4 mb-2">
-                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
-                            <div className='bg-blue-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
-                                <FaUsers className='h-5 w-5 text-blue-400' />
+                    <div className="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs">
+                            <div className='bg-blue-50 w-10 h-10 flex items-center justify-center rounded-xl border border-blue-100'>
+                                <FaUsers className='h-5 w-5 text-blue-600' />
                             </div>
-                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalUsers}</h3>
-                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Total Users</p>
+                            <h3 className="text-3xl mt-4 font-extrabold text-slate-900">{analyticsData.totalUsers}</h3>
+                            <p className="text-slate-500 text-xs mt-1 font-semibold uppercase tracking-wider">Total Users</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
-                            <div className='bg-emerald-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
-                                <FaClipboardList className='h-5 w-5 text-emerald-400' />
+                        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs">
+                            <div className='bg-emerald-50 w-10 h-10 flex items-center justify-center rounded-xl border border-emerald-100'>
+                                <FaClipboardList className='h-5 w-5 text-emerald-600' />
                             </div>
-                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalAnnexes}</h3>
-                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Total Ads</p>
+                            <h3 className="text-3xl mt-4 font-extrabold text-slate-900">{analyticsData.totalAnnexes}</h3>
+                            <p className="text-slate-500 text-xs mt-1 font-semibold uppercase tracking-wider">Total Listings</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
-                            <div className='bg-red-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
-                                <FaUserCheck className='h-5 w-5 text-red-400' />
+                        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs">
+                            <div className='bg-rose-50 w-10 h-10 flex items-center justify-center rounded-xl border border-rose-100'>
+                                <FaUserCheck className='h-5 w-5 text-rose-600' />
                             </div>
-                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.monthlyNewUsers[analyticsData.monthlyNewUsers.length - 1]?.users || 0}</h3>
-                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">New Users (Monthly)</p>
+                            <h3 className="text-3xl mt-4 font-extrabold text-slate-900">{analyticsData.monthlyNewUsers[analyticsData.monthlyNewUsers.length - 1]?.users || 0}</h3>
+                            <p className="text-slate-500 text-xs mt-1 font-semibold uppercase tracking-wider">New Users (Monthly)</p>
                         </div>
-                        <div className="flex flex-col justify-start bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow">
-                            <div className='bg-amber-500/20 w-11 h-11 flex items-center justify-center rounded-xl'>
-                                <FaClipboardList className='h-5 w-5 text-amber-400' />
+                        <div className="bg-white border border-slate-200/80 p-5 rounded-2xl shadow-xs">
+                            <div className='bg-amber-50 w-10 h-10 flex items-center justify-center rounded-xl border border-amber-100'>
+                                <FaClipboardList className='h-5 w-5 text-amber-600' />
                             </div>
-                            <h3 className="text-3xl mt-4 font-black text-white">{analyticsData.totalAnnouncement}</h3>
-                            <p className="text-slate-500 text-xs mt-2 font-semibold uppercase tracking-wider">Announcements</p>
+                            <h3 className="text-3xl mt-4 font-extrabold text-slate-900">{analyticsData.totalAnnouncement}</h3>
+                            <p className="text-slate-500 text-xs mt-1 font-semibold uppercase tracking-wider">Announcements</p>
                         </div>
                     </div>
 
                     {/* Charts */}
-                    <div className="bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
-                        <h3 className="text-base font-bold text-white mb-4">Advertisement Status</h3>
-                        <ResponsiveContainer width="100%" height={300}>
+                    <div className="bg-white border border-slate-200/80 p-6 rounded-2xl shadow-xs">
+                        <h3 className="text-sm font-bold text-slate-900 mb-4">Listing Status Breakdown</h3>
+                        <ResponsiveContainer width="100%" height={280}>
                             <PieChart>
                                 <Pie
                                     data={analyticsData.annexStatus}
                                     cx="50%"
                                     cy="50%"
-                                    outerRadius={100}
-                                    fill="#8884d8"
+                                    outerRadius={95}
+                                    fill="#2563eb"
                                     dataKey="value"
                                     label={({ name, percent }: { name: string; percent?: number }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
                                 >
@@ -127,59 +130,59 @@ const AnalyticsPage = () => {
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '0.75rem', color: '#0f172a' }} />
                                 <Legend />
                             </PieChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
-                        <h3 className="text-base font-bold text-white mb-4">Advertisements by university</h3>
-                        <ResponsiveContainer width="100%" height={300}>
+                    <div className="bg-white border border-slate-200/80 p-6 rounded-2xl shadow-xs">
+                        <h3 className="text-sm font-bold text-slate-900 mb-4">Listings by University</h3>
+                        <ResponsiveContainer width="100%" height={280}>
                             <BarChart
                                 data={analyticsData.annexesPerUniversity}
-                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+                                <YAxis stroke="#64748b" fontSize={11} />
+                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '0.75rem', color: '#0f172a' }} />
                                 <Legend />
-                                <Bar dataKey="count" fill="#8884d8" name="Advertisements" radius={[10, 10, 0, 0]} />
+                                <Bar dataKey="count" fill="#2563eb" name="Listings" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
-                        <h3 className="text-base font-bold text-white mb-4">Monthly new users</h3>
-                        <ResponsiveContainer width="100%" height={300}>
+                    <div className="lg:col-span-2 bg-white border border-slate-200/80 p-6 rounded-2xl shadow-xs">
+                        <h3 className="text-sm font-bold text-slate-900 mb-4">Monthly Student Growth</h3>
+                        <ResponsiveContainer width="100%" height={280}>
                             <BarChart
                                 data={analyticsData.monthlyNewUsers}
-                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="month" />
-                                <YAxis />
-                                <Tooltip />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                <XAxis dataKey="month" stroke="#64748b" fontSize={11} />
+                                <YAxis stroke="#64748b" fontSize={11} />
+                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '0.75rem', color: '#0f172a' }} />
                                 <Legend />
-                                <Bar dataKey="users" fill="#82ca9d" name="Users" radius={[10, 10, 0, 0]} />
+                                <Bar dataKey="users" fill="#10b981" name="Registered Students" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
 
-                    <div className="lg:col-span-2 bg-white/[0.05] border border-white/[0.07] p-5 rounded-[1.5rem] shadow-md">
-                        <h3 className="text-base font-bold text-white mb-4">Advertiesments by districts</h3>
-                        <ResponsiveContainer width="100%" height={300}>
+                    <div className="lg:col-span-2 bg-white border border-slate-200/80 p-6 rounded-2xl shadow-xs">
+                        <h3 className="text-sm font-bold text-slate-900 mb-4">Listings by District</h3>
+                        <ResponsiveContainer width="100%" height={280}>
                             <BarChart
                                 data={analyticsData.annexesPerDistrict}
-                                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                                margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis />
-                                <Tooltip />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                                <XAxis dataKey="name" stroke="#64748b" fontSize={11} />
+                                <YAxis stroke="#64748b" fontSize={11} />
+                                <Tooltip contentStyle={{ backgroundColor: '#ffffff', borderColor: '#e2e8f0', borderRadius: '0.75rem', color: '#0f172a' }} />
                                 <Legend />
-                                <Bar dataKey="count" fill="#ffc658" name="Advertiesments" radius={[10, 10, 0, 0]} />
+                                <Bar dataKey="count" fill="#f59e0b" name="Listings" radius={[6, 6, 0, 0]} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

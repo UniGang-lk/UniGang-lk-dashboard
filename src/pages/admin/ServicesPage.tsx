@@ -17,7 +17,6 @@ import type { ServiceRequest } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
 import { toast as hotToast } from 'react-hot-toast';
 
-
 const containerVariants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.05 } }
@@ -30,11 +29,11 @@ const itemVariants = {
 
 const StatusBadge = ({ status }: { status: ServiceRequest['status'] }) => {
   const styles = {
-    pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    approved: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    rejected: 'bg-red-500/10 text-red-400 border-red-500/20',
-    in_progress: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-    completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+    pending: 'bg-amber-50 text-amber-700 border-amber-200',
+    approved: 'bg-blue-50 text-blue-700 border-blue-200',
+    rejected: 'bg-rose-50 text-rose-700 border-rose-200',
+    in_progress: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    completed: 'bg-emerald-50 text-emerald-700 border-emerald-200'
   };
 
   const Icons = {
@@ -48,7 +47,7 @@ const StatusBadge = ({ status }: { status: ServiceRequest['status'] }) => {
   const Icon = Icons[status] || LuClock;
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border ${styles[status]}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${styles[status]}`}>
       <Icon className="text-xs" />
       {status.replace('_', ' ')}
     </span>
@@ -105,7 +104,6 @@ const ServicesPage = () => {
       setError(null);
       const data = await fetchServiceRequests();
       setRequests(data);
-      // Keep selected request in sync if it exists
       if (selectedRequest) {
         const updated = data.find(r => r.id === selectedRequest.id);
         if (updated) {
@@ -161,17 +159,17 @@ const ServicesPage = () => {
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     hotToast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5`}>
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1">
-            <p className="text-sm font-bold text-white tracking-wide">{message}</p>
+            <p className="text-sm font-bold text-slate-800 tracking-wide">{message}</p>
           </div>
         </div>
         <div className="flex gap-3 justify-end">
-          <button onClick={() => hotToast.dismiss(t.id)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all">
             Cancel
           </button>
-          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40">
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-blue-500/20">
             Confirm
           </button>
         </div>
@@ -196,7 +194,6 @@ const ServicesPage = () => {
     });
   };
 
-
   const filteredRequests = requests.filter(r => {
     const matchesSearch = 
       r.serviceName.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -209,7 +206,6 @@ const ServicesPage = () => {
     return matchesSearch && matchesStatus;
   });
 
-  // Calculate statistics
   const stats = {
     total: requests.length,
     pending: requests.filter(r => r.status === 'pending').length,
@@ -219,56 +215,57 @@ const ServicesPage = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-white tracking-tight uppercase underline decoration-blue-500/30 underline-offset-8">Service Requests Center</h2>
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Manage project requests submitted by clients</p>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Service Requests</h2>
+          <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Manage client project inquiries and custom task requests</p>
         </div>
       </div>
 
-      {/* Stats Summary Row */}
+      {/* Stats Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-5 relative overflow-hidden">
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Total Inquiries</p>
-          <p className="text-3xl font-black text-white mt-2">{stats.total}</p>
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs transition-all hover:border-slate-300">
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Inquiries</p>
+          <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total}</p>
         </div>
-        <div className="bg-amber-500/5 border border-amber-500/10 rounded-3xl p-5 relative overflow-hidden">
-          <p className="text-amber-500 text-[10px] font-black uppercase tracking-widest">Pending Review</p>
-          <p className="text-3xl font-black text-amber-400 mt-2">{stats.pending}</p>
+        <div className="bg-white border border-amber-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-amber-300">
+          <p className="text-amber-700 text-xs font-bold uppercase tracking-wider">Pending Review</p>
+          <p className="text-3xl font-extrabold text-amber-600 mt-2">{stats.pending}</p>
         </div>
-        <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-3xl p-5 relative overflow-hidden">
-          <p className="text-indigo-500 text-[10px] font-black uppercase tracking-widest">In Progress</p>
-          <p className="text-3xl font-black text-indigo-400 mt-2">{stats.inProgress}</p>
+        <div className="bg-white border border-indigo-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-indigo-300">
+          <p className="text-indigo-700 text-xs font-bold uppercase tracking-wider">In Progress</p>
+          <p className="text-3xl font-extrabold text-indigo-600 mt-2">{stats.inProgress}</p>
         </div>
-        <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-3xl p-5 relative overflow-hidden">
-          <p className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">Completed</p>
-          <p className="text-3xl font-black text-emerald-400 mt-2">{stats.completed}</p>
+        <div className="bg-white border border-emerald-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-emerald-300">
+          <p className="text-emerald-700 text-xs font-bold uppercase tracking-wider">Completed</p>
+          <p className="text-3xl font-extrabold text-emerald-600 mt-2">{stats.completed}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[300px]">
-          <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+        <div className="relative flex-1 min-w-[280px]">
+          <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input
             type="text"
-            placeholder="Search by service name, phone, email, or brief..."
+            placeholder="Search inquiries by title, client phone, email, or brief..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-xs"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-[11px] font-black uppercase tracking-widest text-white focus:outline-none outline-none appearance-none cursor-pointer"
+          className="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs"
         >
-          <option value="all" className="bg-slate-900">All Statuses</option>
-          <option value="pending" className="bg-slate-900">Pending</option>
-          <option value="approved" className="bg-slate-900">Approved</option>
-          <option value="in_progress" className="bg-slate-900">In Progress</option>
-          <option value="completed" className="bg-slate-900">Completed</option>
-          <option value="rejected" className="bg-slate-900">Rejected</option>
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="in_progress">In Progress</option>
+          <option value="completed">Completed</option>
+          <option value="rejected">Rejected</option>
         </select>
       </div>
 
@@ -276,20 +273,20 @@ const ServicesPage = () => {
         {/* List */}
         <div className="lg:col-span-8">
           {loading ? (
-            <div className="py-20 text-center text-slate-500 animate-pulse font-black uppercase tracking-[0.3em] text-xs">Fetching Sync Stream...</div>
+            <div className="py-20 text-center text-slate-400 animate-pulse font-bold uppercase tracking-widest text-xs">Loading service requests...</div>
           ) : error ? (
-            <div className="py-12 px-6 text-center bg-red-500/5 border border-red-500/10 rounded-[2rem] text-red-400">
+            <div className="py-12 px-6 text-center bg-rose-50 border border-rose-200 rounded-2xl text-rose-800">
               <p className="font-bold text-sm mb-4">{error}</p>
               <button 
                 onClick={loadRequests} 
-                className="px-6 py-3 bg-red-500/20 rounded-2xl hover:bg-red-500/30 font-bold uppercase tracking-wider text-xs transition-all"
+                className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs transition-all shadow-xs"
               >
                 Retry Connection
               </button>
             </div>
           ) : filteredRequests.length === 0 ? (
-            <div className="py-24 text-center bg-white/[0.02] border border-white/5 border-dashed rounded-[3rem]">
-              <p className="text-slate-500 font-black uppercase tracking-[0.3em] text-[10px]">No inquiries matching filters</p>
+            <div className="py-20 text-center bg-white border border-dashed border-slate-200 rounded-2xl">
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No inquiries matching filters</p>
             </div>
           ) : (
             <motion.div
@@ -303,28 +300,28 @@ const ServicesPage = () => {
                   key={request.id}
                   variants={itemVariants}
                   onClick={() => handleSelectRequest(request)}
-                  className={`cursor-pointer p-6 rounded-[2rem] border transition-all duration-300 relative overflow-hidden group ${
+                  className={`cursor-pointer p-5 rounded-2xl border transition-all duration-200 relative overflow-hidden bg-white ${
                     selectedRequest?.id === request.id 
-                    ? 'bg-blue-600/10 border-blue-500/50 shadow-lg shadow-blue-500/10' 
-                    : 'bg-white/5 border-white/10 hover:border-white/20'
+                    ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-md' 
+                    : 'border-slate-200/80 hover:border-slate-300 hover:shadow-sm'
                   }`}
                 >
-                  <div className="flex justify-between items-start mb-4">
+                  <div className="flex justify-between items-start mb-3">
                     <StatusBadge status={request.status} />
-                    <span className="text-[10px] font-bold text-slate-500">
+                    <span className="text-[11px] font-semibold text-slate-400">
                       {new Date(request.created_at || request.updated_at || '').toLocaleDateString()}
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-black text-white mb-2">{request.serviceName}</h3>
-                  <p className="text-slate-400 text-xs line-clamp-2 mb-4 font-medium leading-relaxed">{request.brief}</p>
+                  <h3 className="text-base font-bold text-slate-900 mb-1.5">{request.serviceName}</h3>
+                  <p className="text-slate-600 text-xs line-clamp-2 mb-4 font-normal leading-relaxed">{request.brief}</p>
                   
-                  <div className="flex items-center gap-4 text-slate-500 text-[10px] font-black uppercase tracking-widest">
+                  <div className="flex items-center gap-4 text-slate-500 text-xs font-semibold pt-3 border-t border-slate-100">
                     <div className="flex items-center gap-1.5">
-                      <LuDollarSign size={12} className="text-blue-500" /> {request.budget || 'Open'}
+                      <LuDollarSign size={14} className="text-blue-600" /> {request.budget || 'Open'}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <LuCalendar size={12} className="text-blue-500" /> {request.deadline || 'Flexible'}
+                      <LuCalendar size={14} className="text-blue-600" /> {request.deadline || 'Flexible'}
                     </div>
                   </div>
                 </motion.div>
@@ -339,82 +336,82 @@ const ServicesPage = () => {
             {selectedRequest ? (
               <motion.div
                 key={selectedRequest.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="bg-slate-900/50 border border-white/10 rounded-[2.5rem] p-8 sticky top-6 backdrop-blur-xl"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="bg-white border border-slate-200/80 rounded-2xl p-6 sticky top-6 shadow-sm"
               >
-                <div className="flex justify-between items-start mb-8">
-                  <div className="w-12 h-12 rounded-2xl bg-blue-500/20 flex items-center justify-center text-blue-400 border border-blue-500/20">
-                    <LuMonitor size={24} />
+                <div className="flex justify-between items-start mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
+                    <LuMonitor size={20} />
                   </div>
                   <div className="flex gap-2">
                     <button 
                       onClick={() => handleDelete(selectedRequest.id)}
-                      className="p-3 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all"
+                      className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all border border-rose-100"
                       title="Delete inquiry"
                     >
-                      <LuTrash2 size={18} />
+                      <LuTrash2 size={16} />
                     </button>
                   </div>
                 </div>
 
-                <h3 className="text-2xl font-black text-white mb-6 tracking-tight leading-tight">{selectedRequest.serviceName}</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-4 leading-snug">{selectedRequest.serviceName}</h3>
                 
-                <div className="space-y-6">
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Request Brief</p>
-                    <p className="text-sm text-slate-300 leading-relaxed font-medium whitespace-pre-wrap">{selectedRequest.brief}</p>
+                <div className="space-y-4">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Request Brief</p>
+                    <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{selectedRequest.brief}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Budget Range</p>
-                      <p className="text-sm font-black text-blue-400 uppercase tracking-tighter">{selectedRequest.budget || 'Open'}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Budget Range</p>
+                      <p className="text-xs font-bold text-blue-600 uppercase">{selectedRequest.budget || 'Open'}</p>
                     </div>
-                    <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Target Deadline</p>
-                      <p className="text-sm font-black text-white uppercase tracking-tighter">{selectedRequest.deadline || 'Flexible'}</p>
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Target Deadline</p>
+                      <p className="text-xs font-bold text-slate-800 uppercase">{selectedRequest.deadline || 'Flexible'}</p>
                     </div>
                   </div>
 
                   {selectedRequest.user && (
-                    <div className="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/10 flex items-center gap-3">
+                    <div className="p-3.5 rounded-xl bg-blue-50/50 border border-blue-100 flex items-center gap-3">
                       <img
                         src={selectedRequest.user.profile_pic || 'https://api.dicebear.com/7.x/avataaars/svg?seed=user'}
                         alt={selectedRequest.user.name}
-                        className="w-10 h-10 rounded-full object-cover border border-white/10"
+                        className="w-10 h-10 rounded-full object-cover border border-slate-200"
                       />
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-0.5">Registered Owner</p>
-                        <p className="text-sm font-black text-white leading-tight">{selectedRequest.user.name}</p>
-                        <p className="text-[10px] text-slate-400 font-medium leading-none mt-1">{selectedRequest.user.email}</p>
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 mb-0.5">Registered Owner</p>
+                        <p className="text-xs font-bold text-slate-900 truncate leading-tight">{selectedRequest.user.name}</p>
+                        <p className="text-[11px] text-slate-500 truncate mt-0.5">{selectedRequest.user.email}</p>
                       </div>
                     </div>
                   )}
 
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Client Details</p>
-                    <div className="space-y-3">
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Client Details</p>
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <LuPhone className="text-slate-500" size={14} />
-                          <p className="text-sm font-black text-white">{selectedRequest.clientPhone}</p>
+                          <LuPhone className="text-slate-400" size={14} />
+                          <p className="text-xs font-bold text-slate-800">{selectedRequest.clientPhone}</p>
                         </div>
                         <a 
                           href={`https://wa.me/${selectedRequest.clientPhone.replace(/[^0-9]/g, '')}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all flex items-center gap-1 text-[10px] font-black uppercase tracking-widest"
+                          className="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-all flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider border border-emerald-200"
                           title="Open WhatsApp chat"
                         >
-                          WhatsApp <LuExternalLink size={12} />
+                          WhatsApp <LuExternalLink size={11} />
                         </a>
                       </div>
                       {selectedRequest.clientEmail && (
-                        <div className="flex items-center gap-2 pt-2 border-t border-white/5">
-                          <LuMail className="text-slate-500" size={14} />
-                          <p className="text-xs font-bold text-slate-300 truncate max-w-[200px]" title={selectedRequest.clientEmail}>
+                        <div className="flex items-center gap-2 pt-2 border-t border-slate-200/60">
+                          <LuMail className="text-slate-400" size={14} />
+                          <p className="text-xs font-medium text-slate-600 truncate max-w-[200px]" title={selectedRequest.clientEmail}>
                             {selectedRequest.clientEmail}
                           </p>
                         </div>
@@ -423,8 +420,8 @@ const ServicesPage = () => {
                   </div>
 
                   {/* Progress Stepper Timeline */}
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4 text-left">Lifecycle Progress</p>
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Lifecycle Progress</p>
                     <div className="flex justify-between items-center relative">
                       {[
                         { id: 'pending', label: 'Pending' },
@@ -447,22 +444,22 @@ const ServicesPage = () => {
                           <div key={step.id} className="flex flex-col items-center flex-1 w-full relative z-10">
                             {idx < arr.length - 1 && (
                               <div className={`absolute left-1/2 top-3 w-full h-0.5 -z-10 ${
-                                idx < currentIdx ? 'bg-emerald-500' : 'bg-white/10'
+                                idx < currentIdx ? 'bg-emerald-500' : 'bg-slate-200'
                               }`} />
                             )}
-                            <div className={`w-6.5 h-6.5 rounded-full flex items-center justify-center text-[9px] font-black border-2 transition-all duration-300 ${
+                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold border-2 transition-all duration-200 ${
                               isCurrent
                                 ? isRejected
-                                  ? 'bg-red-500 border-red-500 text-white shadow-md shadow-red-500/20'
-                                  : 'bg-blue-600 border-blue-500 text-white shadow-md shadow-blue-500/20'
+                                  ? 'bg-rose-600 border-rose-600 text-white shadow-xs'
+                                  : 'bg-blue-600 border-blue-600 text-white shadow-xs'
                                 : isDone
-                                  ? 'bg-emerald-500 border-emerald-500 text-white'
-                                  : 'bg-slate-900 border-white/10 text-slate-500'
+                                  ? 'bg-emerald-600 border-emerald-600 text-white'
+                                  : 'bg-white border-slate-300 text-slate-400'
                             }`}>
                               {isRejected ? '✕' : isDone && !isCurrent ? '✓' : idx + 1}
                             </div>
-                            <span className={`text-[8px] font-black uppercase tracking-tighter mt-1.5 ${
-                              isCurrent ? 'text-blue-400 font-extrabold' : 'text-slate-500'
+                            <span className={`text-[9px] font-bold uppercase tracking-wider mt-1 ${
+                              isCurrent ? 'text-blue-600' : 'text-slate-500'
                             }`}>
                               {isRejected ? 'Rejected' : step.label}
                             </span>
@@ -473,35 +470,35 @@ const ServicesPage = () => {
                   </div>
 
                   {/* Admin Notes Section */}
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-left">Internal Admin Notes</p>
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Internal Admin Notes</p>
                     <textarea
                       value={notesInput}
                       onChange={(e) => setNotesInput(e.target.value)}
                       placeholder="Add internal notes about this request..."
                       rows={3}
-                      className="w-full bg-slate-950/50 border border-white/10 rounded-xl p-3 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500/40"
+                      className="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                     <button
                       onClick={handleSaveNotes}
                       disabled={savingNotes}
-                      className="mt-2 w-full py-2 bg-white/5 border border-white/10 hover:bg-white/10 rounded-2xl text-[10px] font-bold uppercase tracking-wider text-white transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      className="mt-2 w-full py-2 bg-slate-900 hover:bg-slate-800 rounded-lg text-[10px] font-bold uppercase tracking-wider text-white transition-all flex items-center justify-center gap-1 cursor-pointer"
                     >
                       <LuSave size={12} /> {savingNotes ? 'Saving...' : 'Save Notes'}
                     </button>
                   </div>
 
                   {/* Admin-Client Chat Box */}
-                  <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06] flex flex-col h-[280px]">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 text-left">Direct client discussion</p>
+                  <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex flex-col h-[280px]">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Direct client discussion</p>
                     
-                    <div className="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar flex flex-col">
+                    <div className="flex-1 overflow-y-auto pr-1 space-y-2.5 custom-scrollbar flex flex-col">
                       {loadingMessages ? (
-                        <div className="my-auto text-center text-slate-550 text-[9px] font-black uppercase tracking-wider animate-pulse">
+                        <div className="my-auto text-center text-slate-400 text-[10px] font-bold uppercase tracking-wider animate-pulse">
                           Syncing comments...
                         </div>
                       ) : messages.length === 0 ? (
-                        <div className="my-auto text-center text-slate-550 text-[9px] font-black uppercase tracking-wider">
+                        <div className="my-auto text-center text-slate-400 text-[10px] font-semibold">
                           No comments yet. Send a note to start chat.
                         </div>
                       ) : (
@@ -512,13 +509,13 @@ const ServicesPage = () => {
                               key={msg.id}
                               className={`flex flex-col max-w-[85%] ${isAdmin ? 'self-end items-end text-right' : 'self-start items-start text-left'}`}
                             >
-                              <span className="text-[8px] font-bold text-slate-500 mb-0.5 px-1">
+                              <span className="text-[8px] font-bold text-slate-400 mb-0.5 px-1">
                                 {isAdmin ? 'You (Admin)' : (selectedRequest.user?.name || 'Client')} • {new Date(msg.created_at || msg.createdAt || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </span>
-                              <div className={`p-2.5 rounded-2xl text-[11px] font-semibold leading-relaxed ${
+                              <div className={`p-2.5 rounded-xl text-xs font-medium leading-relaxed ${
                                 isAdmin 
                                   ? 'bg-blue-600 text-white rounded-tr-none shadow-xs' 
-                                  : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-none'
+                                  : 'bg-white border border-slate-200 text-slate-800 rounded-tl-none shadow-xs'
                               }`}>
                                 {msg.message}
                               </div>
@@ -534,11 +531,11 @@ const ServicesPage = () => {
                         placeholder="Type response to client..."
                         value={newMessageText}
                         onChange={(e) => setNewMessageText(e.target.value)}
-                        className="flex-1 bg-slate-950/40 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
                       <button
                         type="submit"
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-2xl transition-all shadow-xs flex items-center justify-center cursor-pointer font-bold uppercase tracking-wider shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40"
+                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-all shadow-xs flex items-center justify-center cursor-pointer"
                         aria-label="Send message"
                       >
                         <LuSend size={14} />
@@ -548,46 +545,46 @@ const ServicesPage = () => {
                 </div>
 
                 {/* Workflow Status Actions */}
-                <div className="mt-8 pt-6 border-t border-white/10 flex flex-col gap-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Change Progress State</p>
+                <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Change Progress State</p>
                   
                   <div className="grid grid-cols-2 gap-2">
                     <button 
                       onClick={() => handleStatusChange(selectedRequest.id, 'approved')}
-                      className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${
+                      className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider border transition-all ${
                         selectedRequest.status === 'approved'
-                          ? 'bg-blue-600 border-blue-500 text-white'
-                          : 'bg-white/5 border-white/10 text-blue-400 hover:bg-blue-500/10'
+                          ? 'bg-blue-600 border-blue-600 text-white'
+                          : 'bg-white border-slate-200 text-blue-600 hover:bg-blue-50'
                       }`}
                     >
                       Approve
                     </button>
                     <button 
                       onClick={() => handleStatusChange(selectedRequest.id, 'in_progress')}
-                      className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${
+                      className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider border transition-all ${
                         selectedRequest.status === 'in_progress'
-                          ? 'bg-indigo-600 border-indigo-500 text-white'
-                          : 'bg-white/5 border-white/10 text-indigo-400 hover:bg-indigo-500/10'
+                          ? 'bg-indigo-600 border-indigo-600 text-white'
+                          : 'bg-white border-slate-200 text-indigo-600 hover:bg-indigo-50'
                       }`}
                     >
                       In Progress
                     </button>
                     <button 
                       onClick={() => handleStatusChange(selectedRequest.id, 'completed')}
-                      className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${
+                      className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider border transition-all ${
                         selectedRequest.status === 'completed'
-                          ? 'bg-emerald-600 border-emerald-500 text-white'
-                          : 'bg-white/5 border-white/10 text-emerald-400 hover:bg-emerald-500/10'
+                          ? 'bg-emerald-600 border-emerald-600 text-white'
+                          : 'bg-white border-slate-200 text-emerald-600 hover:bg-emerald-50'
                       }`}
                     >
                       Complete
                     </button>
                     <button 
                       onClick={() => handleStatusChange(selectedRequest.id, 'rejected')}
-                      className={`py-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all ${
+                      className={`py-2 rounded-lg font-bold text-xs uppercase tracking-wider border transition-all ${
                         selectedRequest.status === 'rejected'
-                          ? 'bg-red-600 border-red-500 text-white'
-                          : 'bg-white/5 border-white/10 text-red-400 hover:bg-red-500/10'
+                          ? 'bg-rose-600 border-rose-600 text-white'
+                          : 'bg-white border-slate-200 text-rose-600 hover:bg-rose-50'
                       }`}
                     >
                       Reject
@@ -596,11 +593,11 @@ const ServicesPage = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="h-[400px] flex flex-col items-center justify-center text-center border border-white/5 border-dashed rounded-[2.5rem] p-8">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-slate-600 mb-4">
-                  <LuMessageSquare size={32} />
+              <div className="h-[360px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 rounded-2xl p-8 bg-white">
+                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-3 border border-slate-100">
+                  <LuMessageSquare size={24} />
                 </div>
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Select a request to inspect details</p>
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">Select a request to view details</p>
               </div>
             )}
           </AnimatePresence>

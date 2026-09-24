@@ -59,7 +59,6 @@ const UniversitiesPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        // Simulate fetching data from backend
         const timer = setTimeout(() => {
             setProvinces(DUMMY_PROVINCES);
             setDistricts(DUMMY_DISTRICTS);
@@ -100,79 +99,64 @@ const UniversitiesPage = () => {
         setIsModalOpen(true);
     };
 
-    // Handle form submission (Add/Edit)
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!itemName.trim()) {
-            alert('please input name.');
+            alert('Please input name.');
             return;
         }
 
         if (modalType === 'add') {
-            // Simulate Add operation
             if (activeTab === 'provinces') {
                 const newProvince = { id: provinces.length + 1, name: itemName };
                 setProvinces([...provinces, newProvince]);
-                alert('province added succesfully!');
             } else if (activeTab === 'districts') {
                 if (!selectedProvinceId) {
-                    alert('please select district.');
+                    alert('Please select province.');
                     return;
                 }
                 const newDistrict = { id: districts.length + 1, name: itemName, provinceId: selectedProvinceId as number };
                 setDistricts([...districts, newDistrict]);
-                alert('district added succesfully!');
             } else if (activeTab === 'universities') {
                 if (!selectedDistrictId) {
-                    alert('please select district.');
+                    alert('Please select district.');
                     return;
                 }
                 const newUniversity = { id: universities.length + 1, name: itemName, districtId: selectedDistrictId as number, location: '' };
                 setUniversities([...universities, newUniversity]);
-                alert('added university succesfully!');
             }
         } else if (modalType === 'edit' && editingItem) {
-            // Simulate Edit operation
             if (activeTab === 'provinces') {
                 setProvinces(provinces.map(p => p.id === editingItem.id ? { ...p, name: itemName } : p));
-                alert('province edited succesfully!');
             } else if (activeTab === 'districts') {
                 if (!selectedProvinceId) {
-                    alert('please select province.');
+                    alert('Please select province.');
                     return;
                 }
                 setDistricts(districts.map(d => d.id === editingItem.id ? { ...d, name: itemName, provinceId: selectedProvinceId as number } : d));
-                alert('edited district successfully!');
             } else if (activeTab === 'universities') {
                 if (!selectedDistrictId) {
-                    alert('please select district.');
+                    alert('Please select district.');
                     return;
                 }
                 setUniversities(universities.map(u => u.id === editingItem.id ? { ...u, name: itemName, districtId: selectedDistrictId as number } : u));
-                alert('edited university successfully!');
             }
         }
-        setIsModalOpen(false); // Close modal after submission
+        setIsModalOpen(false);
     };
 
-    // Handle Delete operation
     const handleDeleteItem = (type: 'provinces' | 'districts' | 'universities', id: number) => {
-        if (window.confirm(`Do u need to delete this? (ID: ${id})`)) {
+        if (window.confirm(`Are you sure you want to delete this? (ID: ${id})`)) {
             if (type === 'provinces') {
                 setProvinces(provinces.filter(p => p.id !== id));
-                // Also remove associated districts and universities (for dummy data)
                 const remainingDistricts = districts.filter(d => d.provinceId !== id);
                 setDistricts(remainingDistricts);
                 setUniversities(universities.filter(u => !remainingDistricts.some(d => d.id === u.districtId)));
-                alert('province deleted successfully!');
             } else if (type === 'districts') {
                 setDistricts(districts.filter(d => d.id !== id));
-                // Also remove associated universities
                 setUniversities(universities.filter(u => u.districtId !== id));
-                alert('deleted district successfully!');
             } else if (type === 'universities') {
                 setUniversities(universities.filter(u => u.id !== id));
-                alert('university deleted successfully!');
             }
         }
     };
@@ -182,139 +166,128 @@ const UniversitiesPage = () => {
         : [];
 
     return (
-        <div className="space-y-8 min-h-screen pb-20">
+        <div className="space-y-6">
             {/* Header section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6">
-                <div>
-                    <h2 className="text-3xl font-black text-white tracking-tight uppercase bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">University & Location Hub</h2>
-                    <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Manage tertiary education institutes, districts, and geographic mapping</p>
-                </div>
+            <div>
+                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">University & Location Hub</h2>
+                <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Manage academic institutes, districts, and geographic mapping</p>
             </div>
 
-            {/* Premium Glassmorphic Tab Grid Selector */}
+            {/* Tab Grid Selector */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 {/* Tab 1: Universities */}
                 <div
                     onClick={() => setActiveTab('universities')}
-                    className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+                    className={`relative p-4 rounded-2xl border cursor-pointer transition-all ${
                         activeTab === 'universities'
-                            ? 'bg-blue-600/10 border-blue-500/60 shadow-[0_0_25px_-5px_rgba(59,130,246,0.3)]'
-                            : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+                            ? 'bg-blue-50/70 border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300'
                     }`}
                 >
-                    <div className="flex items-center gap-3.5">
-                        <div className={`p-3 rounded-xl transition-all duration-300 ${
-                            activeTab === 'universities' ? 'bg-blue-500/25 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.2)]' : 'bg-white/5 text-slate-400'
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2.5 rounded-xl ${
+                            activeTab === 'universities' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'
                         }`}>
-                            <LuGraduationCap className="text-xl" />
+                            <LuGraduationCap size={20} />
                         </div>
                         <div>
-                            <h4 className="font-bold text-white text-sm tracking-tight">Universities ({universities.length})</h4>
-                            <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Manage academic campuses & details</p>
+                            <h4 className="font-bold text-slate-900 text-sm">Universities ({universities.length})</h4>
+                            <p className="text-[11px] text-slate-500 mt-0.5">Manage academic campuses</p>
                         </div>
                     </div>
-                    {activeTab === 'universities' && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-blue-500 rounded-t-full shadow-[0_-2px_10px_rgba(59,130,246,0.8)]"></div>
-                    )}
                 </div>
 
                 {/* Tab 2: Districts */}
                 <div
                     onClick={() => setActiveTab('districts')}
-                    className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+                    className={`relative p-4 rounded-2xl border cursor-pointer transition-all ${
                         activeTab === 'districts'
-                            ? 'bg-amber-600/10 border-amber-500/60 shadow-[0_0_25px_-5px_rgba(245,158,11,0.3)]'
-                            : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+                            ? 'bg-amber-50/70 border-amber-500 ring-2 ring-amber-500/20 shadow-xs'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300'
                     }`}
                 >
-                    <div className="flex items-center gap-3.5">
-                        <div className={`p-3 rounded-xl transition-all duration-300 ${
-                            activeTab === 'districts' ? 'bg-amber-500/25 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]' : 'bg-white/5 text-slate-400'
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2.5 rounded-xl ${
+                            activeTab === 'districts' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600'
                         }`}>
-                            <LuBuilding2 className="text-xl" />
+                            <LuBuilding2 size={20} />
                         </div>
                         <div>
-                            <h4 className="font-bold text-white text-sm tracking-tight">Districts ({districts.length})</h4>
-                            <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Configure regional campus mapping</p>
+                            <h4 className="font-bold text-slate-900 text-sm">Districts ({districts.length})</h4>
+                            <p className="text-[11px] text-slate-500 mt-0.5">Regional campus mapping</p>
                         </div>
                     </div>
-                    {activeTab === 'districts' && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-amber-500 rounded-t-full shadow-[0_-2px_10px_rgba(245,158,11,0.8)]"></div>
-                    )}
                 </div>
 
                 {/* Tab 3: Provinces */}
                 <div
                     onClick={() => setActiveTab('provinces')}
-                    className={`relative p-5.5 rounded-[22px] border cursor-pointer transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl ${
+                    className={`relative p-4 rounded-2xl border cursor-pointer transition-all ${
                         activeTab === 'provinces'
-                            ? 'bg-emerald-600/10 border-emerald-500/60 shadow-[0_0_25px_-5px_rgba(16,185,129,0.3)]'
-                            : 'bg-white/[0.02] border-white/[0.05] hover:bg-white/[0.05] hover:border-white/[0.12]'
+                            ? 'bg-emerald-50/70 border-emerald-500 ring-2 ring-emerald-500/20 shadow-xs'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300'
                     }`}
                 >
-                    <div className="flex items-center gap-3.5">
-                        <div className={`p-3 rounded-xl transition-all duration-300 ${
-                            activeTab === 'provinces' ? 'bg-emerald-500/25 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-slate-400'
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2.5 rounded-xl ${
+                            activeTab === 'provinces' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'
                         }`}>
-                            <LuMapPin className="text-xl" />
+                            <LuMapPin size={20} />
                         </div>
                         <div>
-                            <h4 className="font-bold text-white text-sm tracking-tight">Provinces ({provinces.length})</h4>
-                            <p className="text-[11px] text-slate-500 mt-0.5 font-semibold">Geographic province configurations</p>
+                            <h4 className="font-bold text-slate-900 text-sm">Provinces ({provinces.length})</h4>
+                            <p className="text-[11px] text-slate-500 mt-0.5">Geographic provinces</p>
                         </div>
                     </div>
-                    {activeTab === 'provinces' && (
-                        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-1 bg-emerald-500 rounded-t-full shadow-[0_-2px_10px_rgba(16,185,129,0.8)]"></div>
-                    )}
                 </div>
             </div>
 
             {loading ? (
-                <div className="text-center py-16 text-slate-500 text-sm">Loading Data...</div>
+                <div className="text-center py-16 text-slate-400 font-bold uppercase tracking-wider text-xs animate-pulse">Loading Geographic Data...</div>
             ) : (
                 <>
                     {activeTab === 'universities' && (
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-black text-white uppercase tracking-wider">Universities List</h3>
+                                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Universities List</h3>
                                 <button
                                     onClick={() => handleAddItem('universities')}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20 rounded-xl transition-all border-none cursor-pointer"
+                                    className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all border-none cursor-pointer shadow-xs"
                                 >
-                                    <LuPlus className="text-base" /> Add New Uni / Institute
+                                    <LuPlus size={16} /> Add New Uni / Institute
                                 </button>
                             </div>
-                            <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
-                                <div className="overflow-x-auto custom-scrollbar">
+                            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
+                                <div className="overflow-x-auto">
                                     <table className="min-w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                                                <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Name</th>
-                                                <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">District</th>
-                                                <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Action</th>
+                                            <tr className="border-b border-slate-200 bg-slate-50/75">
+                                                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                                                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">District</th>
+                                                <th className="py-3 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/[0.04]">
+                                        <tbody className="divide-y divide-slate-100">
                                             {universities.length > 0 ? (
                                                 universities.map(uni => (
-                                                    <tr key={uni.id} className="hover:bg-white/[0.04] transition-colors">
-                                                        <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{uni.name}</td>
-                                                        <td className="py-3.5 px-5 text-slate-400">{getDistrictName(uni.districtId)}</td>
-                                                        <td className="py-3.5 px-5">
+                                                    <tr key={uni.id} className="hover:bg-slate-50/60 transition-colors">
+                                                        <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{uni.name}</td>
+                                                        <td className="py-3 px-5 text-slate-500 text-xs font-medium">{getDistrictName(uni.districtId)}</td>
+                                                        <td className="py-3 px-5">
                                                             <div className="flex items-center justify-center gap-1.5">
                                                                 <button
                                                                     onClick={() => handleEditItem('universities', uni)}
-                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all"
-                                                                    title="සංස්කරණය කරන්න"
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                                                                    title="Edit"
                                                                 >
-                                                                    <LuPencil className="text-sm" />
+                                                                    <LuPencil size={14} />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => handleDeleteItem('universities', uni.id)}
-                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
-                                                                    title="මකා දමන්න"
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                                                                    title="Delete"
                                                                 >
-                                                                    <LuTrash2 className="text-sm" />
+                                                                    <LuTrash2 size={14} />
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -322,7 +295,7 @@ const UniversitiesPage = () => {
                                                 ))
                                             ) : (
                                                 <tr>
-                                                    <td colSpan={3} className="py-16 text-center text-slate-600 text-sm">විශ්වවිද්‍යාල හමු නොවීය.</td>
+                                                    <td colSpan={3} className="py-16 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">No universities found</td>
                                                 </tr>
                                             )}
                                         </tbody>
@@ -335,44 +308,44 @@ const UniversitiesPage = () => {
                     {activeTab === 'districts' && (
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-black text-white uppercase tracking-wider">Districts List</h3>
+                                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Districts List</h3>
                                 <button
                                     onClick={() => handleAddItem('districts')}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-amber-600 hover:bg-amber-700 shadow-lg shadow-amber-500/20 rounded-xl transition-all border-none cursor-pointer"
+                                    className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-all border-none cursor-pointer shadow-xs"
                                 >
-                                    <LuPlus className="text-base" /> Add New District
+                                    <LuPlus size={16} /> Add New District
                                 </button>
                             </div>
-                            <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
-                                <div className="overflow-x-auto custom-scrollbar">
+                            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
+                                <div className="overflow-x-auto">
                                     <table className="min-w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                                                <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Name</th>
-                                                <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Province</th>
-                                                <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Action</th>
+                                            <tr className="border-b border-slate-200 bg-slate-50/75">
+                                                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                                                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Province</th>
+                                                <th className="py-3 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/[0.04]">
+                                        <tbody className="divide-y divide-slate-100">
                                             {districts.map(district => (
-                                                <tr key={district.id} className="hover:bg-white/[0.04] transition-colors">
-                                                    <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{district.name}</td>
-                                                    <td className="py-3.5 px-5 text-slate-400">{getProvinceName(district.provinceId)}</td>
-                                                    <td className="py-3.5 px-5">
+                                                <tr key={district.id} className="hover:bg-slate-50/60 transition-colors">
+                                                    <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{district.name}</td>
+                                                    <td className="py-3 px-5 text-slate-500 text-xs font-medium">{getProvinceName(district.provinceId)}</td>
+                                                    <td className="py-3 px-5">
                                                         <div className="flex items-center justify-center gap-1.5">
                                                             <button
                                                                 onClick={() => handleEditItem('districts', district)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all"
-                                                                title="සංස්කරණය කරන්න"
+                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                                                                title="Edit"
                                                             >
-                                                                <LuPencil className="text-sm" />
+                                                                <LuPencil size={14} />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteItem('districts', district.id)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
-                                                                title="මකා දමන්න"
+                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                                                                title="Delete"
                                                             >
-                                                                <LuTrash2 className="text-sm" />
+                                                                <LuTrash2 size={14} />
                                                             </button>
                                                         </div>
                                                     </td>
@@ -388,42 +361,42 @@ const UniversitiesPage = () => {
                     {activeTab === 'provinces' && (
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <h3 className="text-lg font-black text-white uppercase tracking-wider">Provinces List</h3>
+                                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Provinces List</h3>
                                 <button
                                     onClick={() => handleAddItem('provinces')}
-                                    className="flex items-center gap-2 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20 rounded-xl transition-all border-none cursor-pointer"
+                                    className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all border-none cursor-pointer shadow-xs"
                                 >
-                                    <LuPlus className="text-base" /> Add New Province
+                                    <LuPlus size={16} /> Add New Province
                                 </button>
                             </div>
-                            <div className="rounded-[1.75rem] overflow-hidden border border-white/[0.07] bg-white/[0.03] shadow-[0_4px_30px_rgba(0,0,0,0.25)]">
-                                <div className="overflow-x-auto custom-scrollbar">
+                            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-xs">
+                                <div className="overflow-x-auto">
                                     <table className="min-w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-white/[0.06] bg-white/[0.03]">
-                                                <th className="py-3.5 px-5 text-left text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Name</th>
-                                                <th className="py-3.5 px-5 text-center text-[11px] font-black uppercase tracking-[0.12em] text-slate-500">Action</th>
+                                            <tr className="border-b border-slate-200 bg-slate-50/75">
+                                                <th className="py-3 px-5 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Name</th>
+                                                <th className="py-3 px-5 text-center text-xs font-bold uppercase tracking-wider text-slate-500">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/[0.04]">
+                                        <tbody className="divide-y divide-slate-100">
                                             {provinces.map(province => (
-                                                <tr key={province.id} className="hover:bg-white/[0.04] transition-colors">
-                                                    <td className="py-3.5 px-5 font-semibold text-white whitespace-nowrap">{province.name}</td>
-                                                    <td className="py-3.5 px-5">
+                                                <tr key={province.id} className="hover:bg-slate-50/60 transition-colors">
+                                                    <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{province.name}</td>
+                                                    <td className="py-3 px-5">
                                                         <div className="flex items-center justify-center gap-1.5">
                                                             <button
                                                                 onClick={() => handleEditItem('provinces', province)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-700/50 text-slate-400 hover:text-white hover:bg-slate-600/50 transition-all"
-                                                                title="සංස්කරණය කරන්න"
+                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                                                                title="Edit"
                                                             >
-                                                                <LuPencil className="text-sm" />
+                                                                <LuPencil size={14} />
                                                             </button>
                                                             <button
                                                                 onClick={() => handleDeleteItem('provinces', province.id)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 hover:bg-red-500/25 transition-all"
-                                                                title="මකා දමන්න"
+                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                                                                title="Delete"
                                                             >
-                                                                <LuTrash2 className="text-sm" />
+                                                                <LuTrash2 size={14} />
                                                             </button>
                                                         </div>
                                                     </td>
@@ -440,110 +413,98 @@ const UniversitiesPage = () => {
 
             {/* Add/Edit Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-slate-900/95 backdrop-blur-2xl border border-white/[0.08] rounded-[2.5rem] shadow-2xl w-full max-w-md relative p-8">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-black text-white tracking-tight uppercase">
-                                {modalType === 'edit' ? `Edit ${activeTab === 'universities' ? 'University / Institute' : activeTab === 'districts' ? 'District' : 'Province'} ` : `Add New Uni / Institute`}
+                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+                    <div className="bg-white border border-slate-200 rounded-3xl shadow-2xl w-full max-w-md relative p-6">
+                        <div className="flex justify-between items-center mb-5">
+                            <h3 className="text-base font-bold text-slate-900">
+                                {modalType === 'edit' ? `Edit ${activeTab === 'universities' ? 'University / Institute' : activeTab === 'districts' ? 'District' : 'Province'} ` : `Add New ${activeTab === 'universities' ? 'University / Institute' : activeTab === 'districts' ? 'District' : 'Province'}`}
                             </h3>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-all hover:rotate-90"
+                                className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
                             >
-                                <LuX className="h-5 w-5" />
+                                <LuX size={18} />
                             </button>
                         </div>
-                        <form onSubmit={handleSubmit} className="space-y-5">
+                        <form onSubmit={handleSubmit} className="space-y-4">
                             {activeTab === 'districts' && (
-                                <div>
-                                    <label htmlFor="provinceSelect" className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Select Province</label>
-                                    <div className="relative">
-                                        <select
-                                            id="provinceSelect"
-                                            className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 appearance-none
-                                                [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%2394a3b8%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-                                                bg-no-repeat bg-[right_1rem_center] bg-[length:1.25rem]"
-                                            value={selectedProvinceId}
-                                            onChange={(e) => setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value))}
-                                            required
-                                        >
-                                            <option value="" className="bg-slate-900 text-slate-450">Select Province</option>
-                                            {provinces.map(province => (
-                                                <option key={province.id} value={province.id} className="bg-slate-900">{province.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                <div className="space-y-1">
+                                    <label htmlFor="provinceSelect" className="text-xs font-bold text-slate-700">Select Province</label>
+                                    <select
+                                        id="provinceSelect"
+                                        className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs"
+                                        value={selectedProvinceId}
+                                        onChange={(e) => setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value))}
+                                        required
+                                    >
+                                        <option value="">Select Province</option>
+                                        {provinces.map(province => (
+                                            <option key={province.id} value={province.id}>{province.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             )}
                             {activeTab === 'universities' && (
                                 <>
-                                    <div>
-                                        <label htmlFor="provinceSelect" className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Select Province</label>
-                                        <div className="relative">
-                                            <select
-                                                id="provinceSelect"
-                                                className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 appearance-none
-                                                    [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%2394a3b8%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-                                                    bg-no-repeat bg-[right_1rem_center] bg-[length:1.25rem]"
-                                                value={selectedProvinceId}
-                                                onChange={(e) => {
-                                                    setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value));
-                                                    setSelectedDistrictId('');
-                                                }}
-                                                required
-                                            >
-                                                <option value="" className="bg-slate-900 text-slate-455">Select Province</option>
-                                                {provinces.map(province => (
-                                                    <option key={province.id} value={province.id} className="bg-slate-900">{province.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                    <div className="space-y-1">
+                                        <label htmlFor="provinceSelect" className="text-xs font-bold text-slate-700">Select Province</label>
+                                        <select
+                                            id="provinceSelect"
+                                            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs"
+                                            value={selectedProvinceId}
+                                            onChange={(e) => {
+                                                setSelectedProvinceId(e.target.value === '' ? '' : Number(e.target.value));
+                                                setSelectedDistrictId('');
+                                            }}
+                                            required
+                                        >
+                                            <option value="">Select Province</option>
+                                            {provinces.map(province => (
+                                                <option key={province.id} value={province.id}>{province.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
-                                    <div>
-                                        <label htmlFor="districtSelect" className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Select District</label>
-                                        <div className="relative">
-                                            <select
-                                                id="districtSelect"
-                                                className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 appearance-none
-                                                    [background-image:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%2214%22%20height=%2214%22%20viewBox=%220%200%2020%2020%22%3E%3Cpath%20fill=%22none%22%20stroke=%22%2394a3b8%22%20stroke-width=%222%22%20d=%22M6%208l4%204%204-4%22/%3E%3C/svg%3E')]
-                                                    bg-no-repeat bg-[right_1rem_center] bg-[length:1.25rem]"
-                                                value={selectedDistrictId}
-                                                onChange={(e) => { setSelectedDistrictId(e.target.value === '' ? '' : Number(e.target.value)) }}
-                                                required
-                                                disabled={!selectedProvinceId}
-                                            >
-                                                <option value="" className="bg-slate-900 text-slate-455">Select District</option>
-                                                {filteredDistrictsForSelection.map(district => (
-                                                    <option key={district.id} value={district.id} className="bg-slate-900">{district.name}</option>
-                                                ))}
-                                            </select>
-                                        </div>
+                                    <div className="space-y-1">
+                                        <label htmlFor="districtSelect" className="text-xs font-bold text-slate-700">Select District</label>
+                                        <select
+                                            id="districtSelect"
+                                            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 cursor-pointer shadow-xs disabled:opacity-50"
+                                            value={selectedDistrictId}
+                                            onChange={(e) => { setSelectedDistrictId(e.target.value === '' ? '' : Number(e.target.value)) }}
+                                            required
+                                            disabled={!selectedProvinceId}
+                                        >
+                                            <option value="">Select District</option>
+                                            {filteredDistrictsForSelection.map(district => (
+                                                <option key={district.id} value={district.id}>{district.name}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </>
                             )}
-                            <div>
-                                <label htmlFor="itemName" className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">{activeTab === 'universities'? 'University / Institute Name' : activeTab === 'districts' ? 'District Name' : 'Province Name'}</label>
+                            <div className="space-y-1">
+                                <label htmlFor="itemName" className="text-xs font-bold text-slate-700">{activeTab === 'universities'? 'University / Institute Name' : activeTab === 'districts' ? 'District Name' : 'Province Name'}</label>
                                 <input
                                     type="text"
                                     id="itemName"
-                                    className="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-2xl text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-slate-500 focus:ring-4 focus:ring-white/5 transition-all"
+                                    className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-xs"
                                     value={itemName}
                                     onChange={(e) => setItemName(e.target.value)}
                                     placeholder="Enter name..."
                                     required
                                 />
                             </div>
-                            <div className="flex justify-end gap-3 mt-8">
+                            <div className="flex justify-end gap-2.5 pt-3">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="px-6 py-3 bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] text-slate-350 hover:text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all cursor-pointer"
+                                    className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 cursor-pointer"
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer"
                                 >
                                     {modalType === 'add' ? 'Add' : 'Save'}
                                 </button>

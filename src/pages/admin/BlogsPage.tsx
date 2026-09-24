@@ -48,17 +48,17 @@ const BlogsPage = () => {
 
   const confirmAction = (message: string, onConfirm: () => void) => {
     toast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-slate-900/90 border border-white/10 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5 backdrop-blur-xl`}>
+      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl pointer-events-auto flex flex-col p-5`}>
         <div className="flex items-center gap-3 mb-5">
           <div className="flex-1">
-            <p className="text-sm font-bold text-white tracking-wide">{message}</p>
+            <p className="text-sm font-bold text-slate-800 tracking-wide">{message}</p>
           </div>
         </div>
         <div className="flex gap-3 justify-end">
-          <button onClick={() => toast.dismiss(t.id)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60">
+          <button onClick={() => toast.dismiss(t.id)} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all">
             Cancel
           </button>
-          <button onClick={() => { toast.dismiss(t.id); onConfirm(); }} className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-2xl transition-all shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/40">
+          <button onClick={() => { toast.dismiss(t.id); onConfirm(); }} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-blue-500/20">
             Confirm
           </button>
         </div>
@@ -101,7 +101,7 @@ const BlogsPage = () => {
   if (loading) {
     return (
       <div className="flex h-[400px] items-center justify-center">
-        <div className="text-slate-500 font-bold uppercase tracking-widest text-xs animate-pulse">Loading Blogs Console...</div>
+        <div className="text-slate-400 font-bold uppercase tracking-wider text-xs animate-pulse">Loading Blogs Console...</div>
       </div>
     );
   }
@@ -110,21 +110,21 @@ const BlogsPage = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black text-white tracking-tight uppercase">Blog Management</h2>
-          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">Review and moderate campus voices</p>
+          <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Blog Management</h2>
+          <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Review and moderate campus voices & student articles</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[300px]">
-          <LuSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
+        <div className="relative flex-1 min-w-[280px]">
+          <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input
             type="text"
             placeholder="Search by title, author or tags..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-xs"
           />
         </div>
       </div>
@@ -136,56 +136,56 @@ const BlogsPage = () => {
             variants={containerVariants}
             initial="hidden"
             animate="show"
-            className="space-y-4"
+            className="space-y-3"
           >
             {filteredBlogs.map(blog => (
               <motion.div
                 key={blog.id}
                 variants={itemVariants}
                 onClick={() => setSelectedBlog(blog)}
-                className={`cursor-pointer p-4 rounded-[2rem] border transition-all duration-300 relative overflow-hidden group flex gap-5 ${
+                className={`cursor-pointer p-4 rounded-2xl border transition-all duration-200 relative overflow-hidden bg-white flex gap-4 ${
                   selectedBlog?.id === blog.id 
-                  ? 'bg-blue-600/10 border-blue-500/50 shadow-lg shadow-blue-500/10' 
-                  : 'bg-white/5 border-white/10 hover:border-white/20'
+                  ? 'border-blue-600 ring-2 ring-blue-500/20 shadow-md' 
+                  : 'border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
                 }`}
               >
-                <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-                  <img src={blog.image} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt={blog.title} />
+                <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
+                  <img src={blog.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={blog.title} />
                 </div>
                 
-                <div className="flex-1 min-w-0 py-1">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border ${
+                <div className="flex-1 min-w-0 py-0.5">
+                  <div className="flex justify-between items-start mb-1.5">
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
                       blog.status === 'approved' 
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
                       : blog.status === 'rejected'
-                      ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                      : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : 'bg-amber-50 text-amber-700 border-amber-200'
                     }`}>
                       {blog.status}
                     </span>
-                    <span className="text-[9px] font-bold text-slate-500">{new Date(blog.createdAt).toLocaleDateString()}</span>
+                    <span className="text-[11px] font-semibold text-slate-400">{new Date(blog.createdAt).toLocaleDateString()}</span>
                   </div>
 
-                  <h3 className="text-base font-black text-white mb-1 truncate">{blog.title}</h3>
-                  <div className="flex items-center gap-3 text-slate-500 text-[10px] font-bold">
-                    <div className="flex items-center gap-1">
+                  <h3 className="text-sm font-bold text-slate-900 mb-1 truncate">{blog.title}</h3>
+                  <div className="flex items-center gap-3 text-slate-500 text-xs">
+                    <div className="flex items-center gap-1.5">
                       {blog.authorImage ? (
-                        <img src={blog.authorImage} className="w-3.5 h-3.5 rounded-full object-cover" alt={blog.author} />
+                        <img src={blog.authorImage} className="w-4 h-4 rounded-full object-cover" alt={blog.author} />
                       ) : (
-                        <LuUser size={12} className="text-blue-500" />
+                        <LuUser size={13} className="text-blue-600" />
                       )}
-                      {blog.author}
+                      <span className="font-medium text-slate-700">{blog.author}</span>
                     </div>
-                    <div className="flex items-center gap-1"><LuTag size={12} className="text-blue-500" /> {blog.category}</div>
+                    <div className="flex items-center gap-1 font-medium text-slate-500"><LuTag size={12} className="text-blue-600" /> {blog.category}</div>
                   </div>
                 </div>
               </motion.div>
             ))}
 
             {filteredBlogs.length === 0 && (
-              <div className="text-center py-20 border border-white/5 border-dashed rounded-[2.5rem]">
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No blogs found</p>
+              <div className="text-center py-20 border border-dashed border-slate-200 rounded-2xl bg-white">
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">No blogs found</p>
               </div>
             )}
           </motion.div>
@@ -197,37 +197,37 @@ const BlogsPage = () => {
             {selectedBlog ? (
               <motion.div
                 key={selectedBlog.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                className="bg-slate-900/50 border border-white/10 rounded-[2.5rem] overflow-hidden sticky top-6 backdrop-blur-xl"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="bg-white border border-slate-200/80 rounded-2xl overflow-hidden sticky top-6 shadow-sm"
               >
                 {/* Banner Image */}
-                <div className="h-48 relative">
+                <div className="h-44 relative bg-slate-100">
                   <img src={selectedBlog.image} className="w-full h-full object-cover" alt="Banner" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-                  <div className="absolute top-4 right-4 flex gap-2">
+                  <div className="absolute top-3 right-3 flex gap-2">
                      <button 
                       onClick={() => handleDelete(selectedBlog.id)}
-                      className="w-10 h-10 rounded-full bg-red-500/20 text-red-400 border border-red-500/20 flex items-center justify-center hover:bg-red-500/30 transition-all backdrop-blur-md"
+                      className="w-9 h-9 rounded-full bg-white/90 text-rose-600 border border-slate-200 flex items-center justify-center hover:bg-rose-50 transition-all shadow-sm cursor-pointer"
+                      title="Delete blog"
                     >
-                      <LuTrash2 size={18} />
+                      <LuTrash2 size={16} />
                     </button>
                   </div>
                 </div>
 
-                <div className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase tracking-widest border border-blue-500/20">
+                <div className="p-6">
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold uppercase tracking-wider border border-blue-200">
                       {selectedBlog.category}
                     </span>
-                    <span className="text-slate-500 text-xs font-bold">{new Date(selectedBlog.createdAt).toDateString()}</span>
+                    <span className="text-slate-400 text-xs font-medium">{new Date(selectedBlog.createdAt).toDateString()}</span>
                   </div>
 
-                  <h3 className="text-2xl font-black text-white mb-4 tracking-tight leading-tight">{selectedBlog.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-3 leading-snug">{selectedBlog.title}</h3>
                   
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xs font-black overflow-hidden">
+                  <div className="flex items-center gap-3 mb-6 p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold overflow-hidden">
                       {selectedBlog.authorImage ? (
                         <img src={selectedBlog.authorImage} alt={selectedBlog.author} className="w-full h-full object-cover" />
                       ) : (
@@ -235,33 +235,33 @@ const BlogsPage = () => {
                       )}
                     </div>
                     <div>
-                      <p className="text-xs font-black text-white uppercase tracking-widest">{selectedBlog.author}</p>
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Contributor</p>
+                      <p className="text-xs font-bold text-slate-900">{selectedBlog.author}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">Author / Contributor</p>
                     </div>
                   </div>
 
-                  <div className="space-y-6">
-                    <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Excerpt</p>
-                      <p className="text-sm text-slate-300 leading-relaxed font-medium italic">"{selectedBlog.excerpt}"</p>
+                  <div className="space-y-4">
+                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Excerpt</p>
+                      <p className="text-xs text-slate-700 leading-relaxed font-normal italic">"{selectedBlog.excerpt}"</p>
                     </div>
 
-                    <div className="flex flex-col max-h-[500px] rounded-2xl bg-slate-950/50 border border-white/5 p-6 shadow-inner">
-                      <div className="flex items-center justify-between mb-4 shrink-0 border-b border-white/5 pb-3">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Full Content Analysis</p>
+                    <div className="flex flex-col max-h-[350px] rounded-xl bg-slate-50 border border-slate-100 p-4">
+                      <div className="flex items-center justify-between mb-2.5 shrink-0 border-b border-slate-200/60 pb-2">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Full Content Analysis</p>
                       </div>
                       <div 
-                        className="blog-content overflow-y-auto custom-scrollbar pr-4 flex-1"
+                        className="blog-content overflow-y-auto custom-scrollbar pr-2 flex-1 text-xs text-slate-800 leading-relaxed"
                         dangerouslySetInnerHTML={{ __html: selectedBlog.content }}
                       />
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 pt-1">
                       {selectedBlog.tags.split(',').map(tag => {
                         const trimmedTag = tag.trim();
                         if (!trimmedTag) return null;
                         return (
-                          <span key={trimmedTag} className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-slate-500 text-[10px] font-bold uppercase">
+                          <span key={trimmedTag} className="px-2.5 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-slate-600 text-[10px] font-semibold">
                             #{trimmedTag}
                           </span>
                         );
@@ -269,18 +269,18 @@ const BlogsPage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-10 pt-8 border-t border-white/10 grid grid-cols-2 gap-3">
+                  <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
                     {selectedBlog.status === 'pending' ? (
                       <>
-                        <button onClick={() => handleStatusChange(selectedBlog.id, 'approved')} className="px-6 py-3 rounded-2xl bg-emerald-600 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 hover:shadow-xl hover:shadow-emerald-500/40 hover:scale-105 transition-all">
+                        <button onClick={() => handleStatusChange(selectedBlog.id, 'approved')} className="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer border-none">
                           <LuCircleCheck size={14} /> Approve
                         </button>
-                        <button onClick={() => handleStatusChange(selectedBlog.id, 'rejected')} className="px-6 py-3 rounded-2xl bg-red-500/10 text-red-400 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-red-500/10 shadow-lg shadow-red-500/10 hover:shadow-xl hover:shadow-red-500/20 hover:bg-red-500/20 hover:scale-105 transition-all">
+                        <button onClick={() => handleStatusChange(selectedBlog.id, 'rejected')} className="py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 border border-rose-200 transition-all cursor-pointer">
                           <LuX size={14} /> Reject
                         </button>
                       </>
                     ) : (
-                      <button onClick={() => handleStatusChange(selectedBlog.id, 'pending')} className="col-span-2 px-6 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-slate-900/50 hover:shadow-xl hover:shadow-slate-900/60 hover:bg-slate-700 hover:scale-105 transition-all">
+                      <button onClick={() => handleStatusChange(selectedBlog.id, 'pending')} className="col-span-2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-slate-200">
                         <LuPencilLine size={14} /> Revert to Pending
                       </button>
                     )}
@@ -288,11 +288,11 @@ const BlogsPage = () => {
                 </div>
               </motion.div>
             ) : (
-              <div className="h-[400px] flex flex-col items-center justify-center text-center border border-white/5 border-dashed rounded-[2.5rem] p-8">
-                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-slate-600 mb-4">
-                  <LuMessageCircle size={32} />
+              <div className="h-[300px] flex flex-col items-center justify-center text-center border border-dashed border-slate-200 rounded-2xl p-8 bg-white">
+                <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 mb-3 border border-slate-100">
+                  <LuMessageCircle size={24} />
                 </div>
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Select a blog post to review</p>
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs">Select a blog post to review</p>
               </div>
             )}
           </AnimatePresence>
