@@ -1,5 +1,5 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { LuAlertTriangle, LuRotateCcw, LuHome } from 'react-icons/lu';
+import { Component, ErrorInfo, ReactNode } from 'react';
+import { LuTriangleAlert, LuRotateCcw, LuHouse } from 'react-icons/lu';
 
 interface Props {
   children: ReactNode;
@@ -35,7 +35,7 @@ export class PageErrorBoundary extends Component<Props, State> {
         <div className="min-h-[400px] flex items-center justify-center p-6">
           <div className="max-w-md w-full bg-white border border-rose-100 rounded-3xl p-8 text-center shadow-xl shadow-rose-500/5">
             <div className="w-16 h-16 bg-rose-50 border border-rose-200/80 rounded-2xl flex items-center justify-center mx-auto mb-5 text-rose-600 shadow-sm">
-              <LuAlertTriangle size={30} />
+              <LuTriangleAlert size={30} />
             </div>
             <h3 className="text-xl font-bold text-slate-900 tracking-tight mb-2">
               {this.props.fallbackTitle || 'Section Unavailable'}
@@ -59,7 +59,7 @@ export class PageErrorBoundary extends Component<Props, State> {
                 onClick={() => window.location.href = '/admin/dashboard'}
                 className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center gap-2 transition-all cursor-pointer"
               >
-                <LuHome size={14} /> Dashboard
+                <LuHouse size={14} /> Dashboard
               </button>
             </div>
           </div>
