@@ -68,7 +68,6 @@ const navItems: { section: string; items: NavItem[] }[] = [
     items: [
       { label: 'Universities', icon: LuGraduationCap, path: '/admin/settings/universities' },
       { label: 'Users', icon: LuUsers, path: '/admin/users' },
-      { label: 'Settings', icon: LuSettings, path: '/admin/settings/universities' },
     ],
   },
 ];
@@ -157,7 +156,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                 const pendingCount = item.countKey ? Number(stats[item.countKey] || 0) : 0;
 
                 return (
-                  <li key={item.path}>
+                  <li key={`${group.section}-${item.label}-${item.path}`}>
                     <button
                       onClick={() => handleNav(item.path)}
                       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-150 cursor-pointer group
