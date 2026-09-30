@@ -29,7 +29,7 @@ const ProposalsPage = () => {
       setLoading(true);
       const data = await fetchAdminProposals();
       // Filter out already verified users for the moderation queue
-      setProposals(data.filter((p: any) => p.user && !p.user.is_verified_student));
+      setProposals(Array.isArray(data) ? data.filter((p: any) => p.user && !p.user.is_verified_student) : []);
     } catch (err) {
       toast.error('Failed to fetch proposals');
     } finally {
@@ -41,7 +41,7 @@ const ProposalsPage = () => {
     try {
       setLoading(true);
       const data = await fetchAdminProposalChats();
-      setChats(data);
+      setChats(Array.isArray(data) ? data : []);
     } catch (err) {
       toast.error('Failed to fetch chats');
     } finally {

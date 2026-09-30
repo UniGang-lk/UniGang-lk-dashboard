@@ -103,7 +103,7 @@ const ServicesPage = () => {
       setLoading(true);
       setError(null);
       const data = await fetchServiceRequests();
-      setRequests(data);
+      setRequests(Array.isArray(data) ? data : []);
       if (selectedRequest) {
         const updated = data.find(r => r.id === selectedRequest.id);
         if (updated) {

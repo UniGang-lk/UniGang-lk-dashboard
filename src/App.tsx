@@ -19,6 +19,7 @@ import LoginPage from './pages/LoginPage';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/admin/ProtectedRoute';
+import PageErrorBoundary from './components/ui/PageErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 import './index.css';
 
@@ -44,21 +45,22 @@ function App() {
             }
           >
             <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard"                   element={<DashboardPage />} />
-            <Route path="users"                       element={<UsersPage />} />
-            <Route path="annexes"                     element={<AnnexesPage />} />
-            <Route path="reviews"                     element={<ReviewsPage />} />
-            <Route path="events"                      element={<EventsPage />} />
-            <Route path="advertisements"              element={<AdvertisementsPage />} />
-            <Route path="services"                    element={<ServicesPage />} />
-            <Route path="blogs"                       element={<BlogsPage />} />
-            <Route path="proposals"                   element={<ProposalsPage />} />
-            <Route path="contacts"                    element={<ContactsPage />} />
-            <Route path="notifications"               element={<NotificationsPage />} />
-            <Route path="marketplace"                 element={<MarketplacePage />} />
-            <Route path="settings/universities"       element={<UniversitiesPage />} />
+            <Route path="dashboard"                   element={<PageErrorBoundary fallbackTitle="Dashboard Overview"><DashboardPage /></PageErrorBoundary>} />
+            <Route path="users"                       element={<PageErrorBoundary fallbackTitle="User Management"><UsersPage /></PageErrorBoundary>} />
+            <Route path="annexes"                     element={<PageErrorBoundary fallbackTitle="Annex Management"><AnnexesPage /></PageErrorBoundary>} />
+            <Route path="reviews"                     element={<PageErrorBoundary fallbackTitle="Review Moderation"><ReviewsPage /></PageErrorBoundary>} />
+            <Route path="events"                      element={<PageErrorBoundary fallbackTitle="Events Section"><EventsPage /></PageErrorBoundary>} />
+            <Route path="advertisements"              element={<PageErrorBoundary fallbackTitle="Advertisements Section"><AdvertisementsPage /></PageErrorBoundary>} />
+            <Route path="services"                    element={<PageErrorBoundary fallbackTitle="Services Section"><ServicesPage /></PageErrorBoundary>} />
+            <Route path="blogs"                       element={<PageErrorBoundary fallbackTitle="Blogs Section"><BlogsPage /></PageErrorBoundary>} />
+            <Route path="proposals"                   element={<PageErrorBoundary fallbackTitle="Proposals Section"><ProposalsPage /></PageErrorBoundary>} />
+            <Route path="proposals/security-alerts"   element={<PageErrorBoundary fallbackTitle="Security Alerts"><ProposalsPage /></PageErrorBoundary>} />
+            <Route path="contacts"                    element={<PageErrorBoundary fallbackTitle="Contact Inquiries"><ContactsPage /></PageErrorBoundary>} />
+            <Route path="notifications"               element={<PageErrorBoundary fallbackTitle="Notifications"><NotificationsPage /></PageErrorBoundary>} />
+            <Route path="marketplace"                 element={<PageErrorBoundary fallbackTitle="Marketplace"><MarketplacePage /></PageErrorBoundary>} />
+            <Route path="settings/universities"       element={<PageErrorBoundary fallbackTitle="University Registry"><UniversitiesPage /></PageErrorBoundary>} />
 
-            <Route path="settings/analytics"          element={<AnalyticsPage />} />
+            <Route path="settings/analytics"          element={<PageErrorBoundary fallbackTitle="Analytics"><AnalyticsPage /></PageErrorBoundary>} />
           </Route>
 
           {/* Catch-all */}
@@ -72,4 +74,3 @@ function App() {
 }
 
 export default App;
-

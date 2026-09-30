@@ -280,7 +280,7 @@ export const fetchServiceRequests = async (status?: string): Promise<any[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch service requests');
   const data = await response.json();
-  return data.data ?? [];
+  return Array.isArray(data) ? data : (data?.data ?? []);
 };
 
 // @desc  Fetch a single service request by ID
@@ -774,7 +774,7 @@ export const deleteAdminProblem = async (id: string | number): Promise<void> => 
 // --- PROPOSAL ADMIN API ---
 export const fetchAdminProposals = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch(`${BASE_URL}/api/proposals/admin`, {
+  const response = await fetch(`${BASE_URL}/api/admin/proposals`, {
     headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
   if (!response.ok) throw new Error('Failed to fetch admin proposals');
@@ -783,7 +783,7 @@ export const fetchAdminProposals = async (): Promise<any[]> => {
 
 export const updateAdminProposalStatus = async (id: string | number, status: string): Promise<void> => {
   const token = await getToken();
-  const response = await fetch(`${BASE_URL}/api/proposals/admin/${id}/status`, {
+  const response = await fetch(`${BASE_URL}/api/admin/proposals/${id}/status`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -796,7 +796,7 @@ export const updateAdminProposalStatus = async (id: string | number, status: str
 
 export const fetchAdminProposalChats = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch(`${BASE_URL}/api/proposals/admin/chats`, {
+  const response = await fetch(`${BASE_URL}/api/admin/proposals/chats`, {
     headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
   if (!response.ok) throw new Error('Failed to fetch active proposal chats');
@@ -805,7 +805,7 @@ export const fetchAdminProposalChats = async (): Promise<any[]> => {
 
 export const fetchAdminProposalChatMessages = async (chatId: string): Promise<any> => {
   const token = await getToken();
-  const response = await fetch(`${BASE_URL}/api/proposals/admin/chats/${chatId}/messages`, {
+  const response = await fetch(`${BASE_URL}/api/admin/proposals/chats/${chatId}/messages`, {
     headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
   });
   if (!response.ok) throw new Error('Failed to fetch proposal chat messages');
