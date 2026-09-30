@@ -1,4 +1,5 @@
-﻿import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuUsers, LuClipboardList, LuGraduationCap,
@@ -8,13 +9,22 @@ import {
   LuSettings, LuShieldAlert
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
+import { fetchStats } from '../../api/api';
 
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const navItems = [
+interface NavItem {
+  label: string;
+  icon: any;
+  path: string;
+  badge?: string;
+  countKey?: string;
+}
+
+const navItems: { section: string; items: NavItem[] }[] = [
   {
     section: 'Overview',
     items: [
@@ -25,31 +35,31 @@ const navItems = [
   {
     section: 'Marketplace',
     items: [
-      { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes' },
-      { label: 'Reviews', icon: LuMessageCircle, path: '/admin/reviews' },
-      { label: 'Services', icon: LuMonitor, path: '/admin/services' },
-      { label: 'Advertisements', icon: LuSparkles, path: '/admin/advertisements' },
-      { label: 'Hustle Hub', icon: LuShoppingBag, path: '/admin/marketplace' },
+      { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes', countKey: 'pendingAnnexes' },
+      { label: 'Reviews', icon: LuMessageCircle, path: '/admin/reviews', countKey: 'pendingReviews' },
+      { label: 'Services', icon: LuMonitor, path: '/admin/services', countKey: 'pendingServices' },
+      { label: 'Advertisements', icon: LuSparkles, path: '/admin/advertisements', countKey: 'pendingAds' },
+      { label: 'Hustle Hub', icon: LuShoppingBag, path: '/admin/marketplace', countKey: 'pendingMarketOrders' },
     ],
   },
   {
     section: 'Community',
     items: [
-      { label: 'Events', icon: LuCalendarDays, path: '/admin/events' },
-      { label: 'Campus Blogs', icon: LuMessageCircle, path: '/admin/blogs' },
+      { label: 'Events', icon: LuCalendarDays, path: '/admin/events', countKey: 'pendingEvents' },
+      { label: 'Campus Blogs', icon: LuMessageCircle, path: '/admin/blogs', countKey: 'pendingBlogs' },
     ],
   },
   {
     section: 'Matchmaking',
     items: [
-      { label: 'Proposals', icon: LuHeartHandshake, path: '/admin/proposals', badge: 'VIP' },
-      { label: 'Security Alerts', icon: LuShieldAlert, path: '/admin/proposals/security-alerts' },
+      { label: 'Proposals', icon: LuHeartHandshake, path: '/admin/proposals', badge: 'VIP', countKey: 'pendingPayments' },
+      { label: 'Security Alerts', icon: LuShieldAlert, path: '/admin/proposals/security-alerts', countKey: 'unreadPrivacyAlerts' },
     ],
   },
   {
     section: 'Communication',
     items: [
-      { label: 'Contacts', icon: LuPhone, path: '/admin/contacts' },
+      { label: 'Contacts', icon: LuPhone, path: '/admin/contacts', countKey: 'pendingProblems' },
       { label: 'Notifications', icon: LuMegaphone, path: '/admin/notifications' },
     ],
   },
@@ -67,6 +77,24 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { currentUser, logout } = useAuth();
+  const [stats, setStats] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const data = await fetchStats();
+        if (data) {
+          setStats(data);
+        }
+      } catch (err) {
+        // silent fail
+      }
+    };
+    loadStats();
+    // Poll every 15 seconds so admin sees live red badges when users submit requests
+    const interval = setInterval(loadStats, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleNav = (path: string) => {
     navigate(path);
@@ -126,6 +154,8 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
               {group.items.map((item) => {
                 const active = isActive(item.path);
                 const ItemIcon = item.icon;
+                const pendingCount = item.countKey ? Number(stats[item.countKey] || 0) : 0;
+
                 return (
                   <li key={item.path}>
                     <button
@@ -139,6 +169,20 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                       <ItemIcon className={`text-base flex-shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
 
                       <span className="flex-1 text-left truncate">{item.label}</span>
+
+                      {/* Red circle notification badge when frontend has submitted requests/messages */}
+                      {pendingCount > 0 && (
+                        <span
+                          className={`min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center text-[10px] font-black shadow-xs animate-pulse ${
+                            active
+                              ? 'bg-white text-rose-600'
+                              : 'bg-rose-500 text-white'
+                          }`}
+                          title={`${pendingCount} pending items require attention`}
+                        >
+                          {pendingCount > 99 ? '99+' : pendingCount}
+                        </span>
+                      )}
 
                       {item.badge && (
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${

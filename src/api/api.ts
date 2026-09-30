@@ -50,7 +50,7 @@ export const deleteUser = async (id: number | string): Promise<void> => {
   if (!response.ok) throw new Error('Failed to delete user');
 };
 
-export const fetchStats = async (): Promise<{ totalStudents: number; approvedAnnexes: number; pendingAnnexes: number }> => {
+export const fetchStats = async (): Promise<any> => {
   const token = await getToken();
   const response = await fetch(`${BASE_URL}/api/stats`, {
     headers: {
