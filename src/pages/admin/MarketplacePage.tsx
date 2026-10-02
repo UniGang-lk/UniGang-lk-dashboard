@@ -35,21 +35,32 @@ const MarketplacePage = () => {
   const [editImagePreviews, setEditImagePreviews] = useState<string[]>([]);
   const [updatingItem, setUpdatingItem] = useState(false);
 
-  const loadItems = async () => {
-    setLoading(true);
+  const loadItems = async (silent = false) => {
+    if (!silent) setLoading(true);
     try { const data = await fetchAdminMarketItems(); setItems(data); }
-    catch (error) { console.error(error); toast.error('Failed to load marketplace items.'); }
-    finally { setLoading(false); }
+    catch (error) { console.error(error); if (!silent) toast.error('Failed to load marketplace items.'); }
+    finally { if (!silent) setLoading(false); }
   };
 
-  const loadOrders = async () => {
-    setOrdersLoading(true);
+  const loadOrders = async (silent = false) => {
+    if (!silent) setOrdersLoading(true);
     try { const data = await fetchAdminOrders(); setOrders(data); }
-    catch (error) { console.error(error); toast.error('Failed to load customer orders.'); }
-    finally { setOrdersLoading(false); }
+    catch (error) { console.error(error); if (!silent) toast.error('Failed to load customer orders.'); }
+    finally { if (!silent) setOrdersLoading(false); }
   };
 
-  useEffect(() => { if (activeTab === 'orders') loadOrders(); else loadItems(); }, [activeTab]);
+  useEffect(() => {
+    const poll = () => {
+      if (activeTab === 'orders') loadOrders(true);
+      else loadItems(true);
+    };
+
+    if (activeTab === 'orders') loadOrders();
+    else loadItems();
+
+    const interval = setInterval(poll, 5000);
+    return () => clearInterval(interval);
+  }, [activeTab]);
 
   const handleApprove = async (id: string | number) => {
     try { await updateMarketItemStatus(id, 'AVAILABLE'); toast.success('Listing approved.'); loadItems(); }
@@ -262,7 +273,7 @@ const MarketplacePage = () => {
                         <td className="py-3.5 px-5"><div className="flex items-center gap-2"><img src={order.buyer?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(order.buyer?.name || 'Customer')}`} alt="" className="w-7 h-7 rounded-full object-cover border border-slate-200" /><div><p className="font-medium text-slate-900 text-xs">{order.buyer?.name || 'Customer'}</p><p className="text-[10px] text-slate-400">{order.buyer?.email}</p></div></div></td>
                         <td className="py-3.5 px-5"><div className="flex items-center gap-2">{img ? <img src={img} alt="" className="w-8 h-8 object-cover rounded-lg border border-slate-200" /> : <div className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 text-[10px]">N/A</div>}<div><p className="font-medium text-slate-900 text-xs">{order.item?.title || 'Unknown'}</p><p className="text-[10px] text-slate-400">Qty: {order.quantity}</p><p className="text-[11px] font-black text-indigo-500">Rs. {parseFloat(order.total_price || '0').toLocaleString()}</p></div></div></td>
                         <td className="py-3.5 px-5"><div className="text-xs text-slate-500 space-y-0.5"><p className="flex items-center gap-1"><FaPhone className="text-[9px] text-indigo-400" />{order.delivery_phone}</p><p className="flex items-center gap-1 max-w-[130px] truncate"><FaMapMarkerAlt className="text-[9px] text-indigo-400" />{order.delivery_location}</p></div></td>
-                        <td className="py-3.5 px-5"><span className={`py-1 px-2.5 rounded-full text-[10px] font-black uppercase ${statusBadge(item.status)}`}>{order.status}</span></td>
+                        <td className="py-3.5 px-5"><span className={`py-1 px-2.5 rounded-full text-[10px] font-black uppercase ${statusBadge(order.status)}`}>{order.status}</span></td>
                         <td className="py-3.5 px-5"><div className="flex items-center justify-center gap-1.5">
                           <button onClick={() => setSelectedOrder(order)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-blue-50 text-blue-500 hover:bg-blue-100 transition-all cursor-pointer border-none"><FaEye className="text-xs" /></button>
                           <button onClick={() => { if (order.chatId) { setSelectedAuditChatId(order.chatId); setActiveTab('audit'); } else toast.error('No chat history.'); }} className="w-7 h-7 rounded-lg flex items-center justify-center bg-rose-50 text-rose-400 hover:bg-rose-100 transition-all cursor-pointer border-none"><FaHistory className="text-xs" /></button>

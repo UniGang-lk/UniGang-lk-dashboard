@@ -82,8 +82,8 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const load = async () => {
-      setLoading(true);
+    const load = async (silent = false) => {
+      if (!silent) setLoading(true);
       try {
         const [statsData, annexData] = await Promise.all([
           fetchStats().catch(() => ({ totalStudents: 0, approvedAnnexes: 0, pendingAnnexes: 0 })),
@@ -94,10 +94,12 @@ const DashboardPage = () => {
       } catch {
         // fallback
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     };
     load();
+    const interval = setInterval(() => load(true), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const statCards: StatCard[] = [

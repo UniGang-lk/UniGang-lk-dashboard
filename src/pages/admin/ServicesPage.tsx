@@ -70,19 +70,21 @@ const ServicesPage = () => {
   const [newMessageText, setNewMessageText] = useState('');
 
   useEffect(() => {
-    const loadMessages = async () => {
+    const loadMessages = async (silent = false) => {
       if (!selectedRequest) return;
       try {
-        setLoadingMessages(true);
+        if (!silent) setLoadingMessages(true);
         const data = await fetchServiceMessages(selectedRequest.id);
         setMessages(data);
       } catch (err) {
         console.error('Failed to load messages:', err);
       } finally {
-        setLoadingMessages(false);
+        if (!silent) setLoadingMessages(false);
       }
     };
     loadMessages();
+    const interval = setInterval(() => loadMessages(true), 4000);
+    return () => clearInterval(interval);
   }, [selectedRequest]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -98,9 +100,9 @@ const ServicesPage = () => {
     }
   };
 
-  const loadRequests = async () => {
+  const loadRequests = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       setError(null);
       const data = await fetchServiceRequests();
       setRequests(Array.isArray(data) ? data : []);
@@ -109,21 +111,20 @@ const ServicesPage = () => {
         if (updated) {
           setSelectedRequest(updated);
           setNotesInput(updated.adminNotes || '');
-        } else {
-          setSelectedRequest(null);
-          setNotesInput('');
         }
       }
     } catch (err: any) {
       console.error(err);
-      setError('Failed to fetch service requests. Please check if the backend is running.');
+      if (!silent) setError('Failed to fetch service requests. Please check if the backend is running.');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
   useEffect(() => {
     loadRequests();
+    const interval = setInterval(() => loadRequests(true), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleSelectRequest = (request: ServiceRequest) => {
@@ -209,8 +210,70 @@ const ServicesPage = () => {
   const stats = {
     total: requests.length,
     pending: requests.filter(r => r.status === 'pending').length,
+    approved: requests.filter(r => r.status === 'approved').length,
     inProgress: requests.filter(r => r.status === 'in_progress').length,
     completed: requests.filter(r => r.status === 'completed').length,
+  };
+
+  const parseDateString = (dateVal?: string) => {
+    if (!dateVal) return 'Recently';
+    const d = new Date(dateVal);
+    return isNaN(d.getTime()) ? 'Recently' : d.toLocaleDateString();
+  };
+
+  const renderFormattedBrief = (briefText: string, isCondensed = false) => {
+    if (!briefText) return <span className="text-slate-400 italic">No brief provided</span>;
+
+    const configMatch = briefText.match(/^\[Config:\s*(.*?)\]\s*(?:Client Notes:\s*(.*))?$/s);
+    
+    if (configMatch) {
+      const configContent = configMatch[1];
+      const clientNotes = configMatch[2] || '';
+      const configItems = configContent.split('|').map(item => item.trim());
+
+      if (isCondensed) {
+        return (
+          <div className="space-y-1.5 my-2">
+            <div className="flex flex-wrap gap-1">
+              {configItems.map((item, idx) => (
+                <span key={idx} className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 font-semibold text-[10px] rounded border border-blue-100">
+                  {item}
+                </span>
+              ))}
+            </div>
+            {clientNotes ? (
+              <p className="text-slate-600 text-xs line-clamp-2 font-normal leading-relaxed">
+                <span className="font-semibold text-slate-700">Notes:</span> {clientNotes}
+              </p>
+            ) : null}
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-2.5">
+          <div className="flex flex-wrap gap-1.5">
+            {configItems.map((item, idx) => (
+              <span key={idx} className="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 font-semibold text-xs rounded-lg border border-blue-100">
+                {item}
+              </span>
+            ))}
+          </div>
+          {clientNotes ? (
+            <div className="pt-2 border-t border-slate-200/60">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Client Notes</p>
+              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{clientNotes}</p>
+            </div>
+          ) : null}
+        </div>
+      );
+    }
+
+    return (
+      <p className={`text-slate-700 text-xs font-normal leading-relaxed ${isCondensed ? 'line-clamp-2 mb-4' : 'whitespace-pre-wrap'}`}>
+        {briefText}
+      </p>
+    );
   };
 
   return (
@@ -224,7 +287,7 @@ const ServicesPage = () => {
       </div>
 
       {/* Stats Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs transition-all hover:border-slate-300">
           <p className="text-slate-500 text-xs font-bold uppercase tracking-wider">Total Inquiries</p>
           <p className="text-3xl font-extrabold text-slate-900 mt-2">{stats.total}</p>
@@ -232,6 +295,10 @@ const ServicesPage = () => {
         <div className="bg-white border border-amber-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-amber-300">
           <p className="text-amber-700 text-xs font-bold uppercase tracking-wider">Pending Review</p>
           <p className="text-3xl font-extrabold text-amber-600 mt-2">{stats.pending}</p>
+        </div>
+        <div className="bg-white border border-blue-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-blue-300">
+          <p className="text-blue-700 text-xs font-bold uppercase tracking-wider">Approved</p>
+          <p className="text-3xl font-extrabold text-blue-600 mt-2">{stats.approved}</p>
         </div>
         <div className="bg-white border border-indigo-200/70 rounded-2xl p-5 shadow-xs transition-all hover:border-indigo-300">
           <p className="text-indigo-700 text-xs font-bold uppercase tracking-wider">In Progress</p>
@@ -309,12 +376,15 @@ const ServicesPage = () => {
                   <div className="flex justify-between items-start mb-3">
                     <StatusBadge status={request.status} />
                     <span className="text-[11px] font-semibold text-slate-400">
-                      {new Date(request.created_at || request.updated_at || '').toLocaleDateString()}
+                      {parseDateString(request.createdAt || (request as any).created_at || request.updatedAt || (request as any).updated_at)}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-bold text-slate-900 mb-1.5">{request.serviceName}</h3>
-                  <p className="text-slate-600 text-xs line-clamp-2 mb-4 font-normal leading-relaxed">{request.brief}</p>
+                  <h3 className="text-base font-bold text-slate-900 mb-1 flex items-center justify-between">
+                    {request.serviceName}
+                  </h3>
+                  
+                  {renderFormattedBrief(request.brief, true)}
                   
                   <div className="flex items-center gap-4 text-slate-500 text-xs font-semibold pt-3 border-t border-slate-100">
                     <div className="flex items-center gap-1.5">
@@ -348,7 +418,7 @@ const ServicesPage = () => {
                   <div className="flex gap-2">
                     <button 
                       onClick={() => handleDelete(selectedRequest.id)}
-                      className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all border border-rose-100"
+                      className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all border border-rose-100 cursor-pointer"
                       title="Delete inquiry"
                     >
                       <LuTrash2 size={16} />
@@ -360,8 +430,8 @@ const ServicesPage = () => {
                 
                 <div className="space-y-4">
                   <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
-                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Request Brief</p>
-                    <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{selectedRequest.brief}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Request Specification & Brief</p>
+                    {renderFormattedBrief(selectedRequest.brief, false)}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
