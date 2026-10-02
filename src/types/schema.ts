@@ -87,19 +87,26 @@ export interface Announcement {
 export interface SystemEvent {
   id: number | string;
   organizer_id?: number | string;
+  userId?: string;
   title: string;
   description: string;
   date: string;
+  time?: string;
   location: string;
+  category?: string;
   price?: number | string;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | 'pending' | 'approved' | 'rejected';
+  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | 'pending' | 'approved' | 'rejected' | string;
   image?: string;
   phone?: string;
   contact?: string;
+  requirements?: string;
   extra?: string;
+  uni?: string;
   university?: string;
   created_at?: string;
   updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ServiceRequest {

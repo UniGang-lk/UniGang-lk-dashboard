@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  LuSearch, LuPlus, LuCalendar, LuMapPin, 
+  LuSearch, LuCalendar, LuMapPin, 
   LuTrash2, LuCircleCheck, 
-  LuX, LuClock, LuPhone
+  LuX, LuClock, LuPhone, LuTag, LuGraduationCap, LuFileText
 } from 'react-icons/lu';
 import { fetchEvents, updateEventStatus, deleteEvent } from '../../api/api';
 import type { SystemEvent } from '../../types/schema';
@@ -21,7 +21,8 @@ const itemVariants = {
 };
 
 const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
-  const styles = {
+  const normStatus = (status || '').toLowerCase();
+  const styles: Record<string, string> = {
     upcoming:  'bg-blue-50 text-blue-700 border-blue-200',
     ongoing:   'bg-emerald-50 text-emerald-700 border-emerald-200',
     completed: 'bg-slate-100 text-slate-700 border-slate-200',
@@ -31,7 +32,7 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
     rejected:  'bg-rose-50 text-rose-700 border-rose-200',
   };
   
-  const Icons = {
+  const Icons: Record<string, any> = {
     upcoming: LuClock,
     ongoing: LuCircleCheck,
     completed: LuCircleCheck,
@@ -41,10 +42,11 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
     rejected: LuX,
   };
   
-  const Icon = Icons[status as keyof typeof Icons] || LuClock;
+  const Icon = Icons[normStatus] || LuClock;
+  const style = styles[normStatus] || 'bg-slate-50 text-slate-700 border-slate-200';
 
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${styles[status as keyof typeof styles]}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider border ${style}`}>
       <Icon className="text-xs" />
       {status}
     </span>
@@ -53,7 +55,16 @@ const StatusBadge = ({ status }: { status: SystemEvent['status'] }) => {
 
 const getImageUrl = (image?: string) => {
   if (!image) return 'https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800';
-  return image.startsWith('http') ? image : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${image}`;
+  if (image.startsWith('http')) return image;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
+  return `${baseUrl.replace(/\/$/, '')}/${image.replace(/^\//, '')}`;
+};
+
+const formatDateTime = (dateStr?: string, timeStr?: string) => {
+  if (!dateStr) return 'Date TBA';
+  const parsed = new Date(dateStr);
+  const formattedDate = isNaN(parsed.getTime()) ? dateStr : parsed.toLocaleDateString();
+  return timeStr ? `${formattedDate} • ${timeStr}` : formattedDate;
 };
 
 interface EventDetailModalProps {
@@ -68,8 +79,18 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
       <div className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-8 custom-scrollbar">
         <div className='flex justify-between items-start mb-6'>
           <div>
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              {event.category && (
+                <span className="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 font-bold text-[10px] uppercase tracking-wider flex items-center gap-1">
+                  <LuTag size={11} /> {event.category}
+                </span>
+              )}
+              <StatusBadge status={event.status} />
+            </div>
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">{event.title}</h2>
-            <p className="text-blue-600 text-xs font-bold uppercase tracking-wider">{event.location}</p>
+            <p className="text-blue-600 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <LuGraduationCap size={14} /> {event.uni || event.university || 'Campus Event'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -79,22 +100,22 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
           </button>
         </div>
 
-        <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 aspect-video relative group">
+        <div className="mb-6 rounded-2xl overflow-hidden border border-slate-200 aspect-video relative group bg-slate-100">
           <img src={getImageUrl(event.image)} alt={event.title} className="w-full h-full object-cover" />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 mb-6">
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Event Metadata</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2.5">Event Schedule & Location</p>
             <div className="space-y-2">
                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                 <LuCalendar className="text-blue-600" /> {new Date(event.date).toDateString()}
+                 <LuCalendar className="text-blue-600" /> {formatDateTime(event.date, event.time)}
                </div>
                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
                  <LuMapPin className="text-blue-600" /> {event.location}
                </div>
                <div className="flex items-center gap-2.5 text-slate-800 text-xs font-semibold">
-                 <LuPhone className="text-blue-600" /> {event.contact || 'N/A'}
+                 <LuPhone className="text-blue-600" /> {event.contact || event.phone || 'N/A'}
                </div>
             </div>
           </div>
@@ -120,6 +141,15 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
             <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{event.description || 'No description provided.'}</p>
           </div>
 
+          {event.requirements && (
+            <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-100">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700 mb-1.5 flex items-center gap-1">
+                <LuFileText size={12} /> Requirements & Eligibility
+              </p>
+              <p className="text-xs text-slate-700 leading-relaxed font-normal whitespace-pre-wrap">{event.requirements}</p>
+            </div>
+          )}
+
           {event.extra && (
             <div className="p-4 rounded-xl bg-amber-50 border border-amber-200">
               <p className="text-[10px] font-bold uppercase tracking-wider text-amber-800 mb-2">Special Instructions / Extras</p>
@@ -131,15 +161,15 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onS
         <div className="pt-6 border-t border-slate-100 flex gap-3">
           <button 
             onClick={() => { onStatusChange(event.id, 'approved'); onClose(); }}
-            className="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+            className="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border-none"
           >
             <LuCircleCheck size={16} /> Approve Event
           </button>
           <button 
              onClick={() => { onStatusChange(event.id, 'rejected'); onClose(); }}
-             className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
+             className="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer border border-slate-200"
           >
-            <LuX size={16} /> Reject / Cancel
+            <LuX size={16} /> Reject Event
           </button>
         </div>
       </div>
@@ -155,24 +185,36 @@ const EventsPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedEvent, setSelectedEvent] = useState<SystemEvent | null>(null);
 
-  useEffect(() => {
-    const loadEvents = async () => {
-      try {
-        const data = await fetchEvents();
-        setEvents(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const loadEvents = async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      const data = await fetchEvents();
+      setEvents(Array.isArray(data) ? data : []);
+      if (selectedEvent) {
+        const updated = (Array.isArray(data) ? data : []).find(e => e.id === selectedEvent.id);
+        if (updated) setSelectedEvent(updated);
       }
-    };
+    } catch (err) {
+      console.error(err);
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadEvents();
+    const interval = setInterval(() => loadEvents(true), 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const filteredEvents = events.filter(e => {
-    const matchesSearch = e.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          e.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || e.status === filterStatus;
+    const term = searchTerm.toLowerCase();
+    const matchesSearch = 
+      (e.title || '').toLowerCase().includes(term) || 
+      (e.location || '').toLowerCase().includes(term) ||
+      (e.uni || e.university || '').toLowerCase().includes(term) ||
+      (e.category || '').toLowerCase().includes(term);
+    const matchesStatus = filterStatus === 'all' || (e.status || '').toLowerCase() === filterStatus.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
@@ -185,10 +227,10 @@ const EventsPage = () => {
           </div>
         </div>
         <div className="flex gap-3 justify-end">
-          <button onClick={() => hotToast.dismiss(t.id)} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all">
+          <button onClick={() => hotToast.dismiss(t.id)} className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer border-none">
             Cancel
           </button>
-          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-blue-500/20">
+          <button onClick={() => { hotToast.dismiss(t.id); onConfirm(); }} className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-blue-500/20 cursor-pointer border-none">
             Confirm
           </button>
         </div>
@@ -215,6 +257,7 @@ const EventsPage = () => {
       await updateEventStatus(id, status);
       setEvents(events.map(e => e.id === id ? { ...e, status } : e));
       toast.success(`Event status updated to ${status}`);
+      loadEvents(true);
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || 'Failed to update event status.');
@@ -228,14 +271,6 @@ const EventsPage = () => {
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Events Management</h2>
           <p className="text-slate-500 text-xs font-semibold tracking-wide mt-1">Manage and moderate campus activities & workshops</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition-all cursor-pointer"
-        >
-          <LuPlus className="text-base" />
-          Create Event
-        </motion.button>
       </div>
 
       {/* Filters */}
@@ -244,7 +279,7 @@ const EventsPage = () => {
           <LuSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <input
             type="text"
-            placeholder="Search events by title or location..."
+            placeholder="Search events by title, campus, or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-xs"
@@ -276,35 +311,52 @@ const EventsPage = () => {
               key={event.id}
               variants={itemVariants}
               onClick={() => setSelectedEvent(event)}
-              className="bg-white border border-slate-200/80 rounded-2xl p-5 relative overflow-hidden group cursor-pointer transition-all hover:border-slate-300 hover:shadow-sm"
+              className="bg-white border border-slate-200/80 rounded-2xl p-5 relative overflow-hidden group cursor-pointer transition-all hover:border-slate-300 hover:shadow-sm flex flex-col justify-between"
             >
-              <div className="flex justify-between items-start mb-4">
-                <StatusBadge status={event.status} />
-                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button 
-                    onClick={(e) => { e.stopPropagation(); handleDelete(event.id); }}
-                    className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors border border-rose-100 cursor-pointer"
-                  >
-                    <LuTrash2 size={15} />
-                  </button>
+              <div>
+                <div className="flex justify-between items-start mb-4 gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <StatusBadge status={event.status} />
+                    {event.category && (
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-wider border border-slate-200/70">
+                        {event.category}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDelete(event.id); }}
+                      className="p-2 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors border border-rose-100 cursor-pointer"
+                      title="Delete Event"
+                    >
+                      <LuTrash2 size={15} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="aspect-[16/10] rounded-xl overflow-hidden mb-4 border border-slate-100 bg-slate-50 relative">
+                  <img src={getImageUrl(event.image)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Cover" />
+                </div>
+
+                <h3 className="text-base font-bold text-slate-900 mb-1 line-clamp-1 tracking-tight">{event.title}</h3>
+                <p className="text-blue-600 text-xs font-bold mb-3 flex items-center gap-1 truncate">
+                  <LuGraduationCap size={13} className="shrink-0" />
+                  {event.uni || event.university || event.location}
+                </p>
+                
+                <div className="space-y-1.5 mb-4 text-xs font-medium text-slate-500">
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <LuCalendar className="text-slate-400 shrink-0" size={14} />
+                    <span>{formatDateTime(event.date, event.time)}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <LuMapPin className="text-slate-400 shrink-0" size={14} />
+                    <span className="truncate">{event.location}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="aspect-[16/10] rounded-xl overflow-hidden mb-4 border border-slate-100 bg-slate-50">
-                <img src={getImageUrl(event.image)} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Cover" />
-              </div>
-
-              <h3 className="text-base font-bold text-slate-900 mb-1 line-clamp-1 tracking-tight">{event.title}</h3>
-              <p className="text-blue-600 text-xs font-semibold mb-4">{event.location}</p>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-slate-500">
-                  <LuCalendar className="text-slate-400" size={14} />
-                  <span className="text-xs font-medium">{new Date(event.date).toLocaleDateString()}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
                 <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Entry Fee</div>
                 <div className="text-sm font-extrabold text-slate-900">{event.price ? `Rs. ${event.price}` : 'FREE'}</div>
               </div>

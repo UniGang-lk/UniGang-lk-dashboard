@@ -184,7 +184,7 @@ export const fetchEvents = async (): Promise<SystemEvent[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch admin events');
   const result = await response.json();
-  return result.data || [];
+  return Array.isArray(result) ? result : (result.data || []);
 };
 
 export const updateEventStatus = async (id: number | string, status: string): Promise<void> => {
