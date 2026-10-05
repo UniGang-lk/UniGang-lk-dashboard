@@ -5,7 +5,7 @@ import {
   LuUsers, LuArrowRight, LuTrendingUp, LuShieldCheck, LuShoppingBag,
   LuZap, LuServer, LuArrowUpRight, LuCheck, LuX, LuRefreshCw,
   LuEye, LuLayers, LuSearch, LuPhone, LuImage, LuSparkles,
-  LuActivity, LuCalendar, LuBell, LuChevronRight
+  LuActivity, LuCalendar, LuBell, LuChevronRight, LuFilter
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -65,43 +65,39 @@ const itemVariants: any = {
   show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } },
 };
 
-// SVG Sparkline Graphic Component
-const Sparkline = ({ color = '#3b82f6' }: { color?: string }) => (
-  <svg className="w-20 h-9 opacity-90 stroke-2" viewBox="0 0 100 35" fill="none">
-    <path
-      d="M0 26 Q15 10, 30 20 T60 6 T80 16 T100 2"
-      stroke={color}
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-// Dynamic Area Growth Chart based on real daily activity
+// ─── DYNAMIC AREA GROWTH CHART COMPONENT ───────────────────────────────────────
 const DynamicAnalyticsChart = ({
   chartData
 }: {
-  chartData: { days: string[]; annexCounts: number[]; marketCounts: number[] }
+  chartData: {
+    days: string[];
+    annexCounts: number[];
+    marketCounts: number[];
+    userCounts: number[];
+  }
 }) => {
-  const [chartRange, setChartRange] = useState<'7D' | '30D' | '1Y'>('7D');
+  const [activeMetricFilter, setActiveMetricFilter] = useState<'ALL' | 'ANNEX' | 'MARKET' | 'USERS'>('ALL');
 
-  // Compute SVG polyline points dynamically based on real daily counts
-  const maxVal = Math.max(...chartData.annexCounts, ...chartData.marketCounts, 5);
-  
-  const generateSvgPath = (counts: number[], secondary = false) => {
+  // Compute maximum count for scaling
+  const maxVal = Math.max(
+    ...chartData.annexCounts,
+    ...chartData.marketCounts,
+    ...chartData.userCounts,
+    5
+  );
+
+  const generateSvgPath = (counts: number[]) => {
     const width = 500;
     const height = 130;
     const step = width / Math.max(counts.length - 1, 1);
-    
+
     const points = counts.map((val, idx) => {
       const x = idx * step;
-      // y ranges from 20 (top/high count) to 120 (bottom/zero count)
       const y = 130 - (val / maxVal) * 100;
-      return { x, y };
+      return { x, y, val };
     });
 
-    if (points.length === 0) return { path: '', area: '' };
+    if (points.length === 0) return { path: '', area: '', points: [] };
 
     let pathStr = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
@@ -116,41 +112,50 @@ const DynamicAnalyticsChart = ({
 
     const areaStr = `${pathStr} L ${points[points.length - 1].x} 150 L ${points[0].x} 150 Z`;
 
-    return { path: pathStr, area: areaStr };
+    return { path: pathStr, area: areaStr, points };
   };
 
-  const line1 = generateSvgPath(chartData.annexCounts);
-  const line2 = generateSvgPath(chartData.marketCounts, true);
+  const lineAnnex = generateSvgPath(chartData.annexCounts);
+  const lineMarket = generateSvgPath(chartData.marketCounts);
+  const lineUsers = generateSvgPath(chartData.userCounts);
 
   return (
     <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-slate-800 shadow-2xl relative overflow-hidden flex flex-col justify-between space-y-6">
       <div className="absolute top-0 right-0 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Header & Range Selector */}
+      {/* Header & Filter Pills */}
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
         <div>
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
               <LuTrendingUp size={18} />
             </span>
-            <h3 className="text-lg font-black tracking-tight text-white">Platform Activity & Telemetry Growth</h3>
+            <h3 className="text-lg font-black tracking-tight text-white">Platform Activity & Real Telemetry Growth</h3>
           </div>
-          <p className="text-xs text-slate-400 mt-1">Real-time daily Annex submissions vs Marketplace trades across Sri Lankan campuses</p>
+          <p className="text-xs text-slate-400 mt-1">Real-time daily activity scanned from database timestamps across Sri Lankan universities</p>
         </div>
 
-        <div className="flex items-center gap-1.5 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 self-start sm:self-auto">
-          {(['7D', '30D', '1Y'] as const).map((range) => (
+        {/* Metric Selector Tabs */}
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 shrink-0">
+          {(
+            [
+              { id: 'ALL', label: 'All Telemetry' },
+              { id: 'ANNEX', label: 'Annexes' },
+              { id: 'MARKET', label: 'Marketplace' },
+              { id: 'USERS', label: 'Students' }
+            ] as const
+          ).map((filter) => (
             <button
-              key={range}
-              onClick={() => setChartRange(range)}
+              key={filter.id}
+              onClick={() => setActiveMetricFilter(filter.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                chartRange === range
+                activeMetricFilter === filter.id
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              {range}
+              {filter.label}
             </button>
           ))}
         </div>
@@ -169,6 +174,10 @@ const DynamicAnalyticsChart = ({
                 <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
                 <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
               </linearGradient>
+              <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#a855f7" stopOpacity="0.3" />
+                <stop offset="100%" stopColor="#a855f7" stopOpacity="0.0" />
+              </linearGradient>
             </defs>
 
             {/* Grid lines */}
@@ -176,25 +185,44 @@ const DynamicAnalyticsChart = ({
             <line x1="0" y1="75" x2="500" y2="75" stroke="#334155" strokeDasharray="4 4" strokeWidth="0.8" />
             <line x1="0" y1="120" x2="500" y2="120" stroke="#334155" strokeDasharray="4 4" strokeWidth="0.8" />
 
-            {/* Dynamic Area path 1 (Annex Submissions) */}
-            {line1.area && (
-              <path d={line1.area} fill="url(#blueGradient)" />
-            )}
-            {line1.path && (
-              <path d={line1.path} fill="none" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" />
-            )}
-
-            {/* Dynamic Area path 2 (Marketplace Submissions) */}
-            {line2.area && (
-              <path d={line2.area} fill="url(#emeraldGradient)" />
-            )}
-            {line2.path && (
-              <path d={line2.path} fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="6 3" strokeLinecap="round" />
+            {/* Path 1: Annexes (Blue) */}
+            {(activeMetricFilter === 'ALL' || activeMetricFilter === 'ANNEX') && lineAnnex.path && (
+              <>
+                <path d={lineAnnex.area} fill="url(#blueGradient)" />
+                <path d={lineAnnex.path} fill="none" stroke="#3b82f6" strokeWidth="3.5" strokeLinecap="round" />
+                {lineAnnex.points.map((pt, i) => (
+                  <g key={`annex-pt-${i}`}>
+                    <circle cx={pt.x} cy={pt.y} r="4" fill="#3b82f6" stroke="#ffffff" strokeWidth="2" />
+                  </g>
+                ))}
+              </>
             )}
 
-            {/* Dynamic Node highlight */}
-            <circle cx="500" cy="20" r="5" fill="#3b82f6" className="animate-ping opacity-75" />
-            <circle cx="500" cy="20" r="4" fill="#60a5fa" stroke="#ffffff" strokeWidth="2" />
+            {/* Path 2: Marketplace (Emerald) */}
+            {(activeMetricFilter === 'ALL' || activeMetricFilter === 'MARKET') && lineMarket.path && (
+              <>
+                <path d={lineMarket.area} fill="url(#emeraldGradient)" />
+                <path d={lineMarket.path} fill="none" stroke="#10b981" strokeWidth="2.5" strokeDasharray="5 3" strokeLinecap="round" />
+                {lineMarket.points.map((pt, i) => (
+                  <g key={`market-pt-${i}`}>
+                    <circle cx={pt.x} cy={pt.y} r="3.5" fill="#10b981" stroke="#ffffff" strokeWidth="1.5" />
+                  </g>
+                ))}
+              </>
+            )}
+
+            {/* Path 3: Students (Purple) */}
+            {(activeMetricFilter === 'ALL' || activeMetricFilter === 'USERS') && lineUsers.path && (
+              <>
+                <path d={lineUsers.area} fill="url(#purpleGradient)" />
+                <path d={lineUsers.path} fill="none" stroke="#a855f7" strokeWidth="2.5" strokeLinecap="round" />
+                {lineUsers.points.map((pt, i) => (
+                  <g key={`users-pt-${i}`}>
+                    <circle cx={pt.x} cy={pt.y} r="3.5" fill="#a855f7" stroke="#ffffff" strokeWidth="1.5" />
+                  </g>
+                ))}
+              </>
+            )}
           </svg>
         </div>
 
@@ -210,7 +238,7 @@ const DynamicAnalyticsChart = ({
 
       {/* Legend & Real Activity Summary */}
       <div className="relative z-10 pt-2 flex flex-wrap items-center justify-between gap-4 text-xs">
-        <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-5">
           <div className="flex items-center gap-2">
             <span className="w-3 h-3 rounded-full bg-blue-500"></span>
             <span className="text-slate-300 font-semibold">Boarding Annexes</span>
@@ -219,10 +247,14 @@ const DynamicAnalyticsChart = ({
             <span className="w-3 h-3 rounded-full bg-emerald-500 border border-dashed border-emerald-300"></span>
             <span className="text-slate-300 font-semibold">Marketplace Items</span>
           </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-purple-500"></span>
+            <span className="text-slate-300 font-semibold">Student Verifications</span>
+          </div>
         </div>
 
         <span className="text-slate-400 text-[11px]">
-          Daily Peak Telemetry: <strong className="text-white">{maxVal} Submissions/day</strong>
+          Peak Telemetry: <strong className="text-white">{maxVal} Database Events / Day</strong>
         </span>
       </div>
     </div>
@@ -379,7 +411,6 @@ const DashboardPage = () => {
 
   // ─── DYNAMIC METRICS CALCULATION ─────────────────────────────────────────────
   const totalVolumeCalculated = useMemo(() => {
-    // Sum real marketplace items prices + annex prices + order totals
     let marketSum = marketItems.reduce((acc, item) => {
       const priceNum = parseFloat(String(item.price || 0).replace(/[^0-9.]/g, '')) || 0;
       return acc + priceNum;
@@ -399,14 +430,15 @@ const DashboardPage = () => {
     return grandTotal > 0 ? `Rs. ${grandTotal.toLocaleString()}` : 'Rs. 485,000';
   }, [marketItems, listings, ordersList]);
 
+  // Clean Executive Metrics without squiggly line, with ultra sleek progress indicator
   const executiveMetrics = useMemo(() => [
     {
       label: 'Verified Students',
       value: stats.totalStudents || usersList.length || 0,
-      change: `${usersList.length > 0 ? usersList.length : 0} Total Registered`,
+      change: `${usersList.length > 0 ? usersList.length : 0} Total`,
       subtitle: '.ac.lk Authenticated Accounts',
       up: true,
-      sparkColor: '#3b82f6',
+      accentColor: 'bg-blue-600',
       icon: LuUsers,
       iconBg: 'bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400',
     },
@@ -416,27 +448,27 @@ const DashboardPage = () => {
       change: `${stats.approvedAnnexes} Active`,
       subtitle: 'Boarding Places Live',
       up: true,
-      sparkColor: '#10b981',
+      accentColor: 'bg-emerald-600',
       icon: LuHouse,
       iconBg: 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400',
     },
     {
       label: 'Moderation Triage',
       value: stats.pendingAnnexes,
-      change: `${stats.pendingAnnexes} Action Req.`,
-      subtitle: 'Pending Host Approval',
+      change: stats.pendingAnnexes > 0 ? `${stats.pendingAnnexes} Pending` : 'Clean Triage',
+      subtitle: 'Pending Host Approvals',
       up: stats.pendingAnnexes === 0,
-      sparkColor: '#f59e0b',
+      accentColor: 'bg-amber-600',
       icon: LuClock,
       iconBg: 'bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400',
     },
     {
       label: 'Platform Trade Volume',
       value: totalVolumeCalculated,
-      change: `${marketItems.length + listings.length} Total Listings`,
+      change: `${marketItems.length + listings.length} Listings`,
       subtitle: 'Ads & Marketplace Combined',
       up: true,
-      sparkColor: '#8b5cf6',
+      accentColor: 'bg-purple-600',
       icon: LuShoppingBag,
       iconBg: 'bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400',
     }
@@ -455,7 +487,6 @@ const DashboardPage = () => {
       count
     }));
 
-    // If no real listings grouped yet, include defaults
     if (items.length === 0) {
       items.push(
         { name: 'University of Moratuwa (UOM)', count: 0 },
@@ -576,6 +607,7 @@ const DashboardPage = () => {
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const annexCounts = [0, 0, 0, 0, 0, 0, 0];
     const marketCounts = [0, 0, 0, 0, 0, 0, 0];
+    const userCounts = [0, 0, 0, 0, 0, 0, 0];
 
     listings.forEach((item) => {
       const dt = item.createdAt || item.created_at ? new Date(item.createdAt || item.created_at!) : new Date();
@@ -589,8 +621,14 @@ const DashboardPage = () => {
       marketCounts[dayIdx] += 1;
     });
 
-    return { days, annexCounts, marketCounts };
-  }, [listings, marketItems]);
+    usersList.forEach((item) => {
+      const dt = item.createdAt || item.created_at ? new Date(item.createdAt || item.created_at!) : new Date();
+      const dayIdx = (dt.getDay() + 6) % 7;
+      userCounts[dayIdx] += 1;
+    });
+
+    return { days, annexCounts, marketCounts, userCounts };
+  }, [listings, marketItems, usersList]);
 
   const filteredListings = listings.filter(item => {
     const matchesStatus = statusFilter === 'ALL' ||
@@ -665,7 +703,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* ── 2. Sparkline Executive Metric Cards ────────────────────────────── */}
+      {/* ── 2. Sleek Clean Metric Cards (NO squiggly lines) ───────────────── */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -678,25 +716,24 @@ const DashboardPage = () => {
             <motion.div
               key={card.label}
               variants={itemVariants}
-              className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group"
+              className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/90 dark:border-slate-800 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between space-y-4 relative overflow-hidden group cursor-pointer"
             >
+              {/* Top Row: Glowing Icon + Status Badge */}
               <div className="flex items-center justify-between">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${card.iconBg}`}>
                   <Icon className="text-2xl" />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Sparkline color={card.sparkColor} />
-                  <span className={`inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-1 rounded-full ${
-                    card.up
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
-                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
-                  }`}>
-                    <LuTrendingUp size={12} />
-                    <span>{card.change}</span>
-                  </span>
-                </div>
+                <span className={`inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-1 rounded-full ${
+                  card.up
+                    ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800'
+                    : 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                }`}>
+                  <LuTrendingUp size={12} />
+                  <span>{card.change}</span>
+                </span>
               </div>
 
+              {/* Middle Row: Large Value + Labels */}
               <div>
                 <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
                   {loading ? '...' : card.value}
@@ -707,6 +744,11 @@ const DashboardPage = () => {
                 <p className="text-[11px] text-slate-400 font-medium mt-0.5">
                   {card.subtitle}
                 </p>
+              </div>
+
+              {/* Bottom Subtle Accent Bar */}
+              <div className="w-full h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div className={`h-full ${card.accentColor} rounded-full transition-all duration-500 w-full group-hover:opacity-100 opacity-70`} />
               </div>
             </motion.div>
           );
