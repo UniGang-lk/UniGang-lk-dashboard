@@ -16,12 +16,20 @@ interface AdminSidebarProps {
   onClose: () => void;
 }
 
-interface NavItem {
+interface NavSubItem {
   label: string;
   icon: any;
   path: string;
+  countKey?: string;
+}
+
+interface NavItem {
+  label: string;
+  icon: any;
+  path?: string;
   badge?: string;
   countKey?: string;
+  children?: NavSubItem[];
 }
 
 const navItems: { section: string; items: NavItem[] }[] = [
@@ -35,8 +43,16 @@ const navItems: { section: string; items: NavItem[] }[] = [
   {
     section: 'Marketplace',
     items: [
-      { label: 'Annexes', icon: LuClipboardList, path: '/admin/annexes', countKey: 'pendingAnnexes' },
-      { label: 'Reviews', icon: LuMessageCircle, path: '/admin/reviews', countKey: 'pendingReviews' },
+      { 
+        label: 'Annexes', 
+        icon: LuClipboardList, 
+        path: '/admin/annexes',
+        countKey: 'pendingAnnexes',
+        children: [
+          { label: 'All Annexes', icon: LuClipboardList, path: '/admin/annexes', countKey: 'pendingAnnexes' },
+          { label: 'Reviews', icon: LuMessageCircle, path: '/admin/reviews', countKey: 'pendingReviews' },
+        ]
+      },
       { label: 'Services', icon: LuMonitor, path: '/admin/services', countKey: 'pendingServices' },
       { label: 'Advertisements', icon: LuSparkles, path: '/admin/advertisements', countKey: 'pendingAds' },
       { label: 'Hustle Hub', icon: LuShoppingBag, path: '/admin/marketplace', countKey: 'pendingMarketOrders' },
@@ -100,9 +116,13 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
     onClose();
   };
 
-  const isActive = (path: string) => {
+  const isActive = (path?: string, children?: NavSubItem[]) => {
+    if (children && children.length > 0) {
+      return children.some((sub) => location.pathname === sub.path);
+    }
+    if (!path) return false;
     if (path === '/admin/dashboard' && location.pathname === '/admin/dashboard') return true;
-    if (path !== '/admin/dashboard' && location.pathname.startsWith(path)) return true;
+    if (path !== '/admin/dashboard' && location.pathname === path) return true;
     return location.pathname === path;
   };
 
@@ -151,41 +171,45 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
             </p>
             <ul className="space-y-1">
               {group.items.map((item) => {
-                const active = isActive(item.path);
+                const isParentActive = isActive(item.path, item.children);
                 const ItemIcon = item.icon;
-                const pendingCount = item.countKey ? Number(stats[item.countKey] || 0) : 0;
+                const parentPendingCount = item.children
+                  ? item.children.reduce((acc, sub) => acc + (sub.countKey ? Number(stats[sub.countKey] || 0) : 0), 0)
+                  : item.countKey ? Number(stats[item.countKey] || 0) : 0;
 
                 return (
-                  <li key={`${group.section}-${item.label}-${item.path}`}>
+                  <li key={`${group.section}-${item.label}`}>
                     <button
-                      onClick={() => handleNav(item.path)}
+                      onClick={() => handleNav(item.path || (item.children ? item.children[0].path : ''))}
                       className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-[13px] font-bold transition-all duration-150 cursor-pointer group
-                        ${active
+                        ${isParentActive && !item.children
                           ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/30'
+                          : isParentActive && item.children
+                          ? 'bg-slate-100 text-slate-900 border border-slate-200/80 font-black'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/90'
                         }`}
                     >
-                      <ItemIcon className={`text-base flex-shrink-0 transition-transform group-hover:scale-110 ${active ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
+                      <ItemIcon className={`text-base flex-shrink-0 transition-transform group-hover:scale-110 ${isParentActive && !item.children ? 'text-white' : isParentActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-blue-600'}`} />
 
                       <span className="flex-1 text-left truncate">{item.label}</span>
 
                       {/* Red circle notification badge when frontend has submitted requests/messages */}
-                      {pendingCount > 0 && (
+                      {parentPendingCount > 0 && !item.children && (
                         <span
                           className={`min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center text-[10px] font-black shadow-xs animate-pulse ${
-                            active
+                            isParentActive
                               ? 'bg-white text-rose-600'
                               : 'bg-rose-500 text-white'
                           }`}
-                          title={`${pendingCount} pending items require attention`}
+                          title={`${parentPendingCount} pending items require attention`}
                         >
-                          {pendingCount > 99 ? '99+' : pendingCount}
+                          {parentPendingCount > 99 ? '99+' : parentPendingCount}
                         </span>
                       )}
 
                       {item.badge && (
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                          active 
+                          isParentActive 
                             ? 'bg-white/20 text-white' 
                             : 'bg-amber-100 text-amber-800'
                         }`}>
@@ -193,10 +217,44 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
                         </span>
                       )}
 
-                      {active && (
+                      {isParentActive && !item.children && (
                         <LuChevronRight className="text-sm text-white/80" />
                       )}
                     </button>
+
+                    {/* Render sub-items if present */}
+                    {item.children && (
+                      <ul className="mt-1 ml-4 pl-3 space-y-1 border-l-2 border-slate-200/80">
+                        {item.children.map((sub) => {
+                          const subActive = location.pathname === sub.path;
+                          const SubIcon = sub.icon;
+                          const subPendingCount = sub.countKey ? Number(stats[sub.countKey] || 0) : 0;
+
+                          return (
+                            <li key={sub.path}>
+                              <button
+                                onClick={() => handleNav(sub.path)}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold transition-all duration-150 cursor-pointer group ${
+                                  subActive
+                                    ? 'bg-blue-600 text-white shadow-sm shadow-blue-600/20'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+                                }`}
+                              >
+                                <SubIcon className={`text-sm flex-shrink-0 ${subActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'}`} />
+                                <span className="flex-1 text-left truncate">{sub.label}</span>
+                                {subPendingCount > 0 && (
+                                  <span className={`min-w-4 h-4 px-1 rounded-full text-[10px] font-black flex items-center justify-center ${
+                                    subActive ? 'bg-white text-rose-600' : 'bg-rose-500 text-white animate-pulse'
+                                  }`}>
+                                    {subPendingCount > 99 ? '99+' : subPendingCount}
+                                  </span>
+                                )}
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}

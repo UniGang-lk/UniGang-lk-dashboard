@@ -104,7 +104,8 @@ export const fetchPendingReviews = async (): Promise<any[]> => {
     }
   });
   if (!response.ok) throw new Error('Failed to fetch pending reviews');
-  return await response.json();
+  const res = await response.json();
+  return Array.isArray(res) ? res : (res.data ?? []);
 };
 
 export const approveReview = async (reviewId: number | string): Promise<void> => {
@@ -462,7 +463,7 @@ export const fetchAdvertisements = async (): Promise<any[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch advertisements');
   const data = await response.json();
-  return data.data ?? [];
+  return Array.isArray(data) ? data : (data.data ?? []);
 };
 
 export const updateAdvertisementStatus = async (id: string | number, status: string): Promise<void> => {
@@ -509,7 +510,7 @@ export const updateAdvertisement = async (id: string | number, data: any): Promi
   }
 
   const result = await response.json();
-  return result.data;
+  return result?.data ?? result;
 };
 
 export const deleteAdvertisement = async (id: string | number): Promise<void> => {
@@ -706,7 +707,7 @@ export const fetchAdminFeedbacks = async (): Promise<any[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch admin feedbacks');
   const data = await response.json();
-  return data.feedbacks || [];
+  return Array.isArray(data) ? data : data.feedbacks || [];
 };
 
 export const updateAdminFeedback = async (id: string | number, feedbackData: any): Promise<any> => {
@@ -743,7 +744,7 @@ export const fetchAdminProblems = async (): Promise<any[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch support tickets');
   const data = await response.json();
-  return data.problems || [];
+  return Array.isArray(data) ? data : data.problems || [];
 };
 
 export const replyToAdminProblem = async (id: string | number, adminReply: string): Promise<any> => {
