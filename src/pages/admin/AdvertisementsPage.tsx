@@ -45,16 +45,33 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
           {ad.image_url && (
             <div className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
               <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover" />
-              <span className="absolute bottom-3 left-3 px-2.5 py-1 bg-blue-600 text-[10px] font-bold text-white rounded-lg shadow-sm uppercase tracking-wider">{ad.placement_type}</span>
+              <span className={`absolute bottom-3 left-3 px-3 py-1 text-[11px] font-black rounded-xl shadow-md uppercase tracking-wider flex items-center gap-1.5 border ${
+                ad.placement_type?.includes('Hero') ? 'bg-indigo-600 text-white border-indigo-400' :
+                ad.placement_type?.includes('Starter') ? 'bg-slate-900 text-white border-slate-700' :
+                ad.placement_type?.includes('Ultimate') ? 'bg-purple-600 text-white border-purple-400' :
+                'bg-blue-600 text-white border-blue-400'
+              }`}>
+                {ad.placement_type?.includes('Starter') || ad.placement_type?.includes('Hero') || ad.placement_type?.includes('Ultimate') ? '🎁 PACKAGE TIER' : '🎯 CUSTOM PLACEMENT'}
+              </span>
             </div>
           )}
 
           <div className="grid md:grid-cols-2 gap-4 mb-4">
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Placement Details</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Placement & Order Type</p>
                 <div className="flex flex-col gap-1.5">
-                  <p className="text-base font-bold text-slate-900">{ad.placement_type}</p>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold border ${
+                      ad.placement_type?.includes('Hero') ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
+                      ad.placement_type?.includes('Starter') ? 'bg-slate-100 text-slate-800 border-slate-300' :
+                      ad.placement_type?.includes('Ultimate') ? 'bg-purple-50 text-purple-700 border-purple-200' :
+                      'bg-blue-50 text-blue-700 border-blue-200'
+                    }`}>
+                      {ad.placement_type?.includes('Starter') || ad.placement_type?.includes('Hero') || ad.placement_type?.includes('Ultimate') ? '🎁 ' : '🎯 '}
+                      {ad.placement_type}
+                    </span>
+                  </div>
                   <p className="text-xs text-slate-600 font-medium">Duration: <span className="text-slate-900 font-bold">{ad.duration_days} Days</span></p>
                   {ad.target_link && (
                     <a href={ad.target_link} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1">
@@ -458,10 +475,13 @@ const AdvertisementsPage = () => {
                       </div>
                     </td>
                     <td className="py-3.5 px-5">
-                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        ad.placement_type === 'POPUP' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                      <span className={`px-2.5 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1 ${
+                        ad.placement_type?.includes('Hero') ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' :
+                        ad.placement_type?.includes('Starter') ? 'bg-slate-100 text-slate-800 border border-slate-300' :
+                        ad.placement_type?.includes('Ultimate') ? 'bg-purple-50 text-purple-700 border border-purple-200' :
                         'bg-blue-50 text-blue-700 border border-blue-200'
                       }`}>
+                        {ad.placement_type?.includes('Hero') || ad.placement_type?.includes('Starter') || ad.placement_type?.includes('Ultimate') ? '🎁 ' : '🎯 '}
                         {ad.placement_type}
                       </span>
                     </td>

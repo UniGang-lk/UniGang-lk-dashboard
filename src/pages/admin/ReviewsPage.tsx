@@ -29,7 +29,7 @@ const ReviewsPage = () => {
     setLoading(true);
     try {
       const data = await fetchPendingReviews();
-      setReviews(data);
+      setReviews(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load pending reviews:', error);
       toast.error('Failed to load pending reviews.');
@@ -42,7 +42,7 @@ const ReviewsPage = () => {
     loadReviews();
   }, []);
 
-  const filteredReviews = reviews.filter(r => 
+  const filteredReviews = (Array.isArray(reviews) ? reviews : []).filter(r => 
     (r.comment && r.comment.toLowerCase().includes(searchTerm.toLowerCase())) || 
     (r.user?.name && r.user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (r.annex?.title && r.annex.title.toLowerCase().includes(searchTerm.toLowerCase()))
