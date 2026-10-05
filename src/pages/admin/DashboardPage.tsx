@@ -5,7 +5,7 @@ import {
   LuUsers, LuArrowRight, LuTrendingUp, LuShieldCheck, LuShoppingBag,
   LuZap, LuServer, LuArrowUpRight, LuCheck, LuX, LuRefreshCw,
   LuEye, LuLayers, LuSearch, LuPhone, LuImage, LuSparkles,
-  LuActivity, LuBarChart3, LuCalendar, LuBell, LuChevronRight
+  LuActivity, LuCalendar, LuBell, LuChevronRight
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -132,7 +132,7 @@ const DynamicAnalyticsChart = ({
         <div>
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400">
-              <LuBarChart3 size={18} />
+              <LuTrendingUp size={18} />
             </span>
             <h3 className="text-lg font-black tracking-tight text-white">Platform Activity & Telemetry Growth</h3>
           </div>
