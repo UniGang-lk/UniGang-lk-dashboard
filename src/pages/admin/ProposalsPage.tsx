@@ -145,17 +145,45 @@ const ProposalsPage = () => {
                 <div key={p.id} className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all">
                   <div>
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-base font-bold text-slate-900">{p.user?.name || 'Unknown'}, {p.age}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                        {p.blur_photo ? 'ID Uploaded' : 'Pending Upload'}
+                      <h4 className="text-base font-bold text-slate-900">{p.user?.name || 'Candidate'}, {p.age}</h4>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                        p.nicFront ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-600 border-slate-200'
+                      }`}>
+                        {p.nicFront ? '🛡️ NIC Submitted' : 'Pending Verification'}
                       </span>
                     </div>
+
+                    <div className="mb-2.5">
+                      <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 inline-block">
+                        {p.categoryBadge || '🎓 Campus Graduate'}
+                      </span>
+                    </div>
+
                     <p className="text-xs text-rose-600 font-semibold flex items-center gap-2 mb-1.5">
-                      <LuBriefcase size={14} /> {p.profession}
+                      <LuBriefcase size={14} /> {p.profession || 'Not Specified'}
                     </p>
                     <p className="text-xs text-slate-500 font-normal flex items-center gap-1.5">
-                      <LuGraduationCap size={14} className="text-blue-600" /> {p.university} • 📍 {p.district}
+                      <LuGraduationCap size={14} className="text-blue-600" /> {p.university || p.education_category} • 📍 {p.district}
                     </p>
+
+                    {/* NIC Preview if uploaded */}
+                    {(p.nicFront || p.nicBack) && (
+                      <div className="mt-3 pt-3 border-t border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">National ID Proofs</p>
+                        <div className="flex gap-2">
+                          {p.nicFront && (
+                            <a href={p.nicFront} target="_blank" rel="noopener noreferrer" className="block text-[11px] font-bold text-blue-600 hover:underline bg-blue-50 px-2 py-1 rounded-md border border-blue-100">
+                              📄 View NIC Front
+                            </a>
+                          )}
+                          {p.nicBack && (
+                            <a href={p.nicBack} target="_blank" rel="noopener noreferrer" className="block text-[11px] font-bold text-blue-600 hover:underline bg-blue-50 px-2 py-1 rounded-md border border-blue-100">
+                              📄 View NIC Back
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-2 pt-4 border-t border-slate-100">
@@ -163,7 +191,7 @@ const ProposalsPage = () => {
                       onClick={() => handleVerify(p.id, p.user?.name || 'User')}
                       className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl border-none cursor-pointer flex items-center justify-center gap-1 transition-all shadow-xs"
                     >
-                      <LuCheck size={14} /> Approve
+                      <LuCheck size={14} /> Approve & Verify Badge
                     </button>
                     <button
                       onClick={() => handleReject(p.id, p.user?.name || 'User')}
