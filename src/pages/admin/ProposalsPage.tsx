@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
-import { LuCheck, LuX, LuGraduationCap, LuBriefcase, LuChevronLeft, LuEye } from 'react-icons/lu';
+import { LuCheck, LuX, LuGraduationCap, LuBriefcase, LuChevronLeft, LuEye, LuCreditCard, LuFileText, LuExternalLink, LuClock, LuCheckCircle2, LuXCircle } from 'react-icons/lu';
 import toast from 'react-hot-toast';
-import { fetchAdminProposals, fetchAdminProposalChats, updateAdminProposalStatus, fetchAdminProposalChatMessages } from '../../api/api';
+import { 
+  fetchAdminProposals, 
+  fetchAdminProposalChats, 
+  updateAdminProposalStatus, 
+  fetchAdminProposalChatMessages,
+  fetchAdminProposalPayments,
+  updateAdminProposalPaymentStatus
+} from '../../api/api';
 
-type TabView = 'PROFILES' | 'CHATS' | 'CHAT_MESSAGES';
+type TabView = 'PROFILES' | 'CHATS' | 'CHAT_MESSAGES' | 'PAYMENTS';
 
 const ProposalsPage = () => {
   const [activeTab, setActiveTab] = useState<TabView>('PROFILES');
@@ -11,16 +18,20 @@ const ProposalsPage = () => {
   // Data States
   const [proposals, setProposals] = useState<any[]>([]);
   const [chats, setChats] = useState<any[]>([]);
+  const [payments, setPayments] = useState<any[]>([]);
   const [activeChat, setActiveChat] = useState<any | null>(null);
   const [chatMessages, setChatMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedSlip, setSelectedSlip] = useState<string | null>(null);
 
-  // Fetch Profiles
+  // Fetch Data
   useEffect(() => {
     if (activeTab === 'PROFILES') {
       loadProposals();
     } else if (activeTab === 'CHATS') {
       loadChats();
+    } else if (activeTab === 'PAYMENTS') {
+      loadPayments();
     }
   }, [activeTab]);
 
@@ -46,6 +57,38 @@ const ProposalsPage = () => {
       toast.error('Failed to fetch chats');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPayments = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchAdminProposalPayments();
+      setPayments(Array.isArray(data) ? data : []);
+    } catch (err) {
+      toast.error('Failed to fetch payments');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprovePayment = async (id: string | number, userName: string) => {
+    try {
+      await updateAdminProposalPaymentStatus(id, 'APPROVED');
+      setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'APPROVED' } : p));
+      toast.success(`Verified & Activated Premium for ${userName}! 👑`);
+    } catch (err) {
+      toast.error('Failed to approve payment');
+    }
+  };
+
+  const handleRejectPayment = async (id: string | number, userName: string) => {
+    try {
+      await updateAdminProposalPaymentStatus(id, 'REJECTED');
+      setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'REJECTED' } : p));
+      toast.error(`Payment rejected for ${userName}.`);
+    } catch (err) {
+      toast.error('Failed to reject payment');
     }
   };
 
@@ -89,7 +132,7 @@ const ProposalsPage = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Proposals & Chats</h2>
-          <p className="text-xs text-slate-500 font-semibold tracking-wide mt-1">Monitor campus matchmaking profiles and private communication</p>
+          <p className="text-xs text-slate-500 font-semibold tracking-wide mt-1">Monitor campus matchmaking profiles, verified badges, and membership payments</p>
         </div>
       </div>
 
@@ -115,6 +158,21 @@ const ProposalsPage = () => {
             }`}
           >
             Monitor Chats
+          </button>
+          <button
+            onClick={() => setActiveTab('PAYMENTS')}
+            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'PAYMENTS' 
+                ? 'bg-amber-600 text-white shadow-xs' 
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <LuCreditCard size={14} /> Verify Payments
+            {payments.filter(p => p.status === 'pending').length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full">
+                {payments.filter(p => p.status === 'pending').length}
+              </span>
+            )}
           </button>
         </div>
       )}
@@ -292,6 +350,152 @@ const ProposalsPage = () => {
                 );
               })
             )}
+          </div>
+        </div>
+      )}
+
+      {/* PAYMENTS TAB */}
+      {!loading && activeTab === 'PAYMENTS' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">Proposal Membership Payments Queue</h3>
+              <p className="text-xs text-slate-500 font-normal">Review bank deposit slips and activate 3-Month Classic or 6-Month VIP memberships.</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 font-bold text-xs">
+                {payments.filter(p => p.status === 'pending').length} Pending Review
+              </span>
+              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs">
+                {payments.filter(p => p.status === 'APPROVED').length} Active Members
+              </span>
+            </div>
+          </div>
+
+          {payments.length === 0 ? (
+            <div className="py-20 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400 font-bold uppercase tracking-wider text-xs">
+              No proposal payments submitted yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {payments.map((p) => {
+                const isVIP = p.plan === 'vip_6m' || p.amount === 4990;
+
+                return (
+                  <div key={p.id} className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col justify-between space-y-4 hover:border-slate-300 transition-all">
+                    <div>
+                      {/* Top Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 className="text-base font-bold text-slate-900">{p.user?.name || 'Member'}</h4>
+                          <p className="text-xs text-slate-400">{p.user?.email}</p>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${
+                          p.status === 'APPROVED' 
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                            : p.status === 'REJECTED'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200'
+                            : 'bg-amber-50 text-amber-700 border-amber-200 animate-pulse'
+                        }`}>
+                          {p.status === 'APPROVED' ? '✓ Premium Active' : p.status === 'REJECTED' ? '✕ Rejected' : '⏳ Pending Review'}
+                        </span>
+                      </div>
+
+                      {/* Plan Badge & Price */}
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100 mb-3">
+                        <div>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${
+                            isVIP ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                          }`}>
+                            {isVIP ? '👑 VIP Premium (මාස 6)' : '⭐ Classic Plan (මාස 3)'}
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-base font-black text-slate-900">
+                            Rs. {p.amount ? p.amount.toLocaleString() : (isVIP ? '4,990' : '2,990')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Details List */}
+                      <div className="space-y-1.5 text-xs text-slate-600">
+                        {p.whatsapp_number && (
+                          <p className="flex items-center justify-between">
+                            <span className="text-slate-400">WhatsApp:</span>
+                            <span className="font-semibold text-slate-800">{p.whatsapp_number}</span>
+                          </p>
+                        )}
+                        {p.reference_number && (
+                          <p className="flex items-center justify-between">
+                            <span className="text-slate-400">Bank Ref:</span>
+                            <span className="font-mono font-semibold text-slate-800">{p.reference_number}</span>
+                          </p>
+                        )}
+                        {p.payment_date && (
+                          <p className="flex items-center justify-between">
+                            <span className="text-slate-400">Transfer Date:</span>
+                            <span className="font-medium text-slate-700">{p.payment_date}</span>
+                          </p>
+                        )}
+                        <p className="flex items-center justify-between">
+                          <span className="text-slate-400">Submitted:</span>
+                          <span className="text-slate-500 font-medium">
+                            {new Date(p.createdAt).toLocaleDateString()} {new Date(p.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </p>
+                      </div>
+
+                      {/* Slip preview */}
+                      {p.slip_url && (
+                        <div className="mt-4 pt-3 border-t border-slate-100">
+                          <button
+                            onClick={() => setSelectedSlip(p.slip_url)}
+                            className="w-full py-2 px-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          >
+                            <LuFileText size={14} /> View Transfer Slip Receipt
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    {p.status === 'pending' && (
+                      <div className="flex gap-2 pt-3 border-t border-slate-100">
+                        <button
+                          onClick={() => handleApprovePayment(p.id, p.user?.name || 'Member')}
+                          className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl border-none cursor-pointer flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                        >
+                          <LuCheck size={14} /> Approve & Activate
+                        </button>
+                        <button
+                          onClick={() => handleRejectPayment(p.id, p.user?.name || 'Member')}
+                          className="py-2.5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-xl border border-rose-200 cursor-pointer transition-all"
+                        >
+                          <LuX size={14} /> Reject
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Slip Modal View */}
+      {selectedSlip && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setSelectedSlip(null)}>
+          <div className="relative max-w-2xl max-h-[90vh] bg-white rounded-3xl p-4 overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+              <h4 className="text-sm font-bold text-slate-800">Bank Transfer Slip Receipt</h4>
+              <button onClick={() => setSelectedSlip(null)} className="p-1 rounded-lg text-slate-400 hover:text-slate-800 cursor-pointer">
+                <LuX size={20} />
+              </button>
+            </div>
+            <div className="max-h-[75vh] overflow-auto flex items-center justify-center">
+              <img src={selectedSlip} alt="Deposit Slip" className="max-w-full h-auto rounded-xl shadow-xs" />
+            </div>
           </div>
         </div>
       )}
