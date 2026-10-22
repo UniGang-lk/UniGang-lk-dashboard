@@ -812,3 +812,27 @@ export const fetchAdminProposalChatMessages = async (chatId: string): Promise<an
   if (!response.ok) throw new Error('Failed to fetch proposal chat messages');
   return await response.json();
 };
+
+export const fetchAdminProposalPayments = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/admin/proposals/payments`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to fetch proposal payments');
+  return await response.json();
+};
+
+export const updateAdminProposalPaymentStatus = async (id: string | number, status: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/admin/proposals/payments/${id}/status`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update payment status');
+  return await response.json();
+};
+
