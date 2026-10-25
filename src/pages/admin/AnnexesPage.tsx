@@ -162,6 +162,10 @@ const AnnexesPage = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
+  useEffect(() => {
     if (activeTab === 'reviews') {
       const loadReviews = async () => {
         setReviewsLoading(true);
