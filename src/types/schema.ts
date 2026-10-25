@@ -25,9 +25,9 @@ export interface University {
 }
 
 export interface Annex {
-  id: number;
-  owner_id: number;
-  university_id: number;
+  id: string | number;
+  owner_id?: string | number;
+  university_id?: string | number;
   title: string;
   description: string;
   price: string | number;

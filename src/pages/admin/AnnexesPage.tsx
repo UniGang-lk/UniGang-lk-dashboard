@@ -21,8 +21,8 @@ import { toast as hotToast } from 'react-hot-toast';
 interface AnnexDetailModalProps {
   annex: Annex;
   onClose: () => void;
-  onApprove: (id: number) => void;
-  onReject: (id: number) => void;
+  onApprove: (id: string | number) => void;
+  onReject: (id: string | number) => void;
 }
 
 const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose, onApprove, onReject }) => {
@@ -215,7 +215,7 @@ const AnnexesPage = () => {
     loadAnnexes();
   }, []);
 
-  const handleApproveAnnex = async (annexId: number) => {
+  const handleApproveAnnex = async (annexId: string | number) => {
     confirmAction(`Approve this property ad (ID: ${annexId})?`, async () => {
       try {
         await updateAnnexStatusApi(annexId, 'approved');
@@ -228,7 +228,7 @@ const AnnexesPage = () => {
     });
   };
 
-  const handleRejectAnnex = async (annexId: number) => {
+  const handleRejectAnnex = async (annexId: string | number) => {
     confirmAction(`Reject this property ad (ID: ${annexId})?`, async () => {
       try {
         await updateAnnexStatusApi(annexId, 'rejected');
@@ -324,10 +324,12 @@ const AnnexesPage = () => {
 
   // Filtered List
   const filteredAnnexes = annexes.filter(a => {
+    const term = searchTerm.toLowerCase();
     const matchesSearch =
-      a.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.campus.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.contactName.toLowerCase().includes(searchTerm.toLowerCase());
+      (a.title || '').toLowerCase().includes(term) ||
+      (a.campus || '').toLowerCase().includes(term) ||
+      (a.contactName || '').toLowerCase().includes(term) ||
+      (a.address || '').toLowerCase().includes(term);
     const matchesStatus =
       filterStatus === 'All' ||
       (filterStatus === 'Approved' && (a.status === 'Approved' || a.status === 'Active' || a.status === 'approved')) ||
