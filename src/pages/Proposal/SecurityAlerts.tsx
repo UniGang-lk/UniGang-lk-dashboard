@@ -1,39 +1,34 @@
 import { useEffect, useState } from 'react';
 import { LuShieldAlert, LuCircleCheck, LuBan, LuSearch } from 'react-icons/lu';
+import { fetchSecurityAlerts, updateSecurityAlertStatus } from '../../api/api';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchAlerts = () => {
-    fetch('http://localhost:5000/api/proposals/privacy/alerts')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setAlerts(data.alerts);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+  const loadAlerts = async () => {
+    try {
+      const data = await fetchSecurityAlerts();
+      setAlerts(data);
+    } catch (err) {
+      console.error('Failed to load security alerts:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchAlerts();
+    loadAlerts();
   }, []);
 
-  const handleUpdateStatus = (id: string, status: string) => {
-    fetch(`http://localhost:5000/api/proposals/privacy/alerts/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          fetchAlerts();
-        } else {
-          alert('Failed to update alert');
-        }
-      })
-      .catch(console.error);
+  const handleUpdateStatus = async (id: string, status: string) => {
+    try {
+      await updateSecurityAlertStatus(id, status);
+      loadAlerts();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update alert');
+    }
   };
 
   return (

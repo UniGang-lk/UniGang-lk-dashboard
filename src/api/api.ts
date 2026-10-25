@@ -836,3 +836,27 @@ export const updateAdminProposalPaymentStatus = async (id: string | number, stat
   return await response.json();
 };
 
+export const fetchSecurityAlerts = async (): Promise<any[]> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/privacy/alerts`, {
+    headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+  });
+  if (!response.ok) throw new Error('Failed to fetch security alerts');
+  const data = await response.json();
+  return data.alerts || [];
+};
+
+export const updateSecurityAlertStatus = async (id: string, status: string): Promise<any> => {
+  const token = await getToken();
+  const response = await fetch(`${BASE_URL}/api/proposals/privacy/alerts/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    body: JSON.stringify({ status })
+  });
+  if (!response.ok) throw new Error('Failed to update alert status');
+  return await response.json();
+};
+
