@@ -6,7 +6,7 @@ import {
   LuMegaphone, LuChartBar, LuLayoutDashboard,
   LuX, LuLogOut, LuChevronRight, LuCalendarDays,
   LuMonitor, LuMessageCircle, LuPhone, LuSparkles, LuShoppingBag, LuHeartHandshake,
-  LuSettings, LuShieldAlert
+  LuShieldAlert
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
 import { fetchStats } from '../../api/api';
@@ -101,7 +101,7 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         if (data) {
           setStats(data);
         }
-      } catch (err) {
+      } catch {
         // silent fail
       }
     };

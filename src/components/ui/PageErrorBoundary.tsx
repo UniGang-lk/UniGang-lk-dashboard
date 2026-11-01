@@ -1,5 +1,6 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, type ErrorInfo, type ReactNode } from 'react';
 import { LuTriangleAlert, LuRotateCcw, LuHouse } from 'react-icons/lu';
+import { reportDashboardError } from '../../api/errorReporter';
 
 interface Props {
   children: ReactNode;
@@ -23,6 +24,7 @@ export class PageErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Uncaught error in dashboard component:', error, errorInfo);
+    reportDashboardError(error, { componentStack: errorInfo.componentStack, title: this.props.fallbackTitle });
   }
 
   private handleReset = () => {

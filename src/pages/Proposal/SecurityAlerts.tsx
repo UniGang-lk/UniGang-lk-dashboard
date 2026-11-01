@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import { LuShieldAlert, LuCircleCheck, LuBan, LuSearch } from 'react-icons/lu';
 import { fetchSecurityAlerts, updateSecurityAlertStatus } from '../../api/api';
+import toast from 'react-hot-toast';
 
 export default function SecurityAlerts() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const loadAlerts = async () => {
     try {
       const data = await fetchSecurityAlerts();
-      setAlerts(data);
-    } catch (err) {
-      console.error('Failed to load security alerts:', err);
+      setAlerts(Array.isArray(data) ? data : []);
+    } catch {
+      toast.error('Failed to load security alerts');
     } finally {
       setLoading(false);
     }
@@ -24,12 +26,20 @@ export default function SecurityAlerts() {
   const handleUpdateStatus = async (id: string, status: string) => {
     try {
       await updateSecurityAlertStatus(id, status);
+      toast.success(`Alert #${id} marked as ${status}!`);
       loadAlerts();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to update alert');
+    } catch {
+      toast.error('Failed to update alert status');
     }
   };
+
+  const filteredAlerts = alerts.filter(a => {
+    const term = searchTerm.toLowerCase();
+    const userName = (a.user?.name || '').toLowerCase();
+    const userId = (a.user_id || '').toLowerCase();
+    const action = (a.action_type || '').toLowerCase();
+    return userName.includes(term) || userId.includes(term) || action.includes(term);
+  });
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -46,6 +56,8 @@ export default function SecurityAlerts() {
           <input 
             type="text" 
             placeholder="Search users..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/50"
           />
         </div>
@@ -54,11 +66,11 @@ export default function SecurityAlerts() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-slate-500">Loading alerts...</div>
-        ) : alerts.length === 0 ? (
+        ) : filteredAlerts.length === 0 ? (
           <div className="p-12 text-center">
             <LuCircleCheck className="mx-auto text-emerald-500 mb-4" size={48} />
-            <h3 className="text-lg font-bold text-slate-900">All Clear</h3>
-            <p className="text-slate-500">No security alerts logged yet.</p>
+            <h3 className="text-lg font-bold text-slate-900">{searchTerm ? 'No matching alerts' : 'All Clear'}</h3>
+            <p className="text-slate-500">{searchTerm ? 'Try adjusting your search criteria.' : 'No security alerts logged yet.'}</p>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
@@ -72,7 +84,7 @@ export default function SecurityAlerts() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {alerts.map((alert) => (
+              {filteredAlerts.map((alert) => (
                 <tr key={alert.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="p-4">
                     <div className="flex items-center gap-3">

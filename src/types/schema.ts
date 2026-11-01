@@ -121,6 +121,8 @@ export interface ServiceRequest {
   adminNotes?: string;
   created_at: string;
   updated_at: string;
+  createdAt?: string;
+  updatedAt?: string;
   user?: {
     id: string;
     name: string;

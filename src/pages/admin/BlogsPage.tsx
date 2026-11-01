@@ -197,9 +197,9 @@ const BlogsPage = () => {
                 <div className="flex-1 min-w-0 py-0.5">
                   <div className="flex justify-between items-start mb-1.5">
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                      blog.status === 'approved' 
+                      (blog.status || '').toLowerCase() === 'approved' 
                       ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                      : blog.status === 'rejected'
+                      : (blog.status || '').toLowerCase() === 'rejected'
                       ? 'bg-rose-50 text-rose-700 border-rose-200'
                       : 'bg-amber-50 text-amber-700 border-amber-200'
                     }`}>
@@ -311,7 +311,7 @@ const BlogsPage = () => {
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-slate-100 grid grid-cols-2 gap-3">
-                    {selectedBlog.status === 'pending' ? (
+                    {(selectedBlog.status || '').toLowerCase() === 'pending' ? (
                       <>
                         <button onClick={() => handleStatusChange(selectedBlog.id, 'approved')} className="py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-xs transition-all cursor-pointer border-none">
                           <LuCircleCheck size={14} /> Approve

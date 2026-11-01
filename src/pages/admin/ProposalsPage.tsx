@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LuCheck, LuX, LuGraduationCap, LuBriefcase, LuChevronLeft, LuEye, LuCreditCard, LuFileText, LuExternalLink, LuClock, LuCheckCircle2, LuXCircle } from 'react-icons/lu';
+import { LuCheck, LuX, LuGraduationCap, LuBriefcase, LuChevronLeft, LuEye, LuCreditCard, LuFileText, LuClock } from 'react-icons/lu';
 import toast from 'react-hot-toast';
 import { 
   fetchAdminProposals, 
@@ -41,7 +41,7 @@ const ProposalsPage = () => {
       const data = await fetchAdminProposals();
       // Filter out already verified users for the moderation queue
       setProposals(Array.isArray(data) ? data.filter((p: any) => p.user && !p.user.is_verified_student) : []);
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch proposals');
     } finally {
       setLoading(false);
@@ -53,7 +53,7 @@ const ProposalsPage = () => {
       setLoading(true);
       const data = await fetchAdminProposalChats();
       setChats(Array.isArray(data) ? data : []);
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch chats');
     } finally {
       setLoading(false);
@@ -65,7 +65,7 @@ const ProposalsPage = () => {
       setLoading(true);
       const data = await fetchAdminProposalPayments();
       setPayments(Array.isArray(data) ? data : []);
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch payments');
     } finally {
       setLoading(false);
@@ -77,7 +77,7 @@ const ProposalsPage = () => {
       await updateAdminProposalPaymentStatus(id, 'APPROVED');
       setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'APPROVED' } : p));
       toast.success(`Verified & Activated Premium for ${userName}! 👑`);
-    } catch (err) {
+    } catch {
       toast.error('Failed to approve payment');
     }
   };
@@ -87,7 +87,7 @@ const ProposalsPage = () => {
       await updateAdminProposalPaymentStatus(id, 'REJECTED');
       setPayments(prev => prev.map(p => p.id === id ? { ...p, status: 'REJECTED' } : p));
       toast.error(`Payment rejected for ${userName}.`);
-    } catch (err) {
+    } catch {
       toast.error('Failed to reject payment');
     }
   };
@@ -97,7 +97,7 @@ const ProposalsPage = () => {
       await updateAdminProposalStatus(id, 'APPROVED');
       setProposals(prev => prev.filter(p => p.id !== id));
       toast.success(`Approved & Verified Proposal for ${name}!`);
-    } catch (err) {
+    } catch {
       toast.error('Error verifying user');
     }
   };
@@ -107,7 +107,7 @@ const ProposalsPage = () => {
       await updateAdminProposalStatus(id, 'REJECTED');
       setProposals(prev => prev.filter(p => p.id !== id));
       toast.error(`Rejected Proposal submission for ${name}.`);
-    } catch (err) {
+    } catch {
       toast.error('Error rejecting proposal');
     }
   };
@@ -119,7 +119,7 @@ const ProposalsPage = () => {
       setActiveChat(data.match);
       setChatMessages(data.messages);
       setActiveTab('CHAT_MESSAGES');
-    } catch (err) {
+    } catch {
       toast.error('Failed to fetch chat logs');
     } finally {
       setLoading(false);
@@ -443,6 +443,46 @@ const ProposalsPage = () => {
                             {new Date(p.createdAt).toLocaleDateString()} {new Date(p.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </p>
+
+                        {/* Membership Countdown (Days Remaining) */}
+                        {p.status === 'APPROVED' && (() => {
+                          const approvedDate = new Date(p.updatedAt || p.createdAt);
+                          const totalMonths = p.duration_months || (isVIP ? 6 : 3);
+                          const expiryDate = new Date(approvedDate);
+                          expiryDate.setMonth(expiryDate.getMonth() + totalMonths);
+                          
+                          const today = new Date();
+                          const diffTime = expiryDate.getTime() - today.getTime();
+                          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                          const isExpired = diffDays <= 0;
+
+                          return (
+                            <div className="mt-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-500 font-semibold flex items-center gap-1.5">
+                                  <LuClock className="text-blue-600" size={13} /> Validity Period:
+                                </span>
+                                {isExpired ? (
+                                  <span className="px-2 py-0.5 rounded-md bg-rose-100 text-rose-800 font-black text-[10px] uppercase">
+                                    Expired
+                                  </span>
+                                ) : (
+                                  <span className={`px-2 py-0.5 rounded-md font-black text-[11px] ${
+                                    diffDays <= 7 
+                                      ? 'bg-amber-100 text-amber-800 animate-pulse' 
+                                      : 'bg-emerald-100 text-emerald-800'
+                                  }`}>
+                                    ⏳ තව දින {diffDays}ක් ඉතිරියි ({diffDays} Days Left)
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[10px] text-slate-400 mt-1 flex justify-between">
+                                <span>Approved: {approvedDate.toLocaleDateString()}</span>
+                                <span>Expires: {expiryDate.toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
 
                       {/* Slip preview */}

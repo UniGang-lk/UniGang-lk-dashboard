@@ -41,11 +41,19 @@ const DUMMY_UNIVERSITIES: University[] = [
 ];
 
 const UniversitiesPage = () => {
-    const [provinces, setProvinces] = useState(DUMMY_PROVINCES);
-    const [districts, setDistricts] = useState(DUMMY_DISTRICTS);
-    const [universities, setUniversities] = useState(DUMMY_UNIVERSITIES);
+    const [provinces, setProvinces] = useState<Province[]>(() => {
+        const saved = localStorage.getItem('admin_provinces');
+        return saved ? JSON.parse(saved) : DUMMY_PROVINCES;
+    });
+    const [districts, setDistricts] = useState<District[]>(() => {
+        const saved = localStorage.getItem('admin_districts');
+        return saved ? JSON.parse(saved) : DUMMY_DISTRICTS;
+    });
+    const [universities, setUniversities] = useState<University[]>(() => {
+        const saved = localStorage.getItem('admin_universities');
+        return saved ? JSON.parse(saved) : DUMMY_UNIVERSITIES;
+    });
 
-    const [loading, setLoading] = useState(false); 
     const [activeTab, setActiveTab] = useState<'provinces' | 'districts' | 'universities'>('universities'); 
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,16 +65,18 @@ const UniversitiesPage = () => {
     const [selectedProvinceId, setSelectedProvinceId] = useState<number | ''>(''); 
     const [selectedDistrictId, setSelectedDistrictId] = useState<number | ''>(''); 
 
+    // Persist to localStorage on change
     useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => {
-            setProvinces(DUMMY_PROVINCES);
-            setDistricts(DUMMY_DISTRICTS);
-            setUniversities(DUMMY_UNIVERSITIES);
-            setLoading(false);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, []);
+        localStorage.setItem('admin_provinces', JSON.stringify(provinces));
+    }, [provinces]);
+
+    useEffect(() => {
+        localStorage.setItem('admin_districts', JSON.stringify(districts));
+    }, [districts]);
+
+    useEffect(() => {
+        localStorage.setItem('admin_universities', JSON.stringify(universities));
+    }, [universities]);
 
     const getProvinceName = (id: number) => {
         return provinces.find(p => p.id === id)?.name || 'N/A';
@@ -242,11 +252,7 @@ const UniversitiesPage = () => {
                 </div>
             </div>
 
-            {loading ? (
-                <div className="text-center py-16 text-slate-400 font-bold uppercase tracking-wider text-xs animate-pulse">Loading Geographic Data...</div>
-            ) : (
-                <>
-                    {activeTab === 'universities' && (
+            {activeTab === 'universities' && (
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider">Universities List</h3>
@@ -408,8 +414,6 @@ const UniversitiesPage = () => {
                             </div>
                         </div>
                     )}
-                </>
-            )}
 
             {/* Add/Edit Modal */}
             {isModalOpen && (

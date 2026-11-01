@@ -44,7 +44,7 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
 
           {ad.image_url && (
             <div className="mb-6 relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
-              <img src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover" />
+              <img src={ad.image_url.startsWith('http') ? ad.image_url : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${ad.image_url.startsWith('/') ? '' : '/'}${ad.image_url}`} alt={ad.ad_title} className="w-full h-full object-cover" />
               <span className={`absolute bottom-3 left-3 px-3 py-1 text-[11px] font-black rounded-xl shadow-md uppercase tracking-wider flex items-center gap-1.5 border ${
                 ad.placement_type?.includes('Hero') ? 'bg-indigo-600 text-white border-indigo-400' :
                 ad.placement_type?.includes('Starter') ? 'bg-slate-900 text-white border-slate-700' :
@@ -74,7 +74,7 @@ const AdDetailModal: React.FC<AdDetailModalProps> = ({ ad, onClose }) => {
                   </div>
                   <p className="text-xs text-slate-600 font-medium">Duration: <span className="text-slate-900 font-bold">{ad.duration_days} Days</span></p>
                   {ad.target_link && (
-                    <a href={ad.target_link} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1">
+                    <a href={ad.target_link.trim().startsWith('http') ? ad.target_link.trim() : `https://${ad.target_link.trim()}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 font-semibold hover:underline mt-1 inline-flex items-center gap-1">
                       Target Link &rarr;
                     </a>
                   )}

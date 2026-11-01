@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -11,6 +11,8 @@ import {
 import AdminSidebar from './AdminSidebar';
 import { NotificationDropdown } from '../ui/NotificationDropdown';
 import { useAuth } from '../../context/AuthContext';
+import { fetchStats } from '../../api/api';
+import { subscribeToOnlineStats, type LiveOnlineStats } from '../../api/realtime';
 
 const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
   '/admin/dashboard':                 { label: 'Dashboard Overview', icon: LuLayoutDashboard },
@@ -32,9 +34,45 @@ const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [onlineStats, setOnlineStats] = useState<LiveOnlineStats>({
+    activeVisitors: 1,
+    registeredUsers: 0,
+  });
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+
+  useEffect(() => {
+    // Initial fetch from REST stats
+    let isMounted = true;
+    fetchStats()
+      .then((data) => {
+        if (isMounted && data) {
+          setOnlineStats({
+            activeVisitors: Math.max(1, data.activeVisitors ?? 1),
+            registeredUsers: data.registeredOnline ?? 0,
+          });
+        }
+      })
+      .catch(() => {
+        // Fallback gracefully
+      });
+
+    // Subscribe to live WebSockets telemetry
+    const unsubscribe = subscribeToOnlineStats((stats) => {
+      if (isMounted && stats) {
+        setOnlineStats({
+          activeVisitors: Math.max(1, stats.activeVisitors),
+          registeredUsers: stats.registeredUsers ?? 0,
+        });
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
 
   const current = pageTitles[location.pathname] || { label: 'Admin Portal', icon: LuLayoutDashboard };
   const PageIcon = current.icon;
@@ -77,8 +115,29 @@ const AdminLayout = () => {
             </motion.h1>
           </div>
 
-          {/* Right: Quick Action Button, Help, Theme, Notification, Avatar */}
+          {/* Right: Real-time Live Visitors, Quick Action Button, Help, Theme, Notification, Avatar */}
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* 🟢 Live Real-Time Online Visitors Pulse Badge 🟢 */}
+            <div
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50/80 border border-emerald-200/80 text-emerald-800 shadow-2xs cursor-default select-none transition-all hover:bg-emerald-100/70"
+              title={`Real-Time Telemetry: ${onlineStats.activeVisitors} active browser sessions (${onlineStats.registeredUsers} authenticated students)`}
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-xs"></span>
+              </span>
+              <span className="flex items-center gap-1.5 text-xs font-bold tracking-tight">
+                <span className="text-slate-900 font-extrabold text-xs">{onlineStats.activeVisitors}</span>
+                <span className="text-emerald-700 font-semibold hidden sm:inline">Live Online</span>
+                <span className="text-emerald-700 font-semibold sm:hidden">Live</span>
+              </span>
+              {onlineStats.registeredUsers > 0 && (
+                <span className="hidden md:inline-flex items-center px-1.5 py-0.2 text-[10px] font-bold rounded-md bg-emerald-600 text-white">
+                  {onlineStats.registeredUsers} auth
+                </span>
+              )}
+            </div>
+
             {/* Quick Create Action Button (Sigma style solid blue button) */}
             <button
               onClick={() => {

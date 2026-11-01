@@ -31,7 +31,15 @@ const DUMMY_NOTIFICATIONS: Notification[] = [
 ];
 
 const NotificationsPage = () => {
-  const [notifications, setNotifications] = useState<Notification[]>(DUMMY_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState<Notification[]>(() => {
+    try {
+      const saved = localStorage.getItem('the_uni_gang_admin_broadcasts');
+      if (saved) return JSON.parse(saved);
+    } catch {
+      // fallback
+    }
+    return DUMMY_NOTIFICATIONS;
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNotif, setEditingNotif] = useState<Notification | null>(null);
   
@@ -39,6 +47,16 @@ const NotificationsPage = () => {
   const [topic, setTopic] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // Persist to localStorage whenever notifications change
+  const updateNotifications = (newList: Notification[]) => {
+    setNotifications(newList);
+    try {
+      localStorage.setItem('the_uni_gang_admin_broadcasts', JSON.stringify(newList));
+    } catch {
+      // fallback
+    }
+  };
 
   const handleOpenModal = (notif?: Notification) => {
     if (notif) {
@@ -63,7 +81,7 @@ const NotificationsPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingNotif) {
-      setNotifications(notifications.map(n => n.id === editingNotif.id ? { ...n, topic, description, date } : n));
+      updateNotifications(notifications.map(n => n.id === editingNotif.id ? { ...n, topic, description, date } : n));
     } else {
       const newNotif: Notification = {
         id: Date.now(),
@@ -72,14 +90,14 @@ const NotificationsPage = () => {
         date,
         status: 'published'
       };
-      setNotifications([newNotif, ...notifications]);
+      updateNotifications([newNotif, ...notifications]);
     }
     handleCloseModal();
   };
 
   const handleDelete = (id: number) => {
     if (window.confirm('Delete this notification?')) {
-      setNotifications(notifications.filter(n => n.id !== id));
+      updateNotifications(notifications.filter(n => n.id !== id));
     }
   };
 

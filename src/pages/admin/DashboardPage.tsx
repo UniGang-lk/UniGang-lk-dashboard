@@ -2,10 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LuHouse, LuClock, LuPlus, LuMapPin, LuCircleCheck, LuCircleX, LuHourglass,
-  LuUsers, LuArrowRight, LuTrendingUp, LuShieldCheck, LuShoppingBag,
+  LuUsers, LuTrendingUp, LuShoppingBag,
   LuZap, LuServer, LuArrowUpRight, LuCheck, LuX, LuRefreshCw,
-  LuEye, LuLayers, LuSearch, LuPhone, LuImage, LuSparkles,
-  LuActivity, LuCalendar, LuBell, LuChevronRight, LuFilter
+  LuSearch, LuPhone, LuImage,
+  LuActivity, LuChevronRight
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -88,7 +88,6 @@ const DynamicAnalyticsChart = ({
 
   const generateSvgPath = (counts: number[]) => {
     const width = 500;
-    const height = 130;
     const step = width / Math.max(counts.length - 1, 1);
 
     const points = counts.map((val, idx) => {
@@ -385,7 +384,7 @@ const DashboardPage = () => {
       if (selectedPreviewItem?.id === id) {
         setSelectedPreviewItem(prev => prev ? { ...prev, status: 'Approved' } : null);
       }
-    } catch (err: any) {
+    } catch {
       toast.error('Failed to approve listing');
     } finally {
       setActionLoadingId(null);
@@ -402,7 +401,7 @@ const DashboardPage = () => {
       if (selectedPreviewItem?.id === id) {
         setSelectedPreviewItem(prev => prev ? { ...prev, status: 'Rejected' } : null);
       }
-    } catch (err: any) {
+    } catch {
       toast.error('Failed to reject listing');
     } finally {
       setActionLoadingId(null);
@@ -411,17 +410,17 @@ const DashboardPage = () => {
 
   // ─── DYNAMIC METRICS CALCULATION ─────────────────────────────────────────────
   const totalVolumeCalculated = useMemo(() => {
-    let marketSum = marketItems.reduce((acc, item) => {
+    const marketSum = marketItems.reduce((acc, item) => {
       const priceNum = parseFloat(String(item.price || 0).replace(/[^0-9.]/g, '')) || 0;
       return acc + priceNum;
     }, 0);
 
-    let annexSum = listings.reduce((acc, item) => {
+    const annexSum = listings.reduce((acc, item) => {
       const priceNum = parseFloat(String(item.price || 0).replace(/[^0-9.]/g, '')) || 0;
       return acc + priceNum;
     }, 0);
 
-    let ordersSum = ordersList.reduce((acc, item) => {
+    const ordersSum = ordersList.reduce((acc, item) => {
       const priceNum = parseFloat(String(item.totalPrice || item.price || 0).replace(/[^0-9.]/g, '')) || 0;
       return acc + priceNum;
     }, 0);
@@ -597,10 +596,28 @@ const DashboardPage = () => {
       });
     });
 
+    // Service Requests
+    serviceRequests.forEach((req) => {
+      const createdDate = req.createdAt || req.created_at;
+      const ts = createdDate ? new Date(createdDate).getTime() : Date.now();
+      const initials = (req.serviceName || 'SR').substring(0, 2).toUpperCase();
+
+      activities.push({
+        id: `service-${req.id}`,
+        student: req.user?.name || req.clientEmail || 'Campus Student',
+        initials,
+        action: 'requested student service',
+        target: req.serviceName || 'Specialist Gig',
+        time: createdDate ? new Date(createdDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently',
+        bg: 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/20',
+        timestamp: ts
+      });
+    });
+
     // Sort by timestamp descending
     activities.sort((a, b) => b.timestamp - a.timestamp);
     return activities.slice(0, 6);
-  }, [listings, marketItems, usersList, eventsList]);
+  }, [listings, marketItems, usersList, eventsList, serviceRequests]);
 
   // ─── DYNAMIC ANALYTICS CHART DATA ─────────────────────────────────────────────
   const analyticsChartData = useMemo(() => {

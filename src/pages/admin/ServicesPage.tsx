@@ -345,7 +345,7 @@ const ServicesPage = () => {
             <div className="py-12 px-6 text-center bg-rose-50 border border-rose-200 rounded-2xl text-rose-800">
               <p className="font-bold text-sm mb-4">{error}</p>
               <button 
-                onClick={loadRequests} 
+                onClick={() => { loadRequests(); }} 
                 className="px-6 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold uppercase tracking-wider text-xs transition-all shadow-xs"
               >
                 Retry Connection

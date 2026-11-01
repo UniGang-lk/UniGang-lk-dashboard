@@ -259,7 +259,7 @@ const AnnexesPage = () => {
     setCurrentView('editForm');
   };
 
-  const handleDeleteAnnex = async (annexId: number) => {
+  const handleDeleteAnnex = async (annexId: string | number) => {
     confirmAction(`Are you sure you want to delete ad #${annexId}?`, async () => {
       try {
         await deleteAnnexApi(annexId);

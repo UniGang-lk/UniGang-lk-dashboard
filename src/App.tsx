@@ -12,6 +12,7 @@ import EventsPage from './pages/admin/EventsPage';
 import ServicesPage from './pages/admin/ServicesPage';
 import BlogsPage from './pages/admin/BlogsPage';
 import ProposalsPage from './pages/admin/ProposalsPage';
+import SecurityAlerts from './pages/Proposal/SecurityAlerts';
 import ContactsPage from './pages/admin/ContactsPage';
 import NotificationsPage from './pages/admin/NotificationsPage';
 import MarketplacePage from './pages/admin/MarketplacePage';
@@ -54,7 +55,7 @@ function App() {
             <Route path="services"                    element={<PageErrorBoundary fallbackTitle="Services Section"><ServicesPage /></PageErrorBoundary>} />
             <Route path="blogs"                       element={<PageErrorBoundary fallbackTitle="Blogs Section"><BlogsPage /></PageErrorBoundary>} />
             <Route path="proposals"                   element={<PageErrorBoundary fallbackTitle="Proposals Section"><ProposalsPage /></PageErrorBoundary>} />
-            <Route path="proposals/security-alerts"   element={<PageErrorBoundary fallbackTitle="Security Alerts"><ProposalsPage /></PageErrorBoundary>} />
+            <Route path="proposals/security-alerts"   element={<PageErrorBoundary fallbackTitle="Security Alerts"><SecurityAlerts /></PageErrorBoundary>} />
             <Route path="contacts"                    element={<PageErrorBoundary fallbackTitle="Contact Inquiries"><ContactsPage /></PageErrorBoundary>} />
             <Route path="notifications"               element={<PageErrorBoundary fallbackTitle="Notifications"><NotificationsPage /></PageErrorBoundary>} />
             <Route path="marketplace"                 element={<PageErrorBoundary fallbackTitle="Marketplace"><MarketplacePage /></PageErrorBoundary>} />
