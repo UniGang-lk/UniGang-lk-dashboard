@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMail, FiLock, FiAlertCircle, FiArrowRight, FiShield } from 'react-icons/fi';
+import { FiMail, FiLock, FiAlertCircle, FiArrowRight } from 'react-icons/fi';
+import logoImage from '../assets/logoImage.jpg';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -58,14 +59,14 @@ export const LoginPage: React.FC = () => {
         className="w-full max-w-md bg-slate-900/40 backdrop-blur-2xl border border-slate-800/80 rounded-[2rem] p-8 shadow-2xl relative z-10"
       >
         <div className="text-center mb-8">
-          {/* Glowing Shield Icon */}
+          {/* Official Uni Gang Logo */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-blue-500/20"
+            className="w-16 h-16 rounded-2xl overflow-hidden p-0.5 bg-gradient-to-tr from-blue-500 to-indigo-500 mx-auto mb-5 shadow-lg shadow-blue-500/25 flex items-center justify-center border border-white/20"
           >
-            <FiShield className="text-2xl text-white" />
+            <img src={logoImage} alt="The Uni Gang" className="w-full h-full object-cover rounded-[14px]" />
           </motion.div>
           
           <h2 className="text-3xl font-extrabold text-white tracking-tight uppercase">

@@ -10,6 +10,7 @@ import {
 } from 'react-icons/lu';
 import { useAuth } from '../../context/AuthContext';
 import { fetchStats } from '../../api/api';
+import logoImage from '../../assets/logoImage.jpg';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -137,8 +138,8 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-600 to-indigo-600 p-4 text-white shadow-md shadow-blue-500/20">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center font-black text-base shadow-inner text-white">
-                UG
+              <div className="w-10 h-10 rounded-xl overflow-hidden border border-white/30 p-0.5 bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0 shadow-inner">
+                <img src={logoImage} alt="The Uni Gang" className="w-full h-full object-cover rounded-lg" />
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-black tracking-tight leading-none text-white">
