@@ -84,7 +84,7 @@ const navItems: { section: string; items: NavItem[] }[] = [
     section: 'System',
     items: [
       { label: 'Universities', icon: LuGraduationCap, path: '/admin/settings/universities' },
-      { label: 'Users', icon: LuUsers, path: '/admin/users' },
+      { label: 'Users', icon: LuUsers, path: '/admin/users', countKey: 'totalStudents' },
     ],
   },
 ];
