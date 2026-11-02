@@ -191,7 +191,14 @@ const BlogsPage = () => {
                 }`}
               >
                 <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-slate-100 border border-slate-100">
-                  <img src={blog.image} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={blog.title} />
+                  <img 
+                    src={blog.image} 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1523050853063-bd8012fec042?auto=format&fit=crop&q=80&w=1000';
+                    }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    alt={blog.title} 
+                  />
                 </div>
                 
                 <div className="flex-1 min-w-0 py-0.5">
@@ -212,7 +219,14 @@ const BlogsPage = () => {
                   <div className="flex items-center gap-3 text-slate-500 text-xs">
                     <div className="flex items-center gap-1.5">
                       {blog.authorImage ? (
-                        <img src={blog.authorImage} className="w-4 h-4 rounded-full object-cover" alt={blog.author} />
+                        <img 
+                          src={blog.authorImage} 
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                          className="w-4 h-4 rounded-full object-cover" 
+                          alt={blog.author} 
+                        />
                       ) : (
                         <LuUser size={13} className="text-blue-600" />
                       )}
@@ -245,7 +259,14 @@ const BlogsPage = () => {
               >
                 {/* Banner Image */}
                 <div className="h-44 relative bg-slate-100">
-                  <img src={selectedBlog.image} className="w-full h-full object-cover" alt="Banner" />
+                  <img 
+                    src={selectedBlog.image} 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1523050853063-bd8012fec042?auto=format&fit=crop&q=80&w=1000';
+                    }}
+                    className="w-full h-full object-cover" 
+                    alt="Banner" 
+                  />
                   <div className="absolute top-3 right-3 flex gap-2">
                      <button 
                       onClick={() => handleDelete(selectedBlog.id)}
