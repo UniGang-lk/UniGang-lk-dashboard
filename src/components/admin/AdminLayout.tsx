@@ -43,22 +43,45 @@ const AdminLayout = () => {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Initial fetch from REST stats
     let isMounted = true;
-    fetchStats()
-      .then((data) => {
-        if (isMounted && data) {
-          setOnlineStats({
-            activeVisitors: data.activeVisitors ?? 0,
-            registeredUsers: data.registeredOnline ?? 0,
-          });
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully
-      });
 
-    // Subscribe to live WebSockets telemetry
+    const syncTelemetry = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/stats/telemetry`);
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && data) {
+            setOnlineStats({
+              activeVisitors: data.activeVisitors ?? 0,
+              registeredUsers: data.registeredOnline ?? 0,
+            });
+            return;
+          }
+        }
+      } catch {
+        // Fallback to fetchStats if needed
+      }
+
+      // Fallback
+      fetchStats()
+        .then((data) => {
+          if (isMounted && data) {
+            setOnlineStats({
+              activeVisitors: data.activeVisitors ?? 0,
+              registeredUsers: data.registeredOnline ?? 0,
+            });
+          }
+        })
+        .catch(() => {});
+    };
+
+    // Initial fetch
+    syncTelemetry();
+
+    // Auto-pulse telemetry poll every 5 seconds (keeps live count 100% accurate in serverless Lambda)
+    const pollTimer = setInterval(syncTelemetry, 5000);
+
+    // Also subscribe to live WebSockets telemetry instant push
     const unsubscribe = subscribeToOnlineStats((stats) => {
       if (isMounted && stats) {
         setOnlineStats({
@@ -70,6 +93,7 @@ const AdminLayout = () => {
 
     return () => {
       isMounted = false;
+      clearInterval(pollTimer);
       unsubscribe();
     };
   }, []);
