@@ -35,7 +35,7 @@ const pageTitles: Record<string, { label: string; icon: React.ElementType }> = {
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [onlineStats, setOnlineStats] = useState<LiveOnlineStats>({
-    activeVisitors: 1,
+    activeVisitors: 0,
     registeredUsers: 0,
   });
   const location = useLocation();
@@ -49,7 +49,7 @@ const AdminLayout = () => {
       .then((data) => {
         if (isMounted && data) {
           setOnlineStats({
-            activeVisitors: Math.max(1, data.activeVisitors ?? 1),
+            activeVisitors: data.activeVisitors ?? 0,
             registeredUsers: data.registeredOnline ?? 0,
           });
         }
@@ -62,7 +62,7 @@ const AdminLayout = () => {
     const unsubscribe = subscribeToOnlineStats((stats) => {
       if (isMounted && stats) {
         setOnlineStats({
-          activeVisitors: Math.max(1, stats.activeVisitors),
+          activeVisitors: stats.activeVisitors ?? 0,
           registeredUsers: stats.registeredUsers ?? 0,
         });
       }
