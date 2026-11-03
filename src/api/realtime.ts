@@ -16,7 +16,7 @@ export const getDashboardSocket = (): Socket => {
   if (!socketInstance) {
     socketInstance = io(BASE_URL, {
       withCredentials: true,
-      transports: ['websocket', 'polling'],
+      transports: ['polling'],
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: Infinity,

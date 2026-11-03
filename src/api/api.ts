@@ -418,14 +418,22 @@ export const deleteBlog = async (id: number | string): Promise<void> => {
 
 export const fetchMyNotifications = async (): Promise<any[]> => {
   const token = await getToken();
-  const response = await fetch(`${BASE_URL}/api/notifications`, {
-    headers: {
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    }
-  });
-  if (!response.ok) throw new Error('Failed to fetch notifications');
-  const data = await response.json();
-  return data.notifications ?? [];
+  if (!token) return [];
+  try {
+    const response = await fetch(`${BASE_URL}/api/notifications`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) return [];
+    const text = await response.text();
+    if (!text || !text.trim()) return [];
+    const data = JSON.parse(text);
+    return data.notifications ?? [];
+  } catch (err) {
+    console.warn('⚠️ [Notifications] Failed to load notifications cleanly:', err);
+    return [];
+  }
 };
 
 export const markNotificationAsRead = async (id: string): Promise<any> => {
