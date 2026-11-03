@@ -49,8 +49,16 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose, onA
         {annex.images && annex.images.length > 0 && (
           <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
             {annex.images.map((img, index) => (
-              <div key={index} className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xs group">
-                <img src={img} alt={`${annex.title} - Image ${index + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div key={index} className="relative aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-xs group bg-slate-100">
+                <img
+                  src={img}
+                  alt={`${annex.title} - Image ${index + 1}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e: any) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800";
+                  }}
+                />
                 {index === 0 && <span className="absolute top-2 left-2 px-2 py-0.5 bg-blue-600 text-[10px] font-black text-white rounded-md shadow-xs">COVER</span>}
               </div>
             ))}
