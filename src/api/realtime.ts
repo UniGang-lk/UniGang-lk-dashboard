@@ -15,7 +15,7 @@ export interface LiveOnlineStats {
 export const getDashboardSocket = (): Socket => {
   if (!socketInstance) {
     socketInstance = io(BASE_URL, {
-      withCredentials: true,
+      withCredentials: false,
       transports: ['polling'],
       autoConnect: true,
       reconnection: true,
