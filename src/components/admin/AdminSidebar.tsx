@@ -194,17 +194,17 @@ const AdminSidebar = ({ isOpen, onClose }: AdminSidebarProps) => {
 
                       <span className="flex-1 text-left truncate">{item.label}</span>
 
-                      {/* Red circle notification badge when frontend has submitted requests/messages */}
+                      {/* Count badge: Users shows total count in neutral pill; Actionable items show red alert badge */}
                       {parentPendingCount > 0 && !item.children && (
                         <span
-                          className={`min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center text-[10px] font-black shadow-xs animate-pulse ${
-                            isParentActive
-                              ? 'bg-white text-rose-600'
-                              : 'bg-rose-500 text-white'
+                          className={`min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center text-[10px] font-black shadow-xs ${
+                            item.countKey === 'totalStudents'
+                              ? isParentActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                              : isParentActive ? 'bg-white text-rose-600 animate-pulse' : 'bg-rose-500 text-white animate-pulse'
                           }`}
-                          title={`${parentPendingCount} pending items require attention`}
+                          title={`${parentPendingCount} ${item.countKey === 'totalStudents' ? 'registered students' : 'pending items'}`}
                         >
-                          {parentPendingCount > 99 ? '99+' : parentPendingCount}
+                          {parentPendingCount > 999 ? '999+' : parentPendingCount}
                         </span>
                       )}
 

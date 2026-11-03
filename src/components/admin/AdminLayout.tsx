@@ -45,16 +45,42 @@ const AdminLayout = () => {
   useEffect(() => {
     let isMounted = true;
 
+    let lastSignificantTime = Date.now();
+    let smoothedVisitors = 0;
+    let smoothedRegistered = 0;
+
+    const applyStatsUpdate = (rawVisitors: number, rawRegistered: number) => {
+      if (!isMounted) return;
+      const now = Date.now();
+
+      // If active visitors reported is higher, immediately take the higher value
+      if (rawVisitors >= smoothedVisitors) {
+        smoothedVisitors = rawVisitors;
+        smoothedRegistered = rawRegistered;
+        lastSignificantTime = now;
+      } else {
+        // If reported count is lower (e.g., hitting a newly spun up Lambda container or transient disconnect),
+        // hold the active count for 12 seconds before decaying down to prevent flickering/jitter.
+        if (now - lastSignificantTime > 12000) {
+          smoothedVisitors = rawVisitors;
+          smoothedRegistered = rawRegistered;
+          lastSignificantTime = now;
+        }
+      }
+
+      setOnlineStats({
+        activeVisitors: smoothedVisitors,
+        registeredUsers: smoothedRegistered,
+      });
+    };
+
     const syncTelemetry = async () => {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/stats/telemetry`);
         if (res.ok) {
           const data = await res.json();
-          if (isMounted && data) {
-            setOnlineStats({
-              activeVisitors: data.activeVisitors ?? 0,
-              registeredUsers: data.registeredOnline ?? 0,
-            });
+          if (data) {
+            applyStatsUpdate(Number(data.activeVisitors ?? 0), Number(data.registeredOnline ?? 0));
             return;
           }
         }
@@ -65,11 +91,8 @@ const AdminLayout = () => {
       // Fallback
       fetchStats()
         .then((data) => {
-          if (isMounted && data) {
-            setOnlineStats({
-              activeVisitors: data.activeVisitors ?? 0,
-              registeredUsers: data.registeredOnline ?? 0,
-            });
+          if (data) {
+            applyStatsUpdate(Number(data.activeVisitors ?? 0), Number(data.registeredOnline ?? 0));
           }
         })
         .catch(() => {});
@@ -78,16 +101,13 @@ const AdminLayout = () => {
     // Initial fetch
     syncTelemetry();
 
-    // Auto-pulse telemetry poll every 5 seconds (keeps live count 100% accurate in serverless Lambda)
-    const pollTimer = setInterval(syncTelemetry, 5000);
+    // Auto-pulse telemetry poll every 6 seconds
+    const pollTimer = setInterval(syncTelemetry, 6000);
 
     // Also subscribe to live WebSockets telemetry instant push
     const unsubscribe = subscribeToOnlineStats((stats) => {
-      if (isMounted && stats) {
-        setOnlineStats({
-          activeVisitors: stats.activeVisitors ?? 0,
-          registeredUsers: stats.registeredUsers ?? 0,
-        });
+      if (stats) {
+        applyStatsUpdate(Number(stats.activeVisitors ?? 0), Number(stats.registeredUsers ?? 0));
       }
     });
 
