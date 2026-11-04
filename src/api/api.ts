@@ -76,9 +76,11 @@ export const fetchAnnexes = async (): Promise<any[]> => {
     campus: item.university ? item.university.name : 'Unknown',
     contactName: item.owner ? item.owner.name : 'Owner',
     contactPhone: item.owner ? item.owner.phone : '',
+    contactEmail: item.owner ? item.owner.email : '',
+    securityDeposit: item.key_money_months ? `${item.key_money_months} Months Rent` : (item.keyMoneyMonths ? `${item.keyMoneyMonths} Months Rent` : '1 Month Rent'),
     postedDate: new Date(item.createdAt).toLocaleDateString(),
     features: item.features ? item.features.map((f: any) => f.featureName) : [],
-    images: item.images ? item.images.map((img: any) => `${BASE_URL}${img.imageUrl}`) : []
+    images: item.images ? item.images.map((img: any) => typeof img === 'string' ? (img.startsWith('http') ? img : `${BASE_URL}${img}`) : (img.imageUrl?.startsWith('http') ? img.imageUrl : `${BASE_URL}${img.imageUrl}`)) : []
   }));
 };
 

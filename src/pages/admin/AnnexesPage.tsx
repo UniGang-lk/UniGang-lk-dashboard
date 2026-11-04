@@ -4,7 +4,7 @@ import { IoClose } from 'react-icons/io5';
 import {
   LuExternalLink, LuClipboardList, LuMessageSquare,
   LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight,
-  LuCheck, LuX
+  LuCheck, LuX, LuBed, LuBath, LuClock, LuShieldCheck, LuBus, LuZap, LuDroplet, LuUtensils, LuDoorOpen
 } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
 import {
@@ -102,6 +102,82 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose, onA
             <p className="text-sm font-bold text-slate-900">{annex.contactName}</p>
             <p className="text-xs font-semibold text-slate-600">{annex.contactPhone}</p>
             {annex.contactEmail && <p className="text-xs text-slate-500">{annex.contactEmail}</p>}
+          </div>
+        </div>
+
+        {/* Room & Property Specifications */}
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 mb-6">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Property & Accommodation Specifications</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuBed className="text-blue-500" /> Bed Capacity
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.beds || 1} Bed(s)</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuBath className="text-blue-500" /> Bathroom
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.bath || 'Private Bath'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuClock className="text-amber-500" /> Walk to Campus
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.walkTimeMins || annex.walk_time_mins || 5} Mins Walk</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuShieldCheck className="text-indigo-500" /> Gender Policy
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.genderPolicy || annex.gender_policy || 'Any'}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuShieldCheck className="text-emerald-500" /> Curfew & Access
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.curfewTime || annex.curfew_time || '24/7 Access'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuShieldCheck className="text-purple-500" /> Visitor Policy
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.visitorPolicy || annex.visitor_policy || 'Visitors Allowed'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white border border-slate-200/80 space-y-1 col-span-2 sm:col-span-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400 flex items-center gap-1">
+                <LuBus className="text-blue-500" /> Main Bus Route
+              </span>
+              <p className="text-xs font-bold text-slate-800">{annex.busRoute || annex.bus_route || 'Not specified'}</p>
+            </div>
+          </div>
+
+          {/* Living Specifications Pills */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
+              (annex.hasPowerBackup ?? annex.has_power_backup) ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+            }`}>
+              <LuZap size={13} /> {(annex.hasPowerBackup ?? annex.has_power_backup) ? 'Power Backup / UPS' : 'No Power Backup'}
+            </span>
+            <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
+              (annex.hasWaterTank ?? annex.has_water_tank) !== false ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+            }`}>
+              <LuDroplet size={13} /> {(annex.hasWaterTank ?? annex.has_water_tank) !== false ? '24h Water Storage' : 'No Dedicated Tank'}
+            </span>
+            <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
+              (annex.isCookingAllowed ?? annex.is_cooking_allowed) !== false ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+            }`}>
+              <LuUtensils size={13} /> {(annex.isCookingAllowed ?? annex.is_cooking_allowed) !== false ? 'Cooking Permitted' : 'Cooking Not Permitted'}
+            </span>
+            <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border flex items-center gap-1.5 ${
+              (annex.hasSeparateEntrance ?? annex.has_separate_entrance) ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-400 border-slate-200 opacity-60'
+            }`}>
+              <LuDoorOpen size={13} /> {(annex.hasSeparateEntrance ?? annex.has_separate_entrance) ? 'Separate Entrance' : 'Shared Entrance'}
+            </span>
           </div>
         </div>
 
