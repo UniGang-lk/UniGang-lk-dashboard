@@ -4,9 +4,20 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001';
 
 let socketInstance: Socket | null = null;
 
+export interface OnlineUserItem {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  profilePic?: string;
+  university?: string;
+  lastSeen?: string;
+}
+
 export interface LiveOnlineStats {
   activeVisitors: number;
   registeredUsers: number;
+  onlineUsers?: OnlineUserItem[];
 }
 
 /**

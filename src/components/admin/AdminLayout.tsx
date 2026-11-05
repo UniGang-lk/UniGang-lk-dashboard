@@ -49,7 +49,7 @@ const AdminLayout = () => {
     let smoothedVisitors = 0;
     let smoothedRegistered = 0;
 
-    const applyStatsUpdate = (rawVisitors: number, rawRegistered: number) => {
+    const applyStatsUpdate = (rawVisitors: number, rawRegistered: number, users?: any[]) => {
       if (!isMounted) return;
       const now = Date.now();
 
@@ -68,10 +68,11 @@ const AdminLayout = () => {
         }
       }
 
-      setOnlineStats({
+      setOnlineStats(prev => ({
         activeVisitors: smoothedVisitors,
         registeredUsers: smoothedRegistered,
-      });
+        onlineUsers: users !== undefined ? users : prev.onlineUsers,
+      }));
     };
 
     const syncTelemetry = async () => {
@@ -80,7 +81,7 @@ const AdminLayout = () => {
         if (res.ok) {
           const data = await res.json();
           if (data) {
-            applyStatsUpdate(Number(data.activeVisitors ?? 0), Number(data.registeredOnline ?? 0));
+            applyStatsUpdate(Number(data.activeVisitors ?? 0), Number(data.registeredOnline ?? 0), data.onlineUsers);
             return;
           }
         }

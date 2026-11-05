@@ -8,6 +8,7 @@ import {
   LuActivity, LuChevronRight
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router-dom';
+import { type OnlineUserItem } from '../../api/realtime';
 import {
   fetchStats,
   fetchAnnexes,
@@ -297,6 +298,38 @@ const DashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
+    const [onlineTelemetry, setOnlineTelemetry] = useState<{
+    activeVisitors: number;
+    registeredOnline: number;
+    onlineUsers: OnlineUserItem[];
+  }>({
+    activeVisitors: 0,
+    registeredOnline: 0,
+    onlineUsers: [],
+  });
+
+  const fetchLiveTelemetry = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}/api/stats/telemetry`);
+      if (res.ok) {
+        const data = await res.json();
+        setOnlineTelemetry({
+          activeVisitors: Number(data.activeVisitors ?? 0),
+          registeredOnline: Number(data.registeredOnline ?? 0),
+          onlineUsers: data.onlineUsers || [],
+        });
+      }
+    } catch {
+      // silent
+    }
+  };
+
+  useEffect(() => {
+    fetchLiveTelemetry();
+    const interval = setInterval(fetchLiveTelemetry, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'MODERATION' | 'ECOSYSTEM' | 'SYSTEM'>('MODERATION');
 
   const getTimeOfDayGreeting = () => {
@@ -771,6 +804,127 @@ const DashboardPage = () => {
           );
         })}
       </motion.div>
+
+      {/* ── 2.5 Live Real-Time Online Ecosystem Desk ─────────────────────────── */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-900 to-blue-950 text-white rounded-3xl p-6 sm:p-7 border border-slate-800 shadow-xl relative overflow-hidden">
+        {/* Glow Effects */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-800/80">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-lg font-black tracking-tight text-white">Live Online Presence</h3>
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 animate-pulse">
+                  Real-time Pulse
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Live visitors currently browsing and interacting with The Uni Gang platform
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 flex items-center gap-2 text-xs font-bold text-slate-300">
+              <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span>{onlineTelemetry.activeVisitors} Total Active Sessions</span>
+            </div>
+            <div className="px-3.5 py-1.5 rounded-xl bg-emerald-950/60 border border-emerald-700/50 flex items-center gap-2 text-xs font-bold text-emerald-300">
+              <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>{onlineTelemetry.registeredOnline} Authenticated Users</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Live Active Members List Grid */}
+        <div className="relative z-10 mt-5">
+          {onlineTelemetry.onlineUsers && onlineTelemetry.onlineUsers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+              {onlineTelemetry.onlineUsers.map((u) => {
+                const initials = (u.name || 'User')
+                  .split(' ')
+                  .map((n: string) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2);
+
+                const avatarUrl = u.profilePic
+                  ? (u.profilePic.startsWith('http') || u.profilePic.startsWith('data:image')
+                      ? u.profilePic
+                      : `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${u.profilePic}`)
+                  : null;
+
+                const roleBadgeColor =
+                  u.role === 'admin'
+                    ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                    : u.role === 'landlord'
+                    ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                    : 'bg-blue-500/20 text-blue-300 border-blue-500/30';
+
+                return (
+                  <div
+                    key={u.id}
+                    className="p-3.5 rounded-2xl bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 transition-all flex items-center justify-between gap-3 group"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="relative shrink-0">
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt={u.name}
+                            className="w-10 h-10 rounded-xl object-cover border border-slate-600"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-xs flex items-center justify-center shadow-xs">
+                            {initials}
+                          </div>
+                        )}
+                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-slate-900 shadow-xs"></span>
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-xs font-black text-white truncate group-hover:text-blue-400 transition-colors">
+                            {u.name || 'Student Member'}
+                          </p>
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate font-medium">
+                          {u.university || u.email || 'Campus Explorer'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border shrink-0 ${roleBadgeColor}`}>
+                      {u.role || 'Student'}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="py-8 rounded-2xl bg-slate-800/30 border border-slate-800 flex flex-col items-center justify-center text-center">
+              <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 mb-2">
+                <LuUsers size={18} />
+              </div>
+              <p className="text-xs font-bold text-slate-300">
+                {onlineTelemetry.activeVisitors > 0
+                  ? `${onlineTelemetry.activeVisitors} Anonymous guest visitor(s) currently exploring the site.`
+                  : 'Monitoring real-time traffic pulse...'}
+              </p>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Logged-in student & landlord names will automatically appear here as they browse.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* ── 3. Visual Analytics & Live System Stream Split ───────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
