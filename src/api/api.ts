@@ -80,7 +80,12 @@ export const fetchAnnexes = async (): Promise<any[]> => {
     securityDeposit: item.key_money_months ? `${item.key_money_months} Months Rent` : (item.keyMoneyMonths ? `${item.keyMoneyMonths} Months Rent` : '1 Month Rent'),
     postedDate: new Date(item.createdAt).toLocaleDateString(),
     features: item.features ? item.features.map((f: any) => f.featureName) : [],
-    images: item.images ? item.images.map((img: any) => typeof img === 'string' ? (img.startsWith('http') ? img : `${BASE_URL}${img}`) : (img.imageUrl?.startsWith('http') ? img.imageUrl : `${BASE_URL}${img.imageUrl}`)) : []
+    images: item.images ? item.images.map((img: any) => {
+      const url = typeof img === 'string' ? img : (img.imageUrl || img.url || '');
+      if (!url) return '';
+      if (url.startsWith('http') || url.startsWith('data:image')) return url;
+      return `${BASE_URL}${url}`;
+    }).filter(Boolean) : []
   }));
 };
 

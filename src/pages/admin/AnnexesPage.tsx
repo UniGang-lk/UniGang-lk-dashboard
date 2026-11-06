@@ -395,7 +395,12 @@ const AnnexesPage = () => {
           contactPhone: result.owner ? result.owner.phone : updatedData.contactPhone,
           postedDate: new Date(result.createdAt).toLocaleDateString(),
           features: result.features ? result.features.map((f: any) => f.featureName || f) : [],
-          images: result.images ? result.images.map((img: any) => typeof img === 'object' ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${img.imageUrl}` : img) : []
+          images: result.images ? result.images.map((img: any) => {
+            const url = typeof img === 'object' && img !== null ? (img.imageUrl || img.url || '') : String(img);
+            if (!url) return '';
+            if (url.startsWith('http') || url.startsWith('data:image')) return url;
+            return `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'}${url}`;
+          }).filter(Boolean) : []
         };
         setAnnexes(prev => prev.map(a => a.id === editingAnnex.id ? mappedAnnex : a));
         toast.success(`Ad #${editingAnnex.id} updated!`);
