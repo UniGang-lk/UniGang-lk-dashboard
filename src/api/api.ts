@@ -262,22 +262,23 @@ export const updateAnnex = async (id: number | string, adData: any): Promise<any
 
 export const deleteAnnex = async (id: number | string): Promise<void> => {
   const token = await getToken();
-  let response = await fetch(`${BASE_URL}/api/annexes/${id}`, {
+  
+  // Try admin deletion route first in admin dashboard
+  let response = await fetch(`${BASE_URL}/api/annexes/admin/${id}`, {
     method: 'DELETE',
     headers: {
       ...(token ? { Authorization: `Bearer ${token}` } : {})
     }
   });
 
-  // Fallback to admin route if user endpoint returned forbidden or not allowed
-  if (response.status === 403 || response.status === 404) {
-    const adminRes = await fetch(`${BASE_URL}/api/annexes/admin/${id}`, {
+  // Fallback to standard endpoint if needed
+  if (!response.ok && (response.status === 404 || response.status === 403)) {
+    response = await fetch(`${BASE_URL}/api/annexes/${id}`, {
       method: 'DELETE',
       headers: {
         ...(token ? { Authorization: `Bearer ${token}` } : {})
       }
     });
-    if (adminRes.ok) return;
   }
 
   if (!response.ok) {
