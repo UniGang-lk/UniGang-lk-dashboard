@@ -185,12 +185,19 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose, onA
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Description & Rules</p>
           <p className="text-xs text-slate-600 leading-relaxed font-medium">{annex.description}</p>
           {annex.features && annex.features.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {annex.features.map((feature, index) => (
-                <span key={index} className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-xs font-semibold">
-                  {feature}
-                </span>
-              ))}
+            <div className="space-y-1.5 pt-2 border-t border-slate-200/60">
+              <p className="text-[10px] font-black uppercase tracking-wider text-blue-600">Selected Facilities & Features ({annex.features.length})</p>
+              <div className="flex flex-wrap gap-2">
+                {annex.features.map((feature: any, index: number) => {
+                  const featName = typeof feature === 'object' && feature !== null ? (feature.feature_name || feature.featureName || '') : String(feature);
+                  return (
+                    <span key={index} className="px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                      {featName}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -394,7 +401,7 @@ const AnnexesPage = () => {
           contactName: result.owner ? result.owner.name : updatedData.contactName,
           contactPhone: result.owner ? result.owner.phone : updatedData.contactPhone,
           postedDate: new Date(result.createdAt).toLocaleDateString(),
-          features: result.features ? result.features.map((f: any) => f.featureName || f) : [],
+          features: result.features ? result.features.map((f: any) => typeof f === "object" ? (f.feature_name || f.featureName || "") : String(f)).filter(Boolean) : [],
           images: result.images ? result.images.map((img: any) => {
             const url = typeof img === 'object' && img !== null ? (img.imageUrl || img.url || '') : String(img);
             if (!url) return '';
