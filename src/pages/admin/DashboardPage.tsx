@@ -459,7 +459,7 @@ const DashboardPage = () => {
     }, 0);
 
     const grandTotal = marketSum + annexSum + ordersSum;
-    return grandTotal > 0 ? `Rs. ${grandTotal.toLocaleString()}` : 'Rs. 485,000';
+    return `Rs. ${grandTotal.toLocaleString()}`;
   }, [marketItems, listings, ordersList]);
 
   // Clean Executive Metrics without squiggly line, with ultra sleek progress indicator

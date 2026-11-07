@@ -13,23 +13,6 @@ interface Notification {
   status: 'published' | 'draft';
 }
 
-const DUMMY_NOTIFICATIONS: Notification[] = [
-  {
-    id: 1,
-    topic: 'Platform Maintenance',
-    description: 'The dashboard will be offline for 2 hours on Sunday for security updates.',
-    date: '2024-10-28',
-    status: 'published'
-  },
-  {
-    id: 2,
-    topic: 'New Blog Feature!',
-    description: 'Users can now submit their own stories through the "Voice of Campus" portal.',
-    date: '2024-10-26',
-    status: 'published'
-  }
-];
-
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState<Notification[]>(() => {
     try {
@@ -38,7 +21,7 @@ const NotificationsPage = () => {
     } catch {
       // fallback
     }
-    return DUMMY_NOTIFICATIONS;
+    return [];
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingNotif, setEditingNotif] = useState<Notification | null>(null);

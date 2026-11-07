@@ -9,23 +9,11 @@ interface Province {
     name: string;
 }
 
-const DUMMY_PROVINCES: Province[] = [
-    { id: 1, name: 'Western Province' },
-    { id: 2, name: 'Central Province' },
-    { id: 3, name: 'Southern Province' },
-];
-
 interface District {
     id: number;
     name: string;
     provinceId: number;
 }
-
-const DUMMY_DISTRICTS: District[] = [
-    { id: 1, name: 'Colombo', provinceId: 1 },
-    { id: 2, name: 'Kandy', provinceId: 2 },
-    { id: 3, name: 'Galle', provinceId: 3 },
-];
 
 interface University {
     id: number;
@@ -34,24 +22,18 @@ interface University {
     location: string;
 }
 
-const DUMMY_UNIVERSITIES: University[] = [
-    { id: 1, name: 'University of Colombo', districtId: 1, location: 'Colombo' },
-    { id: 2, name: 'University of Peradeniya', districtId: 2, location: 'Kandy' },
-    { id: 3, name: 'University of Moratuwa', districtId: 1, location: 'Moratuwa' },
-];
-
 const UniversitiesPage = () => {
     const [provinces, setProvinces] = useState<Province[]>(() => {
         const saved = localStorage.getItem('admin_provinces');
-        return saved ? JSON.parse(saved) : DUMMY_PROVINCES;
+        return saved ? JSON.parse(saved) : [];
     });
     const [districts, setDistricts] = useState<District[]>(() => {
         const saved = localStorage.getItem('admin_districts');
-        return saved ? JSON.parse(saved) : DUMMY_DISTRICTS;
+        return saved ? JSON.parse(saved) : [];
     });
     const [universities, setUniversities] = useState<University[]>(() => {
         const saved = localStorage.getItem('admin_universities');
-        return saved ? JSON.parse(saved) : DUMMY_UNIVERSITIES;
+        return saved ? JSON.parse(saved) : [];
     });
 
     const [activeTab, setActiveTab] = useState<'provinces' | 'districts' | 'universities'>('universities'); 
@@ -333,30 +315,36 @@ const UniversitiesPage = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
-                                            {districts.map(district => (
-                                                <tr key={district.id} className="hover:bg-slate-50/60 transition-colors">
-                                                    <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{district.name}</td>
-                                                    <td className="py-3 px-5 text-slate-500 text-xs font-medium">{getProvinceName(district.provinceId)}</td>
-                                                    <td className="py-3 px-5">
-                                                        <div className="flex items-center justify-center gap-1.5">
-                                                            <button
-                                                                onClick={() => handleEditItem('districts', district)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
-                                                                title="Edit"
-                                                            >
-                                                                <LuPencil size={14} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDeleteItem('districts', district.id)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
-                                                                title="Delete"
-                                                            >
-                                                                <LuTrash2 size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
+                                            {districts.length > 0 ? (
+                                                districts.map(district => (
+                                                    <tr key={district.id} className="hover:bg-slate-50/60 transition-colors">
+                                                        <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{district.name}</td>
+                                                        <td className="py-3 px-5 text-slate-500 text-xs font-medium">{getProvinceName(district.provinceId)}</td>
+                                                        <td className="py-3 px-5">
+                                                            <div className="flex items-center justify-center gap-1.5">
+                                                                <button
+                                                                    onClick={() => handleEditItem('districts', district)}
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                                                                    title="Edit"
+                                                                >
+                                                                    <LuPencil size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteItem('districts', district.id)}
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                                                                    title="Delete"
+                                                                >
+                                                                    <LuTrash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={3} className="py-16 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">No districts found</td>
                                                 </tr>
-                                            ))}
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
@@ -385,29 +373,35 @@ const UniversitiesPage = () => {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-100">
-                                            {provinces.map(province => (
-                                                <tr key={province.id} className="hover:bg-slate-50/60 transition-colors">
-                                                    <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{province.name}</td>
-                                                    <td className="py-3 px-5">
-                                                        <div className="flex items-center justify-center gap-1.5">
-                                                            <button
-                                                                onClick={() => handleEditItem('provinces', province)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
-                                                                title="Edit"
-                                                            >
-                                                                <LuPencil size={14} />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDeleteItem('provinces', province.id)}
-                                                                className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
-                                                                title="Delete"
-                                                            >
-                                                                <LuTrash2 size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </td>
+                                            {provinces.length > 0 ? (
+                                                provinces.map(province => (
+                                                    <tr key={province.id} className="hover:bg-slate-50/60 transition-colors">
+                                                        <td className="py-3 px-5 font-semibold text-slate-900 whitespace-nowrap">{province.name}</td>
+                                                        <td className="py-3 px-5">
+                                                            <div className="flex items-center justify-center gap-1.5">
+                                                                <button
+                                                                    onClick={() => handleEditItem('provinces', province)}
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition-all cursor-pointer"
+                                                                    title="Edit"
+                                                                >
+                                                                    <LuPencil size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => handleDeleteItem('provinces', province.id)}
+                                                                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all cursor-pointer border border-rose-100"
+                                                                    title="Delete"
+                                                                >
+                                                                    <LuTrash2 size={14} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            ) : (
+                                                <tr>
+                                                    <td colSpan={2} className="py-16 text-center text-slate-400 text-xs font-bold uppercase tracking-wider">No provinces found</td>
                                                 </tr>
-                                            ))}
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>

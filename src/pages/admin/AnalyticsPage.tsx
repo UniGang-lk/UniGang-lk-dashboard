@@ -3,7 +3,17 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 import { FaClipboardList, FaUserCheck, FaUsers } from "react-icons/fa";
 import { fetchStats, fetchAnnexes, fetchUsers } from '../../api/api';
 
-const DUMMY_ANALYTICS_DATA = {
+interface AnalyticsState {
+    totalUsers: number;
+    totalAnnexes: number;
+    totalAnnouncement: number;
+    annexStatus: { name: string; value: number }[];
+    annexesPerUniversity: { name: string; count: number }[];
+    annexesPerDistrict: { name: string; count: number }[];
+    monthlyNewUsers: { month: string; users: number }[];
+}
+
+const INITIAL_ANALYTICS_DATA: AnalyticsState = {
     totalUsers: 0,
     totalAnnexes: 0,
     totalAnnouncement: 0,
@@ -13,35 +23,15 @@ const DUMMY_ANALYTICS_DATA = {
         { name: 'Rejected', value: 0 },
         { name: 'Expired', value: 0 },
     ],
-    annexesPerUniversity: [
-        { name: 'Peradeniya', count: 0 },
-        { name: 'Colombo', count: 0 },
-        { name: 'Moratuwa', count: 0 },
-        { name: 'Jaffna', count: 0 },
-        { name: 'Ruhuna', count: 0 },
-    ],
-    annexesPerDistrict: [
-        { name: 'Kandy', count: 0 },
-        { name: 'Colombo', count: 0 },
-        { name: 'Gampaha', count: 0 },
-        { name: 'Galle', count: 0 },
-        { name: 'Matara', count: 0 },
-    ],
-    monthlyNewUsers: [
-        { month: 'Jan', users: 0 },
-        { month: 'Feb', users: 0 },
-        { month: 'Mar', users: 0 },
-        { month: 'Apr', users: 0 },
-        { month: 'May', users: 0 },
-        { month: 'Jun', users: 0 },
-        { month: 'Jul', users: 0 },
-    ],
+    annexesPerUniversity: [],
+    annexesPerDistrict: [],
+    monthlyNewUsers: [],
 };
 
 const COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
 
 const AnalyticsPage = () => {
-    const [analyticsData, setAnalyticsData] = useState(DUMMY_ANALYTICS_DATA);
+    const [analyticsData, setAnalyticsData] = useState<AnalyticsState>(INITIAL_ANALYTICS_DATA);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -109,9 +99,9 @@ const AnalyticsPage = () => {
                         { name: 'Rejected', value: safeAnnexes.filter(a => a.status === 'Rejected').length },
                         { name: 'Expired', value: 0 },
                     ],
-                    annexesPerUniversity: uniList.length > 0 ? uniList : DUMMY_ANALYTICS_DATA.annexesPerUniversity,
-                    annexesPerDistrict: distList.length > 0 ? distList : DUMMY_ANALYTICS_DATA.annexesPerDistrict,
-                    monthlyNewUsers: monthlyUsers.length > 0 ? monthlyUsers : DUMMY_ANALYTICS_DATA.monthlyNewUsers
+                    annexesPerUniversity: uniList,
+                    annexesPerDistrict: distList,
+                    monthlyNewUsers: monthlyUsers
                 });
             } catch (error) {
                 console.error("Failed to fetch analytics:", error);
