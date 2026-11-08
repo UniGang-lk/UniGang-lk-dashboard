@@ -7,6 +7,7 @@ import {
   LuCheck, LuX, LuBed, LuBath, LuClock, LuShieldCheck, LuBus, LuZap, LuDroplet, LuUtensils, LuDoorOpen
 } from 'react-icons/lu';
 import AnnexForm, { type AnnexData } from '../../components/annex/AnnexForm';
+import ConfirmationModal, { type ConfirmVariant } from '../../components/ui/ConfirmationModal';
 import {
   fetchAnnexes, updateAnnexStatus as updateAnnexStatusApi,
   fetchPendingReviews, approveReview as approveReviewApi,
@@ -15,7 +16,7 @@ import {
 } from '../../api/api';
 import type { Annex } from '../../types/schema';
 import { useToast } from '../../context/ToastContext';
-import { toast as hotToast } from 'react-hot-toast';
+// Toast notifications handled by ToastContext & ConfirmationModal
 
 // ðŸŒŸ Clean Light Annex Detail Modal ðŸŒŸ
 interface AnnexDetailModalProps {
@@ -30,7 +31,7 @@ const AnnexDetailModal: React.FC<AnnexDetailModalProps> = ({ annex, onClose, onA
   const isRejected = annex.status === 'Rejected' || annex.status === 'rejected';
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
       <div className="bg-white border border-slate-200 rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative p-6 sm:p-8 custom-scrollbar">
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
           <div>
@@ -243,6 +244,23 @@ const AnnexesPage = () => {
   const [editingAnnex, setEditingAnnex] = useState<Annex | null>(null);
   const [currentView, setCurrentView] = useState<'table' | 'editForm'>('table');
 
+  // Centered Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    variant: ConfirmVariant;
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    variant: 'info',
+    action: () => {}
+  });
+
   // Reviews Moderation state
   const [activeTab, setActiveTab] = useState<'ads' | 'reviews'>('ads');
   const [pendingReviews, setPendingReviews] = useState<any[]>([]);
@@ -273,26 +291,41 @@ const AnnexesPage = () => {
     }
   }, [activeTab]);
 
+  const openConfirm = (
+    message: string,
+    onConfirm: () => void,
+    options?: { title?: string; confirmText?: string; variant?: ConfirmVariant }
+  ) => {
+    let inferredVariant: ConfirmVariant = options?.variant || 'info';
+    let defaultTitle = options?.title;
+
+    if (!options?.variant) {
+      const lower = message.toLowerCase();
+      if (lower.includes('approve')) {
+        inferredVariant = 'approve';
+        if (!defaultTitle) defaultTitle = 'Approve Listing';
+      } else if (lower.includes('reject')) {
+        inferredVariant = 'reject';
+        if (!defaultTitle) defaultTitle = 'Reject Listing';
+      } else if (lower.includes('delete')) {
+        inferredVariant = 'delete';
+        if (!defaultTitle) defaultTitle = 'Delete Listing';
+      }
+    }
+
+    setConfirmModal({
+      isOpen: true,
+      title: defaultTitle || 'Confirm Action',
+      message,
+      confirmText: options?.confirmText || (inferredVariant === 'approve' ? 'Approve' : inferredVariant === 'reject' ? 'Reject' : inferredVariant === 'delete' ? 'Delete' : 'Confirm'),
+      cancelText: 'Cancel',
+      variant: inferredVariant,
+      action: onConfirm,
+    });
+  };
+
   const confirmAction = (message: string, onConfirm: () => void) => {
-    hotToast.custom((t) => (
-      <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-sm w-full bg-white border border-slate-200 shadow-2xl rounded-2xl p-5 flex flex-col gap-4 text-slate-800`}>
-        <p className="text-sm font-bold text-slate-900">{message}</p>
-        <div className="flex gap-2 justify-end">
-          <button
-            onClick={() => hotToast.dismiss(t.id)}
-            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => { hotToast.dismiss(t.id); onConfirm(); }}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
-          >
-            Confirm
-          </button>
-        </div>
-      </div>
-    ), { duration: Infinity, position: 'top-center' });
+    openConfirm(message, onConfirm);
   };
 
   useEffect(() => {
@@ -863,6 +896,22 @@ const AnnexesPage = () => {
           onReject={handleRejectAnnex}
         />
       )}
+
+      {/* Screen-Centered Action Confirmation Modal with Backdrop Blur */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.confirmText}
+        cancelText={confirmModal.cancelText}
+        variant={confirmModal.variant}
+        onConfirm={() => {
+          const fn = confirmModal.action;
+          setConfirmModal(prev => ({ ...prev, isOpen: false }));
+          if (fn) fn();
+        }}
+        onCancel={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </div>
   );
 };
