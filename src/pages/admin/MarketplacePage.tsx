@@ -11,6 +11,7 @@ import {
   createMarketItem, fetchAdminOrders, updateOrderStatus, updateMarketItem
 } from '../../api/api';
 import { AuditPanel } from '../../components/admin/AuditPanel';
+import ConfirmationModal, { type ConfirmVariant } from '../../components/ui/ConfirmationModal';
 
 const MarketplacePage = () => {
   const { toast } = useToast();
@@ -19,7 +20,6 @@ const MarketplacePage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [activeImgIndex, setActiveImgIndex] = useState(0);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | number | null>(null);
   const [activeTab, setActiveTab] = useState<'gigs' | 'products' | 'store' | 'orders' | 'audit'>('gigs');
   const [selectedAuditChatId, setSelectedAuditChatId] = useState<string | null>(null);
   const [orders, setOrders] = useState<any[]>([]);
@@ -62,20 +62,98 @@ const MarketplacePage = () => {
     return () => clearInterval(interval);
   }, [activeTab]);
 
-  const handleApprove = async (id: string | number) => {
-    try { await updateMarketItemStatus(id, 'AVAILABLE'); toast.success('Listing approved.'); loadItems(); }
-    catch (error) { console.error(error); toast.error('Failed to approve listing.'); }
+  // Centered Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    confirmText?: string;
+    variant: ConfirmVariant;
+    onConfirm: () => Promise<void> | void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'approve',
+    onConfirm: () => {},
+  });
+
+  const openConfirm = (opts: {
+    title: string;
+    description: string;
+    confirmText?: string;
+    variant?: ConfirmVariant;
+    onConfirm: () => Promise<void> | void;
+  }) => {
+    setConfirmModal({
+      isOpen: true,
+      title: opts.title,
+      description: opts.description,
+      confirmText: opts.confirmText,
+      variant: opts.variant || 'approve',
+      onConfirm: opts.onConfirm,
+    });
   };
-  const handleReject = async (id: string | number) => {
-    try { await updateMarketItemStatus(id, 'SUSPENDED'); toast.error('Listing suspended.'); loadItems(); }
-    catch (error) { console.error(error); toast.error('Failed to suspend listing.'); }
+
+  const closeConfirm = () => {
+    setConfirmModal(prev => ({ ...prev, isOpen: false }));
   };
-  const handleDelete = (id: string | number) => setConfirmDeleteId(id);
-  const executeDelete = async () => {
-    if (!confirmDeleteId) return;
-    try { await deleteMarketItem(confirmDeleteId); toast.success('Listing deleted.'); loadItems(); }
-    catch (error) { console.error(error); toast.error('Failed to delete listing.'); }
-    finally { setConfirmDeleteId(null); }
+
+  const handleApprove = (item: any) => {
+    openConfirm({
+      title: 'Approve Marketplace Listing?',
+      description: `Are you sure you want to approve "${item.title}"? It will go live immediately on The Hustle Hub.`,
+      confirmText: 'Yes, Approve Listing',
+      variant: 'approve',
+      onConfirm: async () => {
+        try {
+          await updateMarketItemStatus(item.id, 'AVAILABLE');
+          toast.success('Listing approved & published!');
+          loadItems();
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to approve listing.');
+        }
+      }
+    });
+  };
+
+  const handleReject = (item: any) => {
+    openConfirm({
+      title: 'Suspend / Reject Listing?',
+      description: `Are you sure you want to suspend "${item.title}"? It will be hidden from all students.`,
+      confirmText: 'Yes, Suspend',
+      variant: 'reject',
+      onConfirm: async () => {
+        try {
+          await updateMarketItemStatus(item.id, 'SUSPENDED');
+          toast.error('Listing suspended.');
+          loadItems();
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to suspend listing.');
+        }
+      }
+    });
+  };
+
+  const handleDelete = (item: any) => {
+    openConfirm({
+      title: 'Permanently Delete Listing?',
+      description: `This action cannot be undone. Are you sure you want to permanently delete "${item.title}"?`,
+      confirmText: 'Yes, Delete Permanently',
+      variant: 'delete',
+      onConfirm: async () => {
+        try {
+          await deleteMarketItem(item.id);
+          toast.success('Listing deleted permanently.');
+          loadItems();
+        } catch (error) {
+          console.error(error);
+          toast.error('Failed to delete listing.');
+        }
+      }
+    });
   };
   const handleUpdateOrderStatus = async (orderId: string | number, newStatus: string) => {
     try { await updateOrderStatus(orderId, newStatus); toast.success('Order status updated.'); loadOrders(); }
@@ -256,11 +334,11 @@ const MarketplacePage = () => {
                         <button onClick={() => handleEditClick(item)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all cursor-pointer border-none"><FaEdit className="text-xs" /></button>
                         {item.type === 'GIG' && <button onClick={() => { if (item.chats?.length > 0) { setSelectedAuditChatId(item.chats[0].id); setActiveTab('audit'); } else toast.error('No chat sessions.'); }} className="w-7 h-7 rounded-lg flex items-center justify-center bg-rose-50 text-rose-500 hover:bg-rose-100 transition-all cursor-pointer border-none"><FaHistory className="text-xs" /></button>}
                         {activeTab !== 'store' && (<>
-                          {(item.status === 'PENDING_VERIFICATION' || item.status === 'PENDING') && (<><button onClick={() => handleApprove(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-500 hover:bg-emerald-100 transition-all border-none cursor-pointer"><FaCheckCircle className="text-xs" /></button><button onClick={() => handleReject(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all border-none cursor-pointer"><FaTimesCircle className="text-xs" /></button></>)}
-                          {item.status === 'AVAILABLE' && <button onClick={() => handleReject(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all border-none cursor-pointer"><FaTimesCircle className="text-xs" /></button>}
-                          {item.status === 'SUSPENDED' && <button onClick={() => handleApprove(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-500 hover:bg-emerald-100 transition-all border-none cursor-pointer"><FaCheckCircle className="text-xs" /></button>}
+                          {(item.status === 'PENDING_VERIFICATION' || item.status === 'PENDING') && (<><button onClick={() => handleApprove(item)} title="Approve Listing" className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-500 hover:bg-emerald-100 transition-all border-none cursor-pointer"><FaCheckCircle className="text-xs" /></button><button onClick={() => handleReject(item)} title="Suspend Listing" className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all border-none cursor-pointer"><FaTimesCircle className="text-xs" /></button></>)}
+                          {item.status === 'AVAILABLE' && <button onClick={() => handleReject(item)} title="Suspend Listing" className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-50 text-amber-500 hover:bg-amber-100 transition-all border-none cursor-pointer"><FaTimesCircle className="text-xs" /></button>}
+                          {item.status === 'SUSPENDED' && <button onClick={() => handleApprove(item)} title="Approve Listing" className="w-7 h-7 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-500 hover:bg-emerald-100 transition-all border-none cursor-pointer"><FaCheckCircle className="text-xs" /></button>}
                         </>)}
-                        <button onClick={() => handleDelete(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-100 transition-all border-none cursor-pointer"><FaTrash className="text-xs" /></button>
+                        <button onClick={() => handleDelete(item)} title="Delete Listing" className="w-7 h-7 rounded-lg flex items-center justify-center bg-red-50 text-red-400 hover:bg-red-100 transition-all border-none cursor-pointer"><FaTrash className="text-xs" /></button>
                       </div></td>
                     </tr>
                   )) : <tr><td colSpan={activeTab === 'store' ? 4 : 5} className="py-16 text-center text-slate-400 text-sm">No marketplace items found.</td></tr>
@@ -285,19 +363,6 @@ const MarketplacePage = () => {
                 )}
               </tbody>
             </table>
-          </div>
-        </div>
-      )}
-
-      {confirmDeleteId && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md p-6 bg-white border border-slate-200 rounded-2xl shadow-xl">
-            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete Listing</h3>
-            <p className="text-slate-500 text-sm mb-6">Are you sure? This action cannot be undone.</p>
-            <div className="flex justify-end gap-3">
-              <button onClick={() => setConfirmDeleteId(null)} className="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border-none cursor-pointer">Cancel</button>
-              <button onClick={executeDelete} className="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg border-none cursor-pointer">Delete</button>
-            </div>
           </div>
         </div>
       )}
@@ -470,6 +535,17 @@ const MarketplacePage = () => {
           </div>
         </div>
       )}
+
+      {/* Screen-Centered Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        onCancel={closeConfirm}
+        onConfirm={confirmModal.onConfirm}
+        title={confirmModal.title}
+        message={confirmModal.description}
+        confirmText={confirmModal.confirmText}
+        variant={confirmModal.variant}
+      />
     </div>
   );
 };
