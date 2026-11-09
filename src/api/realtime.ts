@@ -27,12 +27,12 @@ export const getDashboardSocket = (): Socket => {
   if (!socketInstance) {
     socketInstance = io(BASE_URL, {
       withCredentials: false,
-      transports: ['polling'],
+      transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 2000,
+      reconnectionDelayMax: 10000,
       timeout: 20000,
     });
 
