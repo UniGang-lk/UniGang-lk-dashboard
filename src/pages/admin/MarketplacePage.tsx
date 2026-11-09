@@ -12,6 +12,7 @@ import {
 } from '../../api/api';
 import { AuditPanel } from '../../components/admin/AuditPanel';
 import ConfirmationModal, { type ConfirmVariant } from '../../components/ui/ConfirmationModal';
+import { getDashboardSocket } from '../../api/realtime';
 
 const MarketplacePage = () => {
   const { toast } = useToast();
@@ -50,16 +51,31 @@ const MarketplacePage = () => {
   };
 
   useEffect(() => {
-    const poll = () => {
+    if (activeTab === 'orders') {
+      loadOrders();
+    } else {
+      loadItems();
+    }
+
+    // Socket-driven instant live sync
+    const socket = getDashboardSocket();
+    const handleMarketSync = () => {
+      if (activeTab !== 'orders') {
+        loadItems(true);
+      }
+    };
+    socket.on('market_updated', handleMarketSync);
+
+    // Fallback polling relaxed to 25s (prevents heavy constant DB polling)
+    const interval = setInterval(() => {
       if (activeTab === 'orders') loadOrders(true);
       else loadItems(true);
+    }, 25000);
+
+    return () => {
+      socket.off('market_updated', handleMarketSync);
+      clearInterval(interval);
     };
-
-    if (activeTab === 'orders') loadOrders();
-    else loadItems();
-
-    const interval = setInterval(poll, 5000);
-    return () => clearInterval(interval);
   }, [activeTab]);
 
   // Centered Confirmation Modal State
@@ -109,6 +125,8 @@ const MarketplacePage = () => {
         try {
           await updateMarketItemStatus(item.id, 'AVAILABLE');
           toast.success('Listing approved & published!');
+          closeConfirm();
+          setSelectedItem(null);
           loadItems();
         } catch (error) {
           console.error(error);
@@ -128,6 +146,8 @@ const MarketplacePage = () => {
         try {
           await updateMarketItemStatus(item.id, 'SUSPENDED');
           toast.error('Listing suspended.');
+          closeConfirm();
+          setSelectedItem(null);
           loadItems();
         } catch (error) {
           console.error(error);
@@ -147,6 +167,8 @@ const MarketplacePage = () => {
         try {
           await deleteMarketItem(item.id);
           toast.success('Listing deleted permanently.');
+          closeConfirm();
+          setSelectedItem(null);
           loadItems();
         } catch (error) {
           console.error(error);
@@ -404,11 +426,40 @@ const MarketplacePage = () => {
                   <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{selectedItem.description}</p>
                 </div>
               </div>
-              <div className="border-t border-slate-100 pt-5">
-                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Merchant Information</h4>
-                <div className="flex items-center gap-3">
-                  <img src={selectedItem.seller?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedItem.seller?.name || 'Seller')}`} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
-                  <div><h5 className="text-sm font-semibold text-slate-900">{selectedItem.seller?.name || 'Official Store'}</h5><p className="text-xs text-slate-500">{selectedItem.seller?.email || 'store@unigung.lk'}</p></div>
+              <div className="border-t border-slate-100 pt-5 space-y-4">
+                <div>
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Merchant Information</h4>
+                  <div className="flex items-center gap-3">
+                    <img src={selectedItem.seller?.profile_pic || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(selectedItem.seller?.name || 'Seller')}`} alt="" className="w-10 h-10 rounded-full object-cover border border-slate-200" />
+                    <div><h5 className="text-sm font-semibold text-slate-900">{selectedItem.seller?.name || 'Official Store'}</h5><p className="text-xs text-slate-500">{selectedItem.seller?.email || 'store@unigung.lk'}</p></div>
+                  </div>
+                </div>
+
+                {/* Quick Moderation Actions */}
+                <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                  {selectedItem.status !== 'AVAILABLE' && (
+                    <button
+                      onClick={() => handleApprove(selectedItem)}
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shadow-sm"
+                    >
+                      <FaCheckCircle className="w-3.5 h-3.5" /> Approve & Publish
+                    </button>
+                  )}
+                  {selectedItem.status === 'AVAILABLE' && (
+                    <button
+                      onClick={() => handleReject(selectedItem)}
+                      className="flex-1 py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer transition shadow-sm"
+                    >
+                      <FaTimesCircle className="w-3.5 h-3.5" /> Suspend
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleDelete(selectedItem)}
+                    className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs flex items-center justify-center cursor-pointer transition"
+                    title="Delete listing"
+                  >
+                    <FaTrash className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             </div>
