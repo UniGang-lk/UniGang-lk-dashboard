@@ -356,7 +356,7 @@ export const fetchServiceMessages = async (id: string): Promise<any[]> => {
   });
   if (!response.ok) throw new Error('Failed to fetch service messages');
   const data = await response.json();
-  return data.data ?? [];
+  return Array.isArray(data) ? data : (data?.data ?? []);
 };
 
 // @desc  Add a message to a service request
@@ -375,7 +375,7 @@ export const addServiceMessage = async (id: string, message: string): Promise<an
     throw new Error(err.message || 'Failed to add service message');
   }
   const data = await response.json();
-  return data.data;
+  return data?.data ?? data;
 };
 
 // ─── BLOGS CONSOLE ENDPOINTS ────────────────────────────────────────

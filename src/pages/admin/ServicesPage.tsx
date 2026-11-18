@@ -92,7 +92,9 @@ const ServicesPage = () => {
     if (!selectedRequest || !newMessageText.trim()) return;
     try {
       const sent = await addServiceMessage(selectedRequest.id, newMessageText);
-      setMessages([...messages, sent]);
+      if (sent) {
+        setMessages((prev) => [...prev, sent]);
+      }
       setNewMessageText('');
     } catch (err) {
       console.error(err);
@@ -572,11 +574,11 @@ const ServicesPage = () => {
                           No comments yet. Send a note to start chat.
                         </div>
                       ) : (
-                        messages.map((msg) => {
-                          const isAdmin = msg.senderType === 'admin';
+                        messages.filter(Boolean).map((msg) => {
+                          const isAdmin = msg.senderType === 'admin' || msg.sender_type === 'admin';
                           return (
                             <div
-                              key={msg.id}
+                              key={msg.id || Math.random()}
                               className={`flex flex-col max-w-[85%] ${isAdmin ? 'self-end items-end text-right' : 'self-start items-start text-left'}`}
                             >
                               <span className="text-[8px] font-bold text-slate-400 mb-0.5 px-1">
